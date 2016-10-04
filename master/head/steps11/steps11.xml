@@ -7,7 +7,7 @@
     <bibliorelation role="x-no-errata" type="references" xlink:href="http://www.w3.org/XML/2010/xproc-errata.html">errata</bibliorelation>
     <bibliorelation role="x-no-translations" type="references" xlink:href="http://www.w3.org/2003/03/Translations/byTechnology?technology=xproc">translations</bibliorelation>
 
-    <bibliorelation type="isformatof" xlink:href="xproc20-steps.xml">XML</bibliorelation>
+    <bibliorelation type="isformatof" xlink:href="steps11.xml">XML</bibliorelation>
 <!--
     <bibliorelation type="isformatof" xlink:href="changelog.html">ChangeLog</bibliorelation>
 -->
