@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0: Standard Step Library</title><meta charset="utf-8" /><link rel="alternate" title="XML" href="steps30.xml" /><link rel="alternate" title="Latest editor's draft" href="http://www.w3.org/XML/XProc/docs/langspec.html" /><link rel="alternate" title="Latest Public Working Draft" href="http://www.w3.org/TR/xproc/" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="base.css" /><link rel="stylesheet" type="text/css" href="xproc.css" /><link rel="stylesheet" type="text/css" href="http://www.w3.org/StyleSheets/TR/base.css" /><link rel="stylesheet" type="text/css" href="base.css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="specification"><div class="head" id="spec.head"><h1>XProc 3.0: Standard Step Library</h1><h2>Editor's Draft  <time datetime="2017-09-27T19:32:25Z">27 September 2017 at 19:32 UTC (<a href="https://github.com/ndw/3.0-specification/commit/403106078795650403aa2d54b95157879b3a40a0">build 53</a>)</time></h2><dl><dt>This Version:</dt><dd><a href="https://ndw.github.io/3.0-specification/iss-85-doc-prop/head/steps30/">https://ndw.github.io/3.0-specification/iss-85-doc-prop/head/steps30</a></dd><dt>Latest Version:</dt><dd><a href="http://spec.xproc.org/master/head/steps30/">http://spec.xproc.org/master/head/steps30/</a></dd><dt>Editors:</dt><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Norman Walsh</span></dd><dt>Repository:</dt><dd><a href="http://github.com/ndw/3.0-specification">This specification on GitHub</a></dd><dd><a href="http://github.com/xproc/3.0-specification/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="http://github.com/ndw/3.0-specification/commits/iss-85-doc-prop">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="steps30.xml">XML</a>.</p><p class="copyright">Copyright © 2016 FIXME:</p><hr /><div class="abstract"><h2>Abstract</h2>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0: Standard Step Library</title><meta charset="utf-8" /><link rel="alternate" title="XML" href="steps30.xml" /><link rel="alternate" title="Latest editor's draft" href="http://www.w3.org/XML/XProc/docs/langspec.html" /><link rel="alternate" title="Latest Public Working Draft" href="http://www.w3.org/TR/xproc/" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="base.css" /><link rel="stylesheet" type="text/css" href="xproc.css" /><link rel="stylesheet" type="text/css" href="http://www.w3.org/StyleSheets/TR/base.css" /><link rel="stylesheet" type="text/css" href="base.css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="specification"><div class="head" id="spec.head"><h1>XProc 3.0: Standard Step Library</h1><h2>Editor's Draft  <time datetime="2017-09-28T06:31:51Z">28 September 2017 at 06:31 UTC (<a href="https://github.com/ndw/3.0-specification/commit/310de415569c4d8bbfe99ccdddda4ccee6586eee">build 56</a>)</time></h2><dl><dt>This Version:</dt><dd><a href="https://ndw.github.io/3.0-specification/iss-85-doc-prop/head/steps30/">https://ndw.github.io/3.0-specification/iss-85-doc-prop/head/steps30</a></dd><dt>Latest Version:</dt><dd><a href="http://spec.xproc.org/master/head/steps30/">http://spec.xproc.org/master/head/steps30/</a></dd><dt>Editors:</dt><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Norman Walsh</span></dd><dt>Repository:</dt><dd><a href="http://github.com/ndw/3.0-specification">This specification on GitHub</a></dd><dd><a href="http://github.com/xproc/3.0-specification/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="http://github.com/ndw/3.0-specification/commits/iss-85-doc-prop">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="steps30.xml">XML</a>.</p><p class="copyright">Copyright © 2016 FIXME:</p><hr /><div class="abstract"><h2>Abstract</h2>
   <p>This specification describes the standard step vocabulary of
   <em class="citetitle">XProc 3.0: An XML Pipeline Language</em>.</p>
 </div><div class="status"><h2>Status of this Document</h2><p><strong>This document is an editor's  draft that has no official standing.</strong></p>
@@ -1789,7 +1789,7 @@ of the element <span class="rfc2119" id="c.set-attributes.9.2">must</span> also 
 <p>The <code class="tag-element">p:set-properties</code> step sets <em class="glossterm"><a href="../xproc30/#dt-document-properties">document
 properties</a><sup class="xrefspec"><a href="../xproc30/">XP</a></sup></em> on the source document.</p>
 
-<p class="element-syntax element-syntax-declare-step-rqd"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:set-properties</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">source</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">*/*</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">*/*</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-req"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">properties</code><code>"</code> <code class="attr required-attr">required</code><code>="</code><code class="value required-value">true</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item())</code><code>"</code><code>/&gt;</code><code></code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
+<p class="element-syntax element-syntax-declare-step-rqd"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:set-properties</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">source</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">*/*</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">*/*</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-req"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">properties</code><code>"</code> <code class="attr required-attr">required</code><code>="</code><code class="value required-value">true</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item())</code><code>"</code><code>/&gt;</code><code></code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">merge</code><code>"</code> <code class="attr default-attr">default</code><code>="</code><code class="value default-value">false()</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:boolean</code><code>"</code><code>/&gt;</code><code>    </code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
 
  <p>The <em class="glossterm"><a href="../xproc30/#dt-document-properties">document properties</a><sup class="xrefspec"><a href="../xproc30/">XP</a></sup></em> of the document
 on the <code class="port">source</code> port are augmented with the values specified
@@ -1797,16 +1797,22 @@ in the <code class="option">properties</code> option. The document produced on
 the <code class="port">result</code> port has the same representation but the
 adjusted property values.</p>
 
+<p>If the <code class="option">merge</code>
+option is true, then the supplied properties are added to the existing
+properties. If it is false, the document’s properties are replaced by
+the new set.</p>
+
 <p><a id="err.inline.C1001"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic
 error</a></em> (<a href="#err.C1001"><code class="errqname">err:XC1001</code></a>) if the <code class="option">properties</code> map contains
 a key equal to the string “<code class="literal">content-type</code>”.
 </p>
 
-<section id="c.set-properties.6" class="section"><div class="section-titlepage"><h5>1.1.23.1 Document properties</h5></div>
+<section id="c.set-properties.7" class="section"><div class="section-titlepage"><h5>1.1.23.1 Document properties</h5></div>
 
-<p>No document properties
-are preserved. The resulting document has the properties specified in
-the <code class="tag-attribute">properties</code> option.
+<p>If <code class="option">merge</code> is
+true, document properties not overridden by settings in the <code class="option">properties</code>
+map are  preserved, otherwise the resulting document has the properties specified in
+the <code class="option">properties</code> map.
 </p>
 </section>
 </section>
@@ -1870,7 +1876,7 @@ any annotations that appear in the input.</p>
 
 <section id="c.split-sequence.10" class="section"><div class="section-titlepage"><h5>1.1.25.1 Document properties</h5></div>
 
-<p>No document properties are preserved.</p>
+<p>All document properties are preserved.</p>
 </section>
 </section>
 <section id="c.store" class="section"><div class="section-titlepage"><h4>1.1.26 p:store</h4></div>
@@ -2438,7 +2444,7 @@ and will be returned as escaped text.</p>
 <p id="cv.line">If <code class="option">wrap-result-lines</code> is
 true, a <a href="#cv.line"><code class="tag-element">c:line</code></a> element will be wrapped around each line of output.</p>
 
-<p id="d1926e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:line&gt;<br />    <var>string</var><br />&lt;/c:line&gt;</code></p>
+<p id="d1929e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:line&gt;<br />    <var>string</var><br />&lt;/c:line&gt;</code></p>
 
 <p><a id="err.inline.C0035"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic
 error</a></em> (<a href="#err.C0035"><code class="errqname">err:XC0035</code></a>) to specify both <code class="option">result-is-xml</code> and
@@ -3192,7 +3198,7 @@ is empty.</p>
 <ul><li>
 <p>If the document root element is <a href="#cv.query"><code id="cv.query" class="tag-element">c:query</code></a>, the text
 descendants of this element are considered the query.</p>
-<p id="d2289e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:query&gt;<br />    <var>string</var><br />&lt;/c:query&gt;</code></p>
+<p id="d2292e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:query&gt;<br />    <var>string</var><br />&lt;/c:query&gt;</code></p>
 </li><li>
 <p>If the document root element is in the XQueryX namespace, the
 document is treated as an XQueryX-encoded query. <span id="impl-26">Support for
