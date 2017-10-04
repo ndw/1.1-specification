@@ -2827,6 +2827,11 @@ the summaries:</para><itemizedlist>
           </para>
         </listitem>
         <listitem>
+          <para><error code="S0077">It is a <glossterm>static error</glossterm> if the value on an 
+            attribute of an XProc element does not satisfy the type required for that attribute.</error>
+          </para>
+        </listitem>
+        <listitem>
           <para><error code="D0028">It is a <glossterm>dynamic error</glossterm> if any attribute
               value does not satisfy the type required for that attribute.</error></para>
         </listitem>
@@ -4076,7 +4081,7 @@ specified options are allowed.</para>
 
 <para>For XML outputs, see <xref linkend="xml-serialization"/>.
 For non-XML outputs, see <xref linkend="non-xml-serialization"/>.
-<error code="S0077">It is a <glossterm>static error</glossterm> if the
+<error code="D0041">It is a <glossterm>dynamic error</glossterm> if the
 map contains any property name not recognized as a serialization
 parameter.</error></para>
 
