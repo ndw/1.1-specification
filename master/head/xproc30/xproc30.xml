@@ -286,8 +286,10 @@ one input with respect to some set of XML Schemas, etc.</para>
             <firstterm>subpipeline</firstterm>.</termdef>
         <termdef xml:id="dt-last-step">The <firstterm>last step</firstterm> in a subpipeline is its
           last step in document order.</termdef></para>
+
       <para xml:id="p.subpipeline" role="element-syntax element-syntax-language-construct hanging-indent">
-        <code>subpipeline</code> = <tag>p:variable</tag>*, (<tag>p:for-each</tag>|<tag>p:viewport</tag>|<tag>p:choose</tag>|<tag>p:group</tag>|<tag>p:try</tag>|<code xlink:href="#p.atomic">p:<replaceable>standard-step</replaceable></code>|<code xlink:href="#p.atomic"><replaceable>pfx:user-pipeline</replaceable></code>)+ </para>
+        <code>subpipeline</code> = (<tag>p:variable</tag>|<tag>p:for-each</tag>|<tag>p:viewport</tag>|<tag>p:choose</tag>|<tag>p:if</tag>|<tag>p:group</tag>|<tag>p:try</tag>|<code xlink:href="#p.atomic">p:<replaceable>standard-step</replaceable></code>|<code xlink:href="#p.atomic"><replaceable>pfx:user-pipeline</replaceable></code>)+ </para>
+
       <note xml:id="note-udp">
         <para>User-defined pipelines (identified with
               <code><replaceable>pfx:user-pipeline</replaceable></code> in the preceding syntax
@@ -2663,15 +2665,26 @@ or collections.</error>
 </para>
 </section>
 
-<section xml:id="syntax-summaries"><title>Syntax Summaries</title><para>The description of each
-        element in the pipeline namespace is accompanied by a syntactic summary that provides a
-        quick overview of the element's syntax:</para>
+<section xml:id="syntax-summaries"><title>Syntax Summaries</title>
+
+<para>The description of each element in the pipeline namespace is
+accompanied by a syntactic summary that provides a quick overview of
+the element's syntax:</para>
+
       <e:rng-fragment name="SomeElement" role="nosummary">
         <grammar xmlns="http://relaxng.org/ns/structure/1.0">
           <define xmlns:sa="http://xproc.org/ns/syntax-annotations" name="SomeElement" sa:class="language-example">
             <element name="some-element">
+              <attribute name="reqd-attribute">
+                <data type="some-type"/>
+              </attribute>
               <optional>
                 <attribute name="some-attribute">
+                  <data type="some-type"/>
+                </attribute>
+              </optional>
+              <optional>
+                <attribute name="avt-attribute" sa:avt="true">
                   <data type="some-type"/>
                 </attribute>
               </optional>
@@ -2724,6 +2737,13 @@ or collections.</error>
         <listitem>
           <para>An element or group followed by a plus (“+”) is required and may be repeated; it
             must occur at least once, and it can occur any number of times. </para>
+        </listitem>
+        <listitem>
+          <para>Required attributes are bold. Optional attributes are followed by a question mark.</para>
+        </listitem>
+        <listitem>
+          <para>If an attribute value is an attribute value template, its type is shown
+          in curly brackets: “<code>{ some-type }</code>”.</para>
         </listitem>
 
 </itemizedlist>
@@ -4330,10 +4350,14 @@ the value of the variable.</para>
 
 <e:rng-pattern name="VariableSelect"/>
 
-<para>If a <tag class="attribute">select</tag> expression is given, it
+<para>The <tag class="attribute">select</tag> expression
 is evaluated as an XPath expression using the appropriate context as
 described in <xref linkend="xpath-context"/>, for the enclosing
-<glossterm>container</glossterm>.</para>
+<glossterm>container</glossterm>.
+<impl>The precise details about what XPath expressions are allowed
+(for example, can the expression declare a function) is
+<glossterm>implementation-defined</glossterm>.</impl>
+</para>
 
 <para>The type of the value may be specified in the <tag class="attribute">as</tag> attribute using an XPath Sequence
 Type<superscript>[citation needed]</superscript>. If an atomic type,
@@ -4483,7 +4507,7 @@ has not declared an option with that name.</error>
 is operating in
 <link linkend="vers-forwcomp">forwards-compatible mode</link>.)</para>
 
-<para><error code="S0004">It is a <glossterm>static error</glossterm>
+<para><error code="S0080">It is a <glossterm>static error</glossterm>
 to include more than one <tag>p:with-option</tag> with the same option
 name as part of the same step invocation.</error></para>
 
@@ -4908,12 +4932,15 @@ step.</error>
 
 <e:rng-pattern name="Inline"/>
 
-<para>The <tag class="attribute">document-properties</tag> attribute can 
-  be used to set the <glossterm>document properties</glossterm> of the provided document. The document's 
-  content type is determined by the value of the "content-type" key in the provided map.
-  If no attribute <tag class="attribute">document-properties</tag> is provided or the provided map does not
-  contain a "content-type" key, the value "<literal>application/xml</literal>" is assumed.
+<para>The <tag class="attribute">document-properties</tag> attribute
+can be used to set the <glossterm>document properties</glossterm> of
+the provided document. The document's content type is determined by
+the value of the "content-type" key in the provided map. If no
+attribute <tag class="attribute">document-properties</tag> is provided
+or the provided map does not contain a "content-type" key, the value
+"<literal>application/xml</literal>" is assumed.
 </para>
+
 <para>How the content of a <tag>p:inline</tag> element is interpreted
 depends on the document's content type and the <tag class="attribute">encoding</tag> attribute.
 </para>
@@ -5135,10 +5162,10 @@ effect.)</para>
 <section xml:id="implicit-inlines">
 <title>Implicit inlines</title>
 
-<para>As an authoring convenience, if a single element node,
-optionally preceded and/or followed by whitespace, in any namespace other
-than the XProc namespace, occurs where a <tag>p:inline</tag> is
-allowed, it is treated as if it was enclosed within a
+<para>As an authoring convenience, if one or more element nodes,
+optionally preceded and/or followed by whitespace, in any namespace
+other than the XProc namespace, occurs where a <tag>p:inline</tag> is
+allowed, each is treated as if it was enclosed within a
 <tag>p:inline</tag> element (with no attributes). Any preceding or
 following whitespace is discarded.</para>
 
@@ -5147,6 +5174,7 @@ following whitespace is discarded.</para>
 <programlisting language="xml">&lt;p:identity name="identity" code="my:implicitinline1"&gt;
     &lt;p:with-input port="source"&gt;
         &lt;para xmlns="http://docbook.org/ns/docbook"&gt;Some text&lt;/para&gt;
+        &lt;para xmlns="http://docbook.org/ns/docbook"&gt;Some other text&lt;/para&gt;
     &lt;/p:with-input&gt;
 &lt;/p:identity&gt;</programlisting>
 
@@ -5155,12 +5183,18 @@ following whitespace is discarded.</para>
 <programlisting language="xml">&lt;p:identity name="identity" code="my:implicitinline2"&gt;
     &lt;p:with-input port="source"&gt;
         &lt;p:inline&gt;&lt;para xmlns="http://docbook.org/ns/docbook"&gt;Some text&lt;/para&gt;&lt;/p:inline&gt;
+        &lt;p:inline&gt;&lt;para xmlns="http://docbook.org/ns/docbook"&gt;Some other text&lt;/para&gt;&lt;/p:inline&gt;
     &lt;/p:with-input&gt;
 &lt;/p:identity&gt;</programlisting>
 
 <para>An explicit <tag>p:inline</tag> is required if the author
 wants to include top level comments, processing instructions, or whitespace,
 or if the document element is in the XProc namespace.</para>
+
+<para><error code="S00xx">It is a <glossterm>static error</glossterm>
+if comments or processing instructions occur as siblings of an element node
+that would be treated as an implicit inline.</error>
+</para>
 </section>
 </section>
 
