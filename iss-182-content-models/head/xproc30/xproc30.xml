@@ -288,7 +288,7 @@ one input with respect to some set of XML Schemas, etc.</para>
           last step in document order.</termdef></para>
 
       <para xml:id="p.subpipeline" role="element-syntax element-syntax-language-construct hanging-indent">
-        <code>subpipeline</code> = (<tag>p:variable</tag>|<tag>p:for-each</tag>|<tag>p:viewport</tag>|<tag>p:choose</tag>|<tag>p:group</tag>|<tag>p:try</tag>|<code xlink:href="#p.atomic">p:<replaceable>standard-step</replaceable></code>|<code xlink:href="#p.atomic"><replaceable>pfx:user-pipeline</replaceable></code>)+ </para>
+        <code>subpipeline</code> = (<tag>p:variable</tag>|<tag>p:for-each</tag>|<tag>p:viewport</tag>|<tag>p:choose</tag>|<tag>p:if</tag>|<tag>p:group</tag>|<tag>p:try</tag>|<code xlink:href="#p.atomic">p:<replaceable>standard-step</replaceable></code>|<code xlink:href="#p.atomic"><replaceable>pfx:user-pipeline</replaceable></code>)+ </para>
 
       <note xml:id="note-udp">
         <para>User-defined pipelines (identified with
