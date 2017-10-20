@@ -164,10 +164,7 @@ Input =
       primary.attr?,
       content-types.attr?,
       select.attr?,
-      [ sa:avt = "true" ]
-         href.attr?,
-      [ sa:avt = "true" ]
-         pipe.attr?,
+      href.attr?,
       common.attributes,
       inline.attributes,
       use-when.attr?,
