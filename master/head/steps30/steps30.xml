@@ -296,7 +296,7 @@ of its input.</para>
 </p:declare-step>
 
 <para>The input document is transformed from one media type to another.
-<error code="C1002">It is a <glossterm>dynamic
+<error code="C0070">It is a <glossterm>dynamic
 error</glossterm> if the supplied <option>content-type</option> is not
 a valid media type of the form
 “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”.</error></para>
@@ -327,13 +327,13 @@ a <tag>c:data</tag> document. The resulting document will
 have the specified media type and a <glossterm>representation</glossterm> that
 is the content of the <tag>c:data</tag> element after decoding the base64
 encoded content.</para>
-<para><error code="C1004">It is a <glossterm>dynamic
+<para><error code="C0072">It is a <glossterm>dynamic
 error</glossterm> if the <tag>c:data</tag> contains content is not
 a valid base64 string.</error></para>
-<para><error code="C1005">It is a <glossterm>dynamic
+<para><error code="C0073">It is a <glossterm>dynamic
 error</glossterm> if the <tag>c:data</tag> element does not have
 a <tag class="attribute">content-type</tag> attribute.</error></para>
-<para><error code="C1006">It is a <glossterm>dynamic
+<para><error code="C0074">It is a <glossterm>dynamic
 error</glossterm> if the <option>content-type</option> is supplied and is
 not the same as the <tag class="attribute">content-type</tag> specified on
 the <tag>c:data</tag> element.</error>
@@ -345,13 +345,13 @@ the input document is not a <tag>c:data</tag> document is
 <listitem>
 <para><impl>What happens when one non-XML media type is cast to another
 non-XML media type is <glossterm>implementation-defined</glossterm>.</impl>
-<error code="C1003">It is a <glossterm>dynamic
+<error code="C0071">It is a <glossterm>dynamic
 error</glossterm> if the <tag>p:cast-content-type</tag> step
 cannot perform the requested cast.</error></para>
 </listitem>
 </itemizedlist>
 
-<para><error code="C1007">In all cases except when the input document
+<para><error code="C075">In all cases except when the input document
 is a <tag>c:data</tag> element, it is a <glossterm>dynamic
 error</glossterm> if the <option>content-type</option> is not supplied.</error>
 </para>
@@ -373,26 +373,41 @@ equality.</para>
    <p:input port="source" primary="true" content-types="*/*"/>
    <p:input port="alternate" content-types="*/*"/>
    <p:output port="result" content-types="application/xml"/>
-   <p:option name="fail-if-not-equal" select="false" as="xs:boolean"/>
+   <p:output port="differences" content-types="*/*" sequence="true"/>
+   <p:option name="method" as="xs:QName"/>
+   <p:option name="fail-if-not-equal" select="false()" as="xs:boolean"/>
+   <p:option name="parameters" as="map(xs:QName,item())"/>
 </p:declare-step>
 
-<para>The value of the <option>fail-if-not-equal</option> option
-<rfc2119>must</rfc2119> be a boolean.</para>
-
 <para>This step takes single documents on each of two ports and
-compares them. If both media types are XML media types, the comparison
-uses <function>fn:deep-equal</function> (as defined in <biblioref linkend="xpath-functions"/>). <impl>In <tag>p:compare</tag>, if either
-media type is not an XML media type, the result is
-<glossterm>implementation-defined</glossterm>.</impl></para>
+compares them. If <option>method</option> is not specified, or if
+<code>deep-equal</code> is specified, the comparison
+uses <function>fn:deep-equal</function> (as defined in <biblioref linkend="xpath-functions"/>). <impl>Implementations of <tag>p:compare</tag>
+<rfc2119>must</rfc2119> support the <code>deep-equal</code> <option>method</option>;
+other supported methods are <glossterm>implementation-defined</glossterm>.</impl>
+<error code="C0076">It is a <glossterm>dynamic error</glossterm> if
+the comparison <option>method</option> specified in <tag>p:compare</tag>
+is not supported by the implementation.</error>
+<error code="C0077">It is a <glossterm>dynamic error</glossterm> if
+the media types of the documents supplied are incompatible with the
+comparison <option>method</option>.</error>
+</para>
 
 <para><error code="C0019">It is a <glossterm>dynamic error</glossterm>
-if the documents are not equal, and the value of the
+if the documents are not equal according to the specified comparison
+<option>method</option>, and the value of the
 <option>fail-if-not-equal</option> option is
 <literal>true</literal>.</error> If the documents are equal, or if the
 value of the <option>fail-if-not-equal</option> option is
 <literal>false</literal>, a <tag>c:result</tag> document is produced
 with contents <literal>true</literal> if the documents are equal,
 otherwise <literal>false</literal>.</para>
+
+<para><impl>If
+<option>fail-if-not-equal</option> is <code>false</code>, and the
+documents differ, an <glossterm>implementation-defined</glossterm>
+summary of the differences between the two documents may appear on the
+<port>differences</port> port.</impl></para>
 
 <section>
 <title>Document properties</title>
@@ -2009,7 +2024,7 @@ option is true, then the supplied properties are added to the existing
 properties. If it is false, the document’s properties are replaced by
 the new set.</para>
 
-<para><error code="C1001">It is a <glossterm>dynamic
+<para><error code="C0069">It is a <glossterm>dynamic
 error</glossterm> if the <option>properties</option> map contains
 a key equal to the string “<literal>content-type</literal>”.</error>
 </para>
