@@ -307,7 +307,7 @@
         <ref name="href.attr" sa:avt="true"/>
       </optional>
       <optional>
-        <ref name="pipe.attr" sa:avt="true"/>
+        <ref name="pipe.attr"/>
       </optional>
       <ref name="common.attributes"/>
       <ref name="inline.attributes"/>
@@ -390,7 +390,7 @@
         <ref name="href.attr" sa:avt="true"/>
       </optional>
       <optional>
-        <ref name="pipe.attr" sa:avt="true"/>
+        <ref name="pipe.attr"/>
       </optional>
       <ref name="common.attributes"/>
       <ref name="inline.attributes"/>
@@ -571,7 +571,7 @@
         <ref name="href.attr" sa:avt="true"/>
       </optional>
       <optional>
-        <ref name="pipe.attr" sa:avt="true"/>
+        <ref name="pipe.attr"/>
       </optional>
       <ref name="common.attributes"/>
       <ref name="inline.attributes"/>
@@ -622,7 +622,7 @@
         <ref name="href.attr" sa:avt="true"/>
       </optional>
       <optional>
-        <ref name="pipe.attr" sa:avt="true"/>
+        <ref name="pipe.attr"/>
       </optional>
       <ref name="common.attributes"/>
       <ref name="inline.attributes"/>
@@ -696,6 +696,14 @@
         </attribute>
       </optional>
       <ref name="decl.attributes"/>
+      <optional>
+        <attribute name="visibility">
+          <choice>
+            <value>private</value>
+            <value>public</value>
+          </choice>
+        </attribute>
+      </optional>
       <ref name="common.attributes"/>
       <optional>
         <ref name="use-when.attr"/>
@@ -1288,6 +1296,16 @@
       <optional>
         <attribute name="override-content-type">
           <ref name="ContentType"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="timeout">
+          <data type="positiveInteger"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="fail-on-timeout">
+          <data type="boolean"/>
         </attribute>
       </optional>
       <group>

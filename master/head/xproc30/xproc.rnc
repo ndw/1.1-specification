@@ -181,7 +181,6 @@ WithInput =
       select.attr?,
       [ sa:avt = "true" ]
          href.attr?,
-      [ sa:avt = "true" ]
          pipe.attr?,
       common.attributes,
       inline.attributes,
@@ -218,7 +217,6 @@ OutputConnection =
       serialization.attr?,
       [ sa:avt = "true" ]
          href.attr?,
-      [ sa:avt = "true" ]
          pipe.attr?,
       common.attributes,
       inline.attributes,
@@ -328,7 +326,6 @@ WithOptionSelect =
         collection.attr?,
       [ sa:avt = "true" ]
          href.attr?,
-      [ sa:avt = "true" ]
          pipe.attr?,
       common.attributes,
       inline.attributes,
@@ -355,7 +352,6 @@ VariableSelect =
          collection.attr?,
       [ sa:avt = "true" ]
          href.attr?,
-      [ sa:avt = "true" ]
          pipe.attr?,
       common.attributes,
       inline.attributes,
@@ -392,6 +388,7 @@ DeclareStep =
       name.ncname.attr?,
       attribute type { xsd:QName }?,
       decl.attributes,
+      attribute visibility { "private" | "public"  }?,
       common.attributes,
       use-when.attr?,
       (Input|Output|Option|Documentation|PipeInfo)*,
@@ -700,6 +697,8 @@ VocabHttpRequest =
       attribute auth-method { text }?,
       attribute send-authorization { xsd:boolean }?,
       attribute override-content-type { ContentType }?,
+      attribute timeout {xsd:positiveInteger}?,
+      attribute fail-on-timeout {xsd:boolean}?, 
       (VocabHeader*,(VocabMultipart|VocabBody)?)
    }
 

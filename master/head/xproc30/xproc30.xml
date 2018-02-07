@@ -16,6 +16,9 @@
     <personname>Gerrit Imsieke</personname>
   </author>
   <author>
+    <personname>Erik Siegel</personname>
+  </author>
+  <author>
     <personname>Norman Walsh</personname>
   </author>
 </authorgroup>
@@ -956,7 +959,7 @@ are visible.</para>
 
     </section>
     <section xml:id="xpath-context">
-      <title>XPaths in XProc</title>
+      <title>XPath in XProc</title>
 
 <para>XProc uses XPath 3.1 as an expression language. XPath expressions
 are evaluated by the XProc processor in several places: on compound
@@ -2213,7 +2216,7 @@ the <tag class="attribute">version</tag> attribute <rfc2119>must</rfc2119> be a
 <type>xs:decimal</type>.</error></para>
 
 <para>The version of XProc defined
-by this specification is “<literal>2.0</literal>”.</para>
+by this specification is “<literal>3.0</literal>”.</para>
 
 <para>A pipeline author <rfc2119>must</rfc2119> identify the version of XProc
 on the document element of a pipeline document.
@@ -2234,7 +2237,7 @@ forwards-compatible mode. </para>
 <section xml:id="vers-backcomp">
 <title>Backwards-compatible Mode</title>
 <para>If the processor encounters a request for a previous version of
-XProc (e.g., if a "2.0" processor encounters an explicit request for
+XProc (e.g., if a "3.0" processor encounters an explicit request for
 the "1.0" language), it <rfc2119>must</rfc2119> process the pipeline
 as if it was a processor for the requested version: it
 <rfc2119>must</rfc2119> enforce the semantics
@@ -4000,24 +4003,8 @@ document.</simpara>
 <tag>p:document</tag> child element with the specified
 <tag class="attribute">href</tag> attribute. <error code="S0081">If
 <tag class="attribute">href</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:input</tag>.</error></para>
-</listitem>
-</varlistentry>
-<varlistentry><term><tag class="attribute">pipe</tag></term>
-<listitem>
-<para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
-more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
-space-separated list of step/port pairs of the form
-“<replaceable>step-name</replaceable>@<replaceable>port-name</replaceable>”.
-If “@port-name” is omitted, the connection is to the primary output port of
-the step named “step-name”. If the “step-name” is omitted, the connection is
-to the specified port on the same step as the step associated with the
-current default readable port.</para>
-<para><error code="S0082">If
-<tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:input</tag>.</error></para>
+if <tag>p:input</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">exclude-inline-prefixes</tag></term>
@@ -4076,6 +4063,9 @@ is no primary input port.</error>
 </para>
 </listitem>
 </itemizedlist>
+<para><error code="S0086">It is a <glossterm>static error</glossterm> 
+to provide more than one p:with-input for the same port.</error>
+</para>
 
 <para>If no connection is provided for a <glossterm>primary input
 port</glossterm>, the input will be connected to the
@@ -4137,8 +4127,11 @@ text nodes, then it has a content type of
 <tag>p:document</tag> child element with the specified
 <tag class="attribute">href</tag> attribute. <error code="S0081">If
 <tag class="attribute">href</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:with-input</tag>.</error></para>
+if <tag>p:with-input</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:with-input</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
@@ -4150,11 +4143,15 @@ space-separated list of step/port pairs of the form
 If “@port-name” is omitted, the connection is to the primary output port of
 the step named “step-name”. If the “step-name” is omitted, the connection is
 to the specified port on the same step as the step associated with the
-current default readable port.</para>
+current default readable port. An empty or all whitespace attribute value is a shortcut
+for the binding to the default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:with-input</tag>.</error></para>
+if <tag>p:with-input</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:with-input</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">exclude-inline-prefixes</tag></term>
@@ -4171,8 +4168,8 @@ connection is provided for an input port which has a default
 connection, then the input is treated as if the default connection
 appeared.</para>
 
-<para>A <tag>p:input</tag> element with no children
-(<foreignphrase>e.g.</foreignphrase>, “<code>&lt;p:input/&gt;</code>”)
+<para>A <tag>p:with-input</tag> element with no children
+(<foreignphrase>e.g.</foreignphrase>, “<code>&lt;p:with-input/&gt;</code>”)
 is equivalent to an
 input connection that contains only “<code>&lt;p:pipe/&gt;</code>”, which is
 in turn equivalent to a binding to the default readable port.
@@ -4290,8 +4287,11 @@ are:</para>
 <tag>p:document</tag> child element with the specified
 <tag class="attribute">href</tag> attribute. <error code="S0081">If
 <tag class="attribute">href</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:output</tag>.</error></para>
+if <tag>p:output</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:output</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para> 
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
@@ -4306,8 +4306,11 @@ to the specified port on the same step as the step associated with the
 current default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:output</tag>.</error></para>
+if <tag>p:output</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:output</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">exclude-inline-prefixes</tag></term>
@@ -4618,7 +4621,9 @@ XPath Sequence Type<superscript>[citation needed]</superscript>.</para>
 <listitem>
 <para>The name of the variable <rfc2119>must</rfc2119> be an EQName. If
 it does not contain a prefix then it is in no namespace. <error code="S0028">It is a <glossterm>static error</glossterm> to declare an
-option or variable in the XProc namespace.</error>
+option or variable in the XProc namespace.</error> <error code="S0087">It is 
+a <glossterm>static error</glossterm> if the name attribute on p:option or p:variable 
+has a prefix which is not bound to a namespace.</error>
 </para>
 </listitem>
 </varlistentry>
@@ -4628,6 +4633,8 @@ option or variable in the XProc namespace.</error>
 Type<superscript>[citation needed]</superscript>. If an atomic type,
 or sequence of atomic types, is specified, the value provided for the
 option will be atomized according to the standard XPath rules.
+<error code="D0049">It is a <glossterm>dynamic error</glossterm> if 
+the sequence type is not syntactically valid.</error>   
 <error code="D0036">It is a <glossterm>dynamic error</glossterm> if
 the computed value does not match the specified sequence
 type.</error></para>
@@ -4655,14 +4662,11 @@ evaluation error will occur.</para>
 
 <para>If a <tag class="attribute">select</tag> expression is given,
 the <glossterm>readable ports</glossterm> available for document
-connections are the <glossterm>readable ports</glossterm> in the
-environment inherited by the first step in the surrounding
-<glossterm>container</glossterm>'s <glossterm>contained
-steps</glossterm>.</para>
+connections are computed as if <tag>p:variable</tag> was an atomic step.</para>
 
 <para>If a <tag class="attribute">select</tag> expression is given but
 no document connection is provided, the implicit connection is to the
-<glossterm>default readable port</glossterm> computed as if the variable
+<glossterm>default readable port</glossterm> computed as if <tag>p:variable</tag>
 was an atomic step. If there is no default readable port, the
 connection is treated as if <tag>p:empty</tag> was specified.</para>
 </listitem>
@@ -4693,8 +4697,11 @@ undefined.</error></para>
 <tag>p:document</tag> child element with the specified
 <tag class="attribute">href</tag> attribute. <error code="S0081">If
 <tag class="attribute">href</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:variable</tag>.</error></para>
+if <tag>p:variable</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:variable</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para> 
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
@@ -4709,8 +4716,11 @@ to the specified port on the same step as the step associated with the
 current default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:variable</tag>.</error></para>
+if <tag>p:variable</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:variable</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">exclude-inline-prefixes</tag></term>
@@ -4748,6 +4758,9 @@ a <tag>p:declare-step</tag>.</para>
 does not contain a prefix then it is in no namespace. <error code="S0028">It is a <glossterm>static error</glossterm> to declare an
 option or variable in the XProc namespace.</error></para>
 
+<para><error code="S0087">It is a <glossterm>static error</glossterm> if the name attribute on p:option or p:variable 
+has a prefix which is not bound to a namespace.</error></para>
+
 <para><error code="S0004">It is a <glossterm>static error</glossterm>
 to declare two or more options on the same step with the same
 name.</error></para>
@@ -4759,6 +4772,8 @@ name.</error></para>
 Type<superscript>[citation needed]</superscript>. If an atomic type,
 or sequence of atomic types, is specified, the value provided for the
 option will be atomized according to the standard XPath rules.
+<error code="D0049">It is a <glossterm>dynamic error</glossterm> if 
+the sequence type is not syntactically valid.</error>  
 <error code="D0036">It is a <glossterm>dynamic error</glossterm> if
 the computed value does not match the specified sequence
 type.</error></para>
@@ -4807,8 +4822,6 @@ default value.</error></para>
 the <tag class="attribute">select</tag> expression makes reference to
 the context node, size, or position.</error></para>
 
-<para>Regardless of the implicit type of the expression, the value is
-an <type>xs:untypedAtomic</type>.</para>
 </section>
 
 <!-- ============================================================ -->
@@ -4847,6 +4860,8 @@ name as part of the same step invocation.</error></para>
 Type<superscript>[citation needed]</superscript>. If an atomic type,
 or sequence of atomic types, is specified, the value provided for the
 option will be atomized according to the standard XPath rules.
+<error code="D0049">It is a <glossterm>dynamic error</glossterm> if 
+the sequence type is not syntactically valid.</error>  
 <error code="D0036">It is a <glossterm>dynamic error</glossterm> if
 the computed value does not match the specified sequence
 type.</error></para>
@@ -4900,8 +4915,11 @@ undefined.</error></para>
 <tag>p:document</tag> child element with the specified
 <tag class="attribute">href</tag> attribute. <error code="S0081">If
 <tag class="attribute">href</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:with-option</tag>.</error></para>
+if <tag>p:with-option</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:with-option</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para>  
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
@@ -4916,8 +4934,11 @@ to the specified port on the same step as the step associated with the
 current default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
-if <tag>p:document</tag>, <tag>p:pipe</tag>, or <tag>p:inline</tag> appear among
-the children of <tag>p:with-option</tag>.</error></para>
+if <tag>p:with-option</tag> has any child elements other than <tag>p:documentation</tag> and
+<tag>p:pipeinfo</tag>.</error></para>
+<para><error code="S0085">It is a <glossterm>static error</glossterm> if a <tag>p:with-option</tag>
+has a <tag class="attribute">href</tag> attribute and a <tag class="attribute">pipe</tag> 
+attribute.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">exclude-inline-prefixes</tag></term>
@@ -5139,6 +5160,15 @@ of XProc for which this step declaration was authored. If the
 has no ancestors in the XProc namespace, then it <rfc2119>must</rfc2119>
 have a <tag class="attribute">version</tag> attribute.
 See <xref linkend="versioning-considerations"/>.</para>
+
+<para>If the <tag>p:declare-step</tag> is a child of a <tag>p:library</tag> the
+<tag class="attribute">visibility</tag> attribute controls whether the step is 
+visible to an importing pipeline. If <tag class="attribute">visibility</tag> is set to
+<literal>private</literal>, the step type is only visible inside the <tag>p:library</tag> 
+but not visible to any pipeline importing the <tag>p:library</tag>. If the 
+<tag class="attribute">visibility</tag> attribute is missing, <literal>public</literal> 
+is assumed. If the <tag>p:declare-step</tag> is not a child of a <tag>p:library</tag> the 
+attribute is ignored.</para>
 
 <para>For a description of <tag class="attribute">psvi-required</tag>,
 see <xref linkend="psvi-support"/>. For <tag class="attribute">xpath-version</tag>, see <xref linkend="xpath-context"/>. For <tag class="attribute">exclude-inline-prefixes</tag>, see
@@ -5573,7 +5603,7 @@ following whitespace is discarded.</para>
 wants to include top level comments, processing instructions, or whitespace,
 or if the document element is in the XProc namespace.</para>
 
-<para><error code="S00xx">It is a <glossterm>static error</glossterm>
+<para><error code="S0079">It is a <glossterm>static error</glossterm>
 if comments or processing instructions occur as siblings of an element node
 that would be treated as an implicit inline.</error>
 </para>
