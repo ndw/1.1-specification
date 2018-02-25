@@ -1531,9 +1531,10 @@ system properties, which are all in the XProc namespace:</para>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term><varname>p:language</varname></term>
+            <term><varname>p:locale</varname></term>
             <listitem>
-              <para>Returns a string which identifies the current language, for example, for message
+              <para>Returns a string which identifies the current environment (usually the OS) 
+                language. This is useful for, for example, message
                 localization purposes. <impl>The exact format of the language string is
                     <glossterm>implementation-defined</glossterm> but <rfc2119>should</rfc2119> be
                   consistent with the <tag class="attribute">xml:lang</tag> attribute.</impl></para>
@@ -1573,21 +1574,23 @@ system properties, which are all in the XProc namespace:</para>
           <varlistentry>
             <term><varname>p:version</varname></term>
             <listitem>
-<para>Returns the version(s) of XProc implemented by the processor
-as a space-separated list. For example, a processor
-that supports XProc 1.0 would return “1.0”; a processor that
-supports XProc 1.0 and 2.0 would
-return “1.0 2.0”; a processor that supports only XProc 2.0 would
-return “2.0”.</para>
+              <para>Returns the version(s) of XProc implemented by the processor
+                as a space-separated list. For example, a processor that
+                supports XProc 1.0 would return “1.0”; a processor that supports
+                XProc 1.0 and 2.0 would return “1.0 2.0”; a processor that
+                supports only XProc 2.0 would return “2.0”.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
             <term><varname>p:xpath-version</varname></term>
             <listitem>
-              <para>Returns the version(s) of XPath implemented by the processor for evaluating
-                XPath expressions on XProc elements. The result is a space-separated list of versions supported. For
-                example, a processor that only supports XPath 2.0 would return “2.0”; a processor
-                that supports XPath 2.0 and XPath 3.0 could return “2.0 3.0”; a processor that supports only XPath 2.0 would return “2.0”.</para>
+              <para>Returns the version(s) of XPath implemented by the processor
+                for evaluating XPath expressions on XProc elements. The result
+                is a space-separated list of versions supported. For example, a
+                processor that only supports XPath 2.0 would return “2.0”; a
+                processor that supports XPath 2.0 and XPath 3.0 could return
+                “2.0 3.0”; a processor that supports only XPath 2.0 would return
+                “2.0”.</para>
             </listitem>
           </varlistentry>
           <varlistentry>
@@ -1625,71 +1628,6 @@ only if the processor knows how to evaluate steps of the specified
 type.</para>
 
       </section>
-      <section xml:id="f.value-available">
-        <title>Value Available</title>
-        <para>The <function>p:value-available</function> function reports whether or not a
-          particular in-scope option has a value.</para>
-
-
-<methodsynopsis>
-<type>xs:boolean</type>
-<methodname>p:value-available</methodname>
-<methodparam><type>xs:string</type><parameter>option-name</parameter></methodparam>
-</methodsynopsis>
-
-<methodsynopsis>
-<type>xs:boolean</type>
-<methodname>p:value-available</methodname>
-<methodparam><type>xs:string</type><parameter>option-name</parameter></methodparam>
-<methodparam><type>xs:boolean</type><parameter>fail-if-unknown</parameter></methodparam>
-</methodsynopsis>
-
-<para>The <varname>$option-name</varname> string <rfc2119>must</rfc2119>
-have the form of an
-<link xlink:href="https://www.w3.org/TR/xquery-30/#doc-xquery30-EQName">EQName</link>.
-If it is a QName, it is expanded using the namespace declarations in
-scope for the expression.
-The <function>p:value-available</function> function
-returns true if and only if the name specified is the name of an
-<glossterm baseform="in-scope-bindings">in-scope binding</glossterm>
-and the binding has a value. <error code="D0033">It is a
-<glossterm>dynamic error</glossterm> if the name specified is not the
-name of an in-scope option or variable.</error></para>
-
-<para>In the two-argument form, it is not an error to specify a name
-that is not the name of an in-scope option or variable if
-<varname>$fail-if-unknown</varname> is false; the function simply
-returns false. The semantics of the two-argument form when
-<varname>$fail-if-unknown</varname> is true are precisely the same as
-the single argument form.</para>
-
-<para>Consider the following example:</para>
-
-<programlisting language="xml">&lt;p:declare-step type="ex:dir-list"&gt;
-  &lt;p:output port="result"/&gt;
-  &lt;p:option name="path"/&gt;
-
-  &lt;p:choose&gt;
-    &lt;p:when test="p:value-available('path')"&gt;
-      &lt;p:directory-list&gt;
-	&lt;p:with-option name="path" select="$path"/&gt;
-      &lt;/p:directory-list&gt;
-    &lt;/p:when&gt;
-    &lt;p:otherwise&gt;
-      &lt;p:directory-list path="."/&gt;
-    &lt;/p:otherwise&gt;
-  &lt;/p:choose&gt;
-&lt;/p:declare-step&gt;
-
-&lt;ex:dir-list path=".."/&gt;</programlisting>
-
-<para>If the <option>path</option> option is specified in the call to
-<code>ex:dir-list</code>, then the first <tag>p:when</tag> clause will
-be evaluated and the specified value will be used. If the option is
-not specified, then the <tag>p:otherwise</tag> clause will be
-evaluated and "<literal>.</literal>" will be used instead.</para>
-
-</section>
 
 <section xml:id="f.iteration-position">
 <title>Iteration Position</title>
@@ -1743,11 +1681,11 @@ specified.</para>
 <methodsynopsis>
 <type>xs:boolean</type>
 <methodname>p:version-available</methodname>
-<methodparam><type>xs:decimal</type><parameter>version</parameter></methodparam>
+<methodparam><type>xs:string</type><parameter>version</parameter></methodparam>
 </methodsynopsis>
 
 <para>A version 1.0 processor will return <literal>true()</literal> when
-<code>p:version-available(1.0)</code> is evaluated.</para>
+<code>p:version-available('1.0')</code> is evaluated.</para>
 
 </section>
 
@@ -1758,13 +1696,13 @@ specified.</para>
 specified.</para>
 
 <methodsynopsis>
-<type>xs:boolean</type>
+<type>xs:string</type>
 <methodname>p:xpath-version-available</methodname>
-<methodparam><type>xs:decimal</type><parameter>version</parameter></methodparam>
+<methodparam><type>xs:string</type><parameter>version</parameter></methodparam>
 </methodsynopsis>
 
 <para>A processor that supports XPath 2.0 will return <literal>true()</literal> when
-<code>p:xpath-version-available(2.0)</code> is evaluated.</para>
+<code>p:xpath-version-available('2.0')</code> is evaluated.</para>
 
 </section>
 
@@ -4135,10 +4073,10 @@ attribute.</error></para>
 <listitem>
 <para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
 more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
-space-separated list of step/port pairs of the form
-“<replaceable>step-name</replaceable>@<replaceable>port-name</replaceable>”.
-If “@port-name” is omitted, the connection is to the primary output port of
-the step named “step-name”. If the “step-name” is omitted, the connection is
+space-separated list of port@step pairs of the form
+“<replaceable>port-name</replaceable>@<replaceable>step-name</replaceable>”.
+If “port-name” is omitted, the connection is to the primary output port of
+the step named “step-name”. If the “@step-name” is omitted, the connection is
 to the specified port on the same step as the step associated with the
 current default readable port. An empty or all whitespace attribute value is a shortcut
 for the binding to the default readable port.</para>
@@ -4293,14 +4231,15 @@ attribute.</error></para>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
 <listitem>
-<para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
-more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
-space-separated list of step/port pairs of the form
-“<replaceable>step-name</replaceable>@<replaceable>port-name</replaceable>”.
-If “@port-name” is omitted, the connection is to the primary output port of
-the step named “step-name”. If the “step-name” is omitted, the connection is
-to the specified port on the same step as the step associated with the
-current default readable port.</para>
+  <para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
+    more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
+    space-separated list of port@step pairs of the form
+    “<replaceable>port-name</replaceable>@<replaceable>step-name</replaceable>”.
+    If “port-name” is omitted, the connection is to the primary output port of
+    the step named “step-name”. If the “@step-name” is omitted, the connection is
+    to the specified port on the same step as the step associated with the
+    current default readable port. An empty or all whitespace attribute value is a shortcut
+    for the binding to the default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
 if <tag>p:output</tag> has any child elements other than <tag>p:documentation</tag> and
@@ -4705,14 +4644,15 @@ attribute.</error></para>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
 <listitem>
-<para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
-more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
-space-separated list of step/port pairs of the form
-“<replaceable>step-name</replaceable>@<replaceable>port-name</replaceable>”.
-If “@port-name” is omitted, the connection is to the primary output port of
-the step named “step-name”. If the “step-name” is omitted, the connection is
-to the specified port on the same step as the step associated with the
-current default readable port.</para>
+  <para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
+    more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
+    space-separated list of port@step pairs of the form
+    “<replaceable>port-name</replaceable>@<replaceable>step-name</replaceable>”.
+    If “port-name” is omitted, the connection is to the primary output port of
+    the step named “step-name”. If the “@step-name” is omitted, the connection is
+    to the specified port on the same step as the step associated with the
+    current default readable port. An empty or all whitespace attribute value is a shortcut
+    for the binding to the default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
 if <tag>p:variable</tag> has any child elements other than <tag>p:documentation</tag> and
@@ -4789,7 +4729,9 @@ declared to be so; in other words, the default value for the
 
 <para>If an option is not declared to be required, it
 <rfc2119>may</rfc2119> be given a default value. The value is
-specified with a <tag class="attribute">select</tag> attribute.</para>
+specified with a <tag class="attribute">select</tag> attribute. If
+no default value is specified, the option has an empty sequence as default
+value.</para>
 
 <e:rng-pattern name="OptionSelect"/>
 
@@ -4929,14 +4871,15 @@ attribute.</error></para>
 </varlistentry>
 <varlistentry><term><tag class="attribute">pipe</tag></term>
 <listitem>
-<para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
-more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
-space-separated list of step/port pairs of the form
-“<replaceable>step-name</replaceable>@<replaceable>port-name</replaceable>”.
-If “@port-name” is omitted, the connection is to the primary output port of
-the step named “step-name”. If the “step-name” is omitted, the connection is
-to the specified port on the same step as the step associated with the
-current default readable port.</para>
+  <para>The <tag class="attribute">pipe</tag> attribute is a shortcut for one or
+    more <tag>p:pipe</tag> children. The attribute value <rfc2119>must</rfc2119> be
+    space-separated list of port@step pairs of the form
+    “<replaceable>port-name</replaceable>@<replaceable>step-name</replaceable>”.
+    If “port-name” is omitted, the connection is to the primary output port of
+    the step named “step-name”. If the “@step-name” is omitted, the connection is
+    to the specified port on the same step as the step associated with the
+    current default readable port. An empty or all whitespace attribute value is a shortcut
+    for the binding to the default readable port.</para>
 <para><error code="S0082">If
 <tag class="attribute">pipe</tag> is specified, it is a <glossterm>static error</glossterm>
 if <tag>p:with-option</tag> has any child elements other than <tag>p:documentation</tag> and
