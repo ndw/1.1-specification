@@ -1,4 +1,4 @@
-<specification xmlns="http://docbook.org/ns/docbook" xmlns:cs="http://www.w3.org/XML/XProc/2006/04/components#" xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax" xmlns:p="http://www.w3.org/ns/xproc" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" class="ed" version="5.0-extension w3c-xproc">
+<specification xmlns="http://docbook.org/ns/docbook" xmlns:cs="http://www.w3.org/XML/XProc/2006/04/components#" xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax" xmlns:p="http://www.w3.org/ns/xproc" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="steps-intro" class="ed" version="5.0-extension w3c-xproc">
 <info>
 <title>XProc 3.0 Steps: An Introduction</title>
 <!-- defaults to date formatted <pubdate>2014-12-18</pubdate> -->
@@ -259,12 +259,12 @@ Mar 1997.
   <bibliomixed xml:id="xproc30"><abbrev>XProc 3.0</abbrev>
 <citetitle xlink:href="http://spec.xproc.org/">XProc 3.0:
 An XML Pipeline Language</citetitle>.
-Achim Berndzen, Gerrit Imsieke, Erik Seigel and Norman Walsh, editors.
+Achim Berndzen, Gerrit Imsieke, Erik Siegel and Norman Walsh, editors.
 </bibliomixed>
   <bibliomixed xml:id="steps30"><abbrev>Steps 3.0</abbrev>
 <citetitle xlink:href="http://spec.xproc.org/">XProc 3.0: Standard
 Step Library</citetitle>.
-Achim Berndzen, Gerrit Imsieke, Erik Seigel and Norman Walsh, editors.
+Achim Berndzen, Gerrit Imsieke, Erik Siegel and Norman Walsh, editors.
 </bibliomixed>
   <bibliomixed xml:id="xmlschema-2"><abbrev>W3C XML Schema: Part 2</abbrev>
 <citetitle xlink:href="http://www.w3.org/TR/xmlschema-2/">XML Schema Part 2:
