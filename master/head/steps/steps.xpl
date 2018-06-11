@@ -23,6 +23,7 @@
       <p:input port="source" content-types="*/*"/>
       <p:output port="result" content-types="*/*"/>
       <p:option name="content-type" as="xs:string"/>
+      <p:option name="parameters" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:compare" xml:id="compare">
       <p:input port="source" primary="true" content-types="*/*"/>
@@ -102,7 +103,7 @@
                content-types="application/xml text/xml */*+xml"/>
       <p:input port="insertion"
                sequence="true"
-               content-types="application/xml text/xml */*+xml"/>
+               content-types="application/xml text/* */*+xml"/>
       <p:output port="result" content-types="application/xml"/>
       <p:option name="match"
                 select="'/*'"
@@ -273,7 +274,7 @@
    </p:declare-step>
    <p:declare-step type="p:wrap-sequence" xml:id="wrap-sequence">
       <p:input port="source"
-               content-types="application/xml text/xml */*+xml"
+               content-types="application/xml */*+xml text/*"
                sequence="true"/>
       <p:output port="result" sequence="true" content-types="application/xml"/>
       <p:option name="wrapper" required="true" as="xs:QName"/>

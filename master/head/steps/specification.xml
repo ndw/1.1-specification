@@ -209,6 +209,7 @@ of its input.</para>
    <p:input port="source" content-types="*/*"/>
    <p:output port="result" content-types="*/*"/>
    <p:option name="content-type" as="xs:string"/>
+   <p:option name="parameters" as="map(*)"/>   
 </p:declare-step>
 
 <para>The input document is transformed from one media type to another.
@@ -217,6 +218,14 @@ error</glossterm> if the supplied <option>content-type</option> is not
 a valid media type of the form
 “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”.</error></para>
 
+   
+<para>The <option>parameters</option> can be used to supply parameters to
+control casting. <impl>The semantics of the keys and the allowed values for 
+these keys are <glossterm>implementation-defined</glossterm>.</impl>
+<error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map 
+<option>parameters</option> contains an entry whose key is defined by the 
+implementation and whose value is not valid for that key.</error></para>
+   
 <itemizedlist>
 <listitem>
 <para>Casting from one XML media type to another simply changes the
@@ -1394,7 +1403,7 @@ port's document relative to the matching elements in the
 
 <p:declare-step type="p:insert">
    <p:input port="source" primary="true" content-types="application/xml text/xml */*+xml"/>
-   <p:input port="insertion" sequence="true" content-types="application/xml text/xml */*+xml"/>
+   <p:input port="insertion" sequence="true" content-types="application/xml text/* */*+xml"/>
    <p:output port="result" content-types="application/xml"/>
    <p:option name="match" select="'/*'" as="xs:string" e:type="XSLTMatchPattern"/>
    <p:option name="position" required="true" as="xs:token" e:type="first-child|last-child|before|after"/>
@@ -1403,7 +1412,7 @@ port's document relative to the matching elements in the
 <para>The value of the <option>match</option> option
 <rfc2119>must</rfc2119> be an XSLTMatchPattern. <error code="C0023">It
 is a <glossterm>dynamic error</glossterm> if that pattern matches
-anything other than element, text, processing-instruction, or comment nodes.</error>
+an attribute or a namespace node.</error>
 Multiple matches are
 allowed, in which case multiple copies of the <port>insertion</port>
 documents will occur. If no elements match, then the document is
@@ -1429,10 +1438,13 @@ the following list:
 </itemizedlist>
 
 <para><error code="C0025">It is a <glossterm>dynamic error</glossterm>
-if the match pattern matches anything other than an element node and
-the value of the <option>position</option> option is
+if the match pattern matches anything other than an element or a document
+node and the value of the <option>position</option> option is
 “<literal>first-child</literal>” or
-“<literal>last-child</literal>”.</error></para>
+“<literal>last-child</literal>”.</error> <error code="C0024">It is a 
+<glossterm>dynamic error</glossterm> if the match pattern matches a document 
+node and the value of the <option>position</option> is “<literal>before</literal>” or
+“<literal>after</literal>”.</error></para>
 
 <para>As the inserted elements are part of the output of the step they
 are not considered in determining matching elements. If an empty sequence
@@ -1539,6 +1551,11 @@ returned. If the URI protocol supports redirection, then redirects
 <rfc2119>should</rfc2119> support “globbing”. See
 <xref linkend="uri-globbing"/>.</para>
 
+<para><error code="D0011">It is a <glossterm>dynamic error</glossterm> 
+if the resource referenced by a <code>p:load</code> element does not exist, 
+cannot be accessed, or has an XML content type and is not a well-formed 
+XML document.</error></para>  
+
 <para>The behavior of this step depends on the content type of the
 document or documents loaded. The content type of each document is
 determined as follows:</para>
@@ -1579,9 +1596,10 @@ be loaded:
 
 <para>For an XML media type, the content is loaded and parsed as XML.</para>
 
-<para>If the <option>dtd-validate</option> parameter is <literal>true</literal>,
+<para>If the <option>dtd-validate</option> parameter is <literal>true</literal>
+and the document has a <literal>doctype</literal> declaration,
 then DTD validation must be performed when parsing the document.
-<error code="C0027">It is a <glossterm>dynamic error</glossterm> if a DTD
+<error code="D0023">It is a <glossterm>dynamic error</glossterm> if a DTD
 validation is performed and the document is not valid.</error>
 <error code="D0043">It is a <glossterm>dynamic error</glossterm>
 if the <option>dtd-validate</option> parameter is <literal>true</literal> and
@@ -1595,6 +1613,10 @@ the processor does not support DTD validation.</error></para>
 <title>Loading text data</title>
 <para>For a text media type, the content is loaded as a text document.</para>
 
+<para><error code="D0060">It is a <glossterm>dynamic error</glossterm> if the 
+<option>content-type</option> specifies an encoding, which is not supported 
+by the processor.</error></para>
+  
 <para><impl>Text parameters are <glossterm>implementation-defined</glossterm>.
 </impl></para>
 
@@ -1610,7 +1632,19 @@ in <biblioref linkend="xpath-functions"/>
 <rfc2119>must</rfc2119> be supported.
 <impl>Additional JSON parameters are <glossterm>implementation-defined</glossterm>.
 </impl></para>
+<para><error code="D0057">It is a <glossterm>dynamic error</glossterm> if the loaded content 
+does not conform to the JSON grammar, unless the parameter <option>liberal</option> is 
+<literal>true</literal> and the processor chooses to accept the deviation.</error></para>
 
+<para><error code="D0058">It is a <glossterm>dynamic error</glossterm> if the parameter 
+<option>duplicates</option> is <literal>reject</literal> and the value of 
+loaded content contains a JSON object with duplicate keys.</error></para>
+  
+<para><error code="D0059">It is a <glossterm>dynamic error</glossterm> if the parameter 
+map contains an entry whose key is defined in the specification of 
+<code>fn:parse-json</code> and whose value is not valid for that key, or if it contains 
+an entry with the key fallback when the parameter <option>escape</option> with 
+<literal>true()</literal> is also present.</error></para>
 </section>
 <section xml:id="c.load.binary">
 <title>Loading binary data</title>
@@ -2472,7 +2506,7 @@ documents and produces either a single document or a new sequence of
 documents.</para>
 
 <p:declare-step type="p:wrap-sequence">
-   <p:input port="source" content-types="application/xml text/xml */*+xml" sequence="true"/>
+   <p:input port="source" content-types="application/xml */*+xml text/*" sequence="true"/>
    <p:output port="result" sequence="true" content-types="application/xml"/>
    <p:option name="wrapper" required="true" as="xs:QName"/>
    <p:option name="wrapper-prefix" as="xs:NCName"/>

@@ -397,15 +397,15 @@ in an XProc pipeline is <glossterm>implementation-defined</glossterm>.</impl>
 <section xml:id="text-documents">
 <title>Text Documents</title>
 
-<para>Text documents are non-XML documents.
-<impl>Representations of text documents are are
-<glossterm>implementation-dependent</glossterm>.</impl>
-</para>
+<para>Text documents are non-XML documents. A text document is represented by
+a single text node wrapped in a document node as instances of the 
+<biblioref linkend="xpath-datamodel"/>.</para>
 
 <para>Text documents are identified by a text media type.
 <termdef xml:id="dt-text-media-type">Media types of the form
 “<literal>text/<replaceable>something</replaceable></literal>”
-are <firstterm baseform="text media type">text media types</firstterm>.
+are <firstterm baseform="text media type">text media types</firstterm> with the
+exception of “<literal>text/xml</literal>” which is an XML media type.
 </termdef>
 </para>
 </section>
@@ -1957,8 +1957,9 @@ value template as an <type>xs:untypedAtomic</type>.</para>
 are designated text value templates. All text nodes that are the
 descendants of a <tag>p:inline</tag> element are text value templates
 unless the <tag>p:inline</tag> has an <tag class="attribute">expand-text</tag> attribute with the value
-“<code>false</code>”. Text nodes that are not the descendants of
-a <tag>p:inline</tag> are never text value templates.</para>
+“<code>false</code>”. Text nodes that are descendants of an element
+node in an implicit inline are text value templates as well. No other
+text node is a text value template.</para>
 
 <para><termdef xml:id="dt-text-value-template">In a text node that is
 designated as a <firstterm>text value template</firstterm>,
@@ -3841,17 +3842,16 @@ expression.
 The selected nodes are returned as separate documents.
 If such a document consists exclusively of text nodes, then it has a content
 type of <literal>text/plain</literal>, otherwise it has a content type
-of <literal>application/xml</literal>.
-</para>
+of <literal>application/xml</literal>. <error code="D0016">It is a 
+<glossterm>dynamic error</glossterm> if the select expression on a p:input or 
+p:with-input returns anything other than document nodes, element nodes, 
+processing instruction nodes, comment nodes, text nodes or an empty sequence.</error></para>
 
 <para>The
 <tag class="attribute">select</tag> expression applies
 <emphasis>only</emphasis> if the default connection is used. If an
 explicit connection is provided by the caller, then the default select
-expression is ignored.
-<error code="D0039">It is a <glossterm>dynamic error</glossterm>
-if the <tag class="attribute">select</tag> is used and any input
-document is not an XML document.</error></para>
+expression is ignored.</para>
 </listitem>
 </varlistentry>
 
@@ -3970,10 +3970,7 @@ undefined.</error></para>
 <para>A <tag class="attribute">select</tag> expression
 <rfc2119>may</rfc2119> also be provided with a connection.
 The <tag class="attribute">select</tag> expression, if specified, applies the
-specified XPath select expression to the document(s) that are read.
-<error code="D0039">It is a <glossterm>dynamic error</glossterm>
-if the <tag class="attribute">select</tag> is used and any input
-document is not an XML document.</error></para>
+specified XPath select expression to the document(s) that are read.</para>
 
 <para>Each selected node is wrapped in a document (unless it is a document)
 and provided to the input port. In other words,</para>
@@ -4008,7 +4005,11 @@ expression is the base URI of the matched element or document.</para>
 <para>If a document constructed by selection consists exclusively of
 text nodes, then it has a content type of
 <literal>text/plain</literal>, otherwise it has a content type of
-<literal>application/xml</literal>.</para>
+<literal>application/xml</literal>. <error code="D0016">It is a 
+<glossterm>dynamic error</glossterm> if the select expression on a p:input or 
+p:with-input returns anything other than document nodes, element nodes, 
+processing instruction nodes, comment nodes, text nodes or an 
+empty sequence.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">href</tag></term>
@@ -4260,10 +4261,7 @@ serialized implementations
 specified options are allowed.</para>
 
 <para>For XML outputs, see <xref linkend="xml-serialization"/>.
-For non-XML outputs, see <xref linkend="non-xml-serialization"/>.
-<error code="D0041">It is a <glossterm>dynamic error</glossterm> if the
-map contains any property name not recognized as a serialization
-parameter.</error></para>
+For non-XML outputs, see <xref linkend="non-xml-serialization"/>.</para>
 
 <section xml:id="xproc-serialization">
 <title>XML serialization</title>
@@ -5186,7 +5184,8 @@ or the provided map does not contain a "content-type" key, the value
 "<literal>application/xml</literal>" is assumed.
 </para>
 
-<para>How the content of a <tag>p:inline</tag> element is interpreted
+<para>The base URI of the document is the base URI of the p:inline element. 
+How the content of a <tag>p:inline</tag> element is interpreted
 depends on the document's content type and the <tag class="attribute">encoding</tag> attribute.
 </para>
 
@@ -5227,16 +5226,22 @@ is “<literal>base64</literal>”.</th>
 </informaltable>
 -->
 
-<para><error code="S0070">It is a
-<glossterm>static error</glossterm> if an encoding is specified
+<para><error code="D0054">It is a
+<glossterm>dynamic error</glossterm> if an encoding is specified
 and the content type is an <glossterm>XML media type</glossterm>.</error>
 </para>
 
-<para><error code="S0071">It is a <glossterm>static error</glossterm>
+<para><error code="D0055">It is a <glossterm>dynamic error</glossterm>
 if the content type value specifies a character set and the <tag class="attribute">encoding</tag> attribute is absent.</error>
 </para>
 
-<para><error code="S0072">It is a <glossterm>static error</glossterm>
+<para><error code="D0039">It is a <glossterm>dynamic error</glossterm> if the 
+<tag class="attribute">encoding</tag> attribute is 
+present and content type value specifies a character set that is not supported 
+by the implementation.</error>  
+</para>
+  
+<para><error code="D0056">It is a <glossterm>dynamic error</glossterm>
 if an encoding is specified and the content of the <tag>p:inline</tag>
 contains any XML markup.</error> In other words, the entire content
 must be a single text node. CDATA sections and character references do
@@ -5278,11 +5283,9 @@ non-XML.</para>
 <para>If the <tag class="attribute">document-properties</tag> is not
 specified or the map does not contain a key "content-type" or specifies
 an <glossterm>XML media type</glossterm>, then
-the content is XML. <error code="S0024">It is a <glossterm>static
-error</glossterm> if the content of the <tag>p:inline</tag> element
-does not consist of exactly one element, optionally preceded and/or
-followed by any number of processing instructions, comments or
-whitespace characters.</error></para>
+the content is XML. A new XML document is created by wrapping a document node
+around the nodes which appear as children of <tag>p:inline</tag>. Any preceding or 
+following whitespace-only text nodes will be discarded.</para>
 
 <para>The in-scope namespaces of the inline document differ from the
 in-scope namespace of the content of the <tag>p:inline</tag> element
@@ -5460,14 +5463,16 @@ semantics of <tag>p:load</tag> where the <option>href</option> option
 comes from the <tag class="attribute">href</tag> attribute, the
 <option>document-properties</option> option comes from the
 <tag class="attribute">document-properties</tag> attribute, and the
-<option>parameters</option> option coes from the
+<option>parameters</option> option comes from the
 <tag class="attribute">parameters</tag> attribute.
 </para>
 
 <para><error code="D0011">It is a <glossterm>dynamic error</glossterm>
 if the resource referenced by a <tag>p:document</tag> element does not
 exist, cannot be accessed, or has an XML content type and is not a
-well-formed XML document.</error>
+well-formed XML document.</error> <error code="D0023">It is a 
+<glossterm>dynamic error</glossterm> if a DTD validation is performed 
+and the document is not valid.</error>
 </para>
 
 <note xml:id="note-document">
@@ -5696,7 +5701,7 @@ in the PSVI, are preserved between steps.</impl></para>
 <citetitle xlink:href="http://www.w3.org/TR/xproc20-steps/">XProc 2.0:
 Standard Step Library</citetitle>.
 Alex Milowski, Henry Thompson, and Norman Walsh editors.
-W3C Working Draft 15 December 2014.
+W3C Working Group Note 21 July 2016.
 </bibliomixed>
     <bibliomixed xml:id="xml-infoset-rec"><abbrev>Infoset</abbrev>
 <citetitle xlink:href="http://www.w3.org/TR/xml-infoset/">XML
@@ -5725,7 +5730,7 @@ Dave Hollander, Andrew Layman, et. al.,
 editors. W3C Recommendation 16 August 2006.</bibliomixed>
     <bibliomixed xml:id="lastcall-xslt30"><abbrev>XSLT 3.0</abbrev>
    <citetitle xlink:href="http://www.w3.org/TR/xslt-30/">XSL Transformations (XSLT) Version 3.0</citetitle>. Michael Kay,
-   W3C Last Call Working Draft 2 October 2014</bibliomixed>
+   W3C Recommendation 8 June 2017</bibliomixed>
     <bibliomixed xml:id="xpath31"><abbrev>XPath 3.1</abbrev>
 <citetitle xlink:href="http://www.w3.org/TR/xpath31/">XML Path Language (XPath)
 	3.1</citetitle>. Jonathan Robie, Michael Dyck, Josh Spiegel, editors.
@@ -5910,7 +5915,8 @@ default value, are its <firstterm>specified options</firstterm>.</para></glossde
         this set <emphasis>Visited</emphasis>), are defined by cases.</para></glossdef></glossentry><glossentry><glossterm>subpipeline</glossterm><glossdef><para>Sibling steps (and the connections between them) form a
             <firstterm>subpipeline</firstterm>.</para></glossdef></glossentry><glossentry><glossterm>text media type</glossterm><glossdef><para>Media types of the form
 “<literal>text/<replaceable>something</replaceable></literal>”
-are <firstterm baseform="text media type">text media types</firstterm>.
+are <firstterm baseform="text media type">text media types</firstterm> with the
+exception of “<literal>text/xml</literal>” which is an XML media type.
 </para></glossdef></glossentry><glossentry><glossterm>text value template</glossterm><glossdef><para>In a text node that is
 designated as a <firstterm>text value template</firstterm>,
 expressions can be used by surrounding each expression with curly
