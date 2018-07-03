@@ -562,6 +562,7 @@ NormalizationForm =
 ListOfQNames = text
 StandardStep =
   Step-exec
+  | Step-run
   | Step-xsl-formatter
   | Step-add-attribute
   | Step-add-xml-base
@@ -580,6 +581,7 @@ StandardStep =
   | Step-insert
   | Step-label-elements
   | Step-load
+  | Step-load-directory-list
   | Step-make-absolute-uris
   | Step-namespace-rename
   | Step-pack
@@ -623,6 +625,13 @@ Step-exec =
     attribute arg-separator { xsd:string }?,
     attribute serialization { xsd:string }?,
     (WithInput* & WithOption* & (Documentation | PipeInfo)*)
+  }
+Step-run =
+  element run {
+    name.ncname.attr?,
+    common.attributes,
+    use-when.attr?,
+    (WithInput* & (Documentation | PipeInfo)*)
   }
 Step-xsl-formatter =
   element xsl-formatter {
@@ -793,6 +802,16 @@ Step-load =
     attribute parameters { xsd:string }?,
     attribute content-type { xsd:string }?,
     attribute document-properties { xsd:string }?,
+    (WithOption* & (Documentation | PipeInfo)*)
+  }
+Step-load-directory-list =
+  element load-directory-list {
+    name.ncname.attr?,
+    common.attributes,
+    use-when.attr?,
+    attribute path { xsd:anyURI }?,
+    attribute include-filter { RegularExpression }?,
+    attribute exclude-filter { RegularExpression }?,
     (WithOption* & (Documentation | PipeInfo)*)
   }
 Step-make-absolute-uris =

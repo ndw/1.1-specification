@@ -158,6 +158,12 @@
       <p:option name="content-type" as="xs:string"/>
       <p:option name="document-properties" as="xs:string"/>
    </p:declare-step>
+   <p:declare-step type="p:load-directory-list" xml:id="load-directory-list">
+      <p:output port="result" content-type="application/xml"/>
+      <p:option name="path" required="true" as="xs:anyURI"/>
+      <p:option name="include-filter" as="xs:string" e:type="RegularExpression"/>
+      <p:option name="exclude-filter" as="xs:string" e:type="RegularExpression"/>
+   </p:declare-step>
    <p:declare-step type="p:make-absolute-uris" xml:id="make-absolute-uris">
       <p:input port="source" content-types="application/xml text/xml */*+xml"/>
       <p:output port="result" content-types="application/xml"/>
@@ -213,6 +219,13 @@
                 required="true"
                 as="xs:string"
                 e:type="XSLTSelectionPattern"/>
+   </p:declare-step>
+   <p:declare-step type="p:run" xml:id="run">
+      <p:input port="source"
+               primary="true"
+               sequence="true"
+               content-types="*/*"/>
+      <p:output port="result" primary="true" content-types="*/*"/>
    </p:declare-step>
    <p:declare-step type="p:set-attributes" xml:id="set-attributes">
       <p:input port="source"
