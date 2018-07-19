@@ -168,7 +168,7 @@
     </attribute>
   </define>
   <define name="p_expand-text.attr" sa:ignore="yes">
-    <attribute name="expand-text">
+    <attribute name="p:expand-text">
       <data type="boolean"/>
     </attribute>
   </define>
