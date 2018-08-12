@@ -1169,19 +1169,18 @@ refer to that variable will raise an error.</para>
             <varlistentry>
               <term>context item</term>
               <listitem>
-<para>A document. The document is either specified with a
+<para>The context item. The context item is either specified with a
 <glossterm>connection</glossterm> or is taken from the
 <glossterm>default readable port</glossterm>. <error code="D0008">It
-is a <glossterm>dynamic error</glossterm> if a document sequence
-appears where a document to be used as the context node is
+is a <glossterm>dynamic error</glossterm> if a sequence of items
+appears where an item to be used as the context item is
 expected.</error>
 </para>
 
-<para>When the context node has a non-XML content type, XPath
-expressions are evaluated in the context of the corresponding
-<glossterm>proxy document</glossterm>.
-<termdef xml:id="dt-proxy-document">A <firstterm>proxy document</firstterm> is
-an empty document node.</termdef>.</para>
+<para>The context item used for an XML, text, or JSON document is
+the XDM representation of that item.
+<impl>The context item used for binary documents is
+<glossterm>implementation-defined</glossterm>.</impl></para>
 
 <para>If there is no explicit connection and there is no default
 readable port then the context node is undefined.</para>
@@ -1795,21 +1794,14 @@ normally during static anlaysis.</para>
 of a document as a map.</para>
 
 <methodsynopsis>
-<type>map(xs:QName,item())</type>
+<type>map(xs:QName,item()*)</type>
 <methodname>p:document-properties</methodname>
-<methodparam><type>document-node()</type><parameter>doc</parameter></methodparam>
+<methodparam><type>item()</type><parameter>doc</parameter></methodparam>
 </methodsynopsis>
 
 <para>The map returned contains (exclusively) the document properties
-associated with the <parameter>doc</parameter> specified.</para>
-
-<para feature="document-properties-non-xml-document">The context node
-for the <function>p:document-properties</function> function must be an
-XPath document node. In order to access the document properties of a
-non-XML document, the processor is responsible for manufacturing an
-empty document node for this purpose and for maintaining the
-association between that empty document node and the corresponding
-non-XML document.</para>
+associated with the <parameter>doc</parameter> specified. If the item
+is not associated with a document, the resulting map will be empty.</para>
 
 <para>The <function>p:document-properties</function> function behaves
 normally during static anlaysis.</para>
@@ -1824,23 +1816,16 @@ of a document as an XML document.</para>
 <methodsynopsis>
 <type>document-node()</type>
 <methodname>p:document-properties-document</methodname>
-<methodparam><type>document-node()</type><parameter>doc</parameter></methodparam>
+<methodparam><type>item()</type><parameter>doc</parameter></methodparam>
 </methodsynopsis>
 
 <para>The document returned is a <code>p:document-properties</code>
 document that contains (exclusively) the document properties
 associated with the <parameter>doc</parameter> specified. Each key in the
 properties becomes an element, each value becomes the content of that element.
-For atomic values other than string, an <tag class="attribute">xsi:type</tag> attribute is added to identify the
+For atomic values other than string, an
+<tag class="attribute">xsi:type</tag> attribute is added to identify the
 type of the value.</para>
-
-<para feature="document-properties-non-xml-document">The context node
-for the <function>p:document-properties-document</function> function must be an
-XPath document node. In order to access the document properties of a
-non-XML document, the processor is responsible for manufacturing an
-empty document node for this purpose and for maintaining the
-association between that empty document node and the corresponding
-non-XML document.</para>
 
 <para>The <function>p:document-properties-document</function> function behaves
 normally during static anlaysis.</para>
@@ -2115,12 +2100,14 @@ value template as an <type>xs:untypedAtomic</type>.</para>
 <title>Text Value Templates</title>
 
 <para>This section describes how text nodes are processed when they
-are designated text value templates. All text nodes that are the
-descendants of a <tag>p:inline</tag> element are text value templates
-unless the <tag>p:inline</tag> has an <tag class="attribute">expand-text</tag> attribute with the value
-“<code>false</code>”. Text nodes that are descendants of an element
-node in an implicit inline are text value templates as well. No other
-text node is a text value template.</para>
+are designated text value templates. Text nodes that are descendants
+of a <tag>p:inline</tag> and text nodes that are descendants of an
+element node in an implicit inline may be text value templates. No
+other text node is a text value template.</para>
+
+<para>Whether or not a text node that may be a text value template is
+designated one is determined by the <code>expand-text</code> attribute,
+see <xref linkend="expand-text-attribute"/>.</para>
 
 <para><termdef xml:id="dt-text-value-template">In a text node that is
 designated as a <firstterm>text value template</firstterm>,
@@ -2231,6 +2218,41 @@ evaluating the template.</para>
 <para>Interpretation of the character content of the <tag>p:inline</tag>
 according to the media type occurs after text value templates have been
 replaced.</para>
+
+<section xml:id="expand-text-attribute">
+<title>The [p:]expand-text attribute</title>
+
+<para>The <code>expand-text</code> attribute controls
+whether or not its descendant text nodes are designated as text value
+templates. On elements in the XProc namespace, the attribute is
+named <tag class="attribute">expand-text</tag>. On elements that are
+not in the XProc namespace, the attribute is named
+<tag class="attribute">p:expand-text</tag>.</para>
+
+<para>If the <code>expand-text</code> attribute appears on more than one
+element among the ancestors of a text node, only the value on the nearest
+ancestor is considered. (An <code>expand-text</code> attribute on an element overrides
+the value on all of its ancestors.)</para>
+
+<para>If the nearest <code>expand-text</code> attribute has the value
+“<code>false</code>”, then the text nodes are not text value
+templates. If it has the value “<code>true</code>”, or if no
+<code>expand-text</code> attribute is present among the text node’s
+ancestors, then the text nodes are text value templates.</para>
+
+<!--feature="p-inline-no-nesting"-->
+<para>If a <tag>p:inline</tag> occurs as a descendant of another
+<tag>p:inline</tag>, any <tag class="attribute">expand-text</tag>
+within the inner <tag>p:inline</tag> is treated like an ordinary
+attribute; that is, neither will its value influence text expansion
+nor will it be removed from the descendant.</para>
+
+<!-- feature="no-p-expand-text-on-p"-->
+<para><error code="S0084">It is a <glossterm>static error</glossterm> if the
+<tag class="attribute">p:expand-text</tag> attribute appears on any element
+in the XProc namespace.</error>
+</para>
+</section>
 
 <simplesect>
 <title>Examples</title>
@@ -4774,7 +4796,7 @@ bound to a namespace.</error>
 If an atomic type,
 or sequence of atomic types, is specified, the value provided for the
 option will be atomized according to the standard XPath rules.
-<error code="D0049">It is a <glossterm>dynamic error</glossterm> if
+<error code="S0096">It is a <glossterm>static error</glossterm> if
 the sequence type is not syntactically valid.</error>
 <error code="D0036">It is a <glossterm>dynamic error</glossterm> if
 the computed value does not match the specified sequence
@@ -4787,9 +4809,10 @@ type.</error></para>
 statically or not. See <link linkend="statics"/>.
 If <tag class="attribute">static</tag> is not specified, it
 defaults to “<code>false</code>”.</para>
-<para>A variable that is declared static cannot have a
-<tag class="attribute">pipe</tag> attribute or <tag>p:pipe</tag> children.
-</para>
+<para><error code="S0098">It is a <glossterm>static error</glossterm> 
+if a variable is declared as static and the <tag>p:variable</tag> has 
+a <tag class="attribute">pipe</tag> attribute or <tag>p:pipe</tag> 
+children.</error></para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">select</tag></term>
@@ -4924,7 +4947,8 @@ The following rules apply:</para>
     <listitem>
       <para>If an atomic type,
         or sequence of atomic types, is specified, the value provided for the
-        option will be atomized according to the standard XPath rules. <error code="D0049">It is a <glossterm>dynamic error</glossterm> if
+        option will be atomized according to the standard XPath rules. 
+        <error code="S0096">It is a <glossterm>static error</glossterm> if
           the sequence type is not syntactically valid.</error>
         <error code="D0036">It is a <glossterm>dynamic error</glossterm> if
           the computed value does not match the specified sequence
@@ -5045,7 +5069,7 @@ name as part of the same step invocation.</error></para>
 If an atomic type,
 or sequence of atomic types, is specified, the value provided for the
 option will be atomized according to the standard XPath rules.
-<error code="D0049">It is a <glossterm>dynamic error</glossterm> if
+<error code="S0096">It is a <glossterm>static error</glossterm> if
 the sequence type is not syntactically valid.</error>
 <error code="D0036">It is a <glossterm>dynamic error</glossterm> if
 the computed value does not match the specified sequence
@@ -5114,8 +5138,8 @@ author to exclude some namespace declarations in inline content, see <tag>p:inli
 </variablelist>
 
 <para><error code="S0092">It is a <glossterm>static
-error</glossterm> if a <tag>p:with-option</tag> refers to an option that
-is declared static.</error>
+error</glossterm> if a <tag>p:with-option</tag> attempts to change
+the value of an option that is declared static.</error>
 See <xref linkend="statics"/>.</para>
 </section>
 
@@ -5529,8 +5553,9 @@ the body is not correctly encoded per the value of the <tag class="attribute">en
 </para>
 
 <para><error code="S0088">It is a <glossterm>static error</glossterm>
-if an <tag class="attribute">encoding</tag> is specified on <tag>p:inline</tag> and
-<tag class="attribute">expand-text</tag> is true.</error></para>
+if a text node designated as a <link linkend="text-value-templates">text
+value template</link> appears in a <tag>p:inline</tag> where an
+<tag class="attribute">encoding</tag> is specified.</error></para>
 
 <para>The interpretation of the (possibily decoded) content
 depends on the document's content type.
@@ -5654,33 +5679,8 @@ as defined below, are removed:</para>
               prefix has been preserved, but it would be equally correct if a different
               prefix had been used.</para>
 
-<para>If the <tag class="attribute">expand-text</tag> attribute is not
-false, then each attribute value and text node within the
-<tag>p:inline</tag> is evaluated as a <glossterm>text value
-template</glossterm>. The context node for these expressions is
-undefined.</para>
-
-<para xml:id="p.expand-text">Within the descendants of <tag>p:inline</tag> the attribute
-<tag class="attribute">p:expand-text</tag> (i.e., the attribute <code>expand-text</code>
-<emphasis>in the XProc namespace</emphasis>), may appear on an element.
-If it does, the specified value is used as the expand text value
-for the descendants of the element on which it occurs. The
-<tag class="attribute">p:expand-text</tag> will not appear in the inline content.
-</para>
-
-<!--feature="p-inline-no-nesting"-->
-<para>If a <tag>p:inline</tag> occurs as
-a descendant of another <tag>p:inline</tag>, any <tag class="attribute">expand-text</tag> within the inner
-<tag>p:inline</tag> is treated like an ordinary attribute; that is,
-neither will its value influence text expansion nor will it be removed
-from the descendant.</para>
-
-<!-- feature="no-p-expand-text-on-p"-->
-<para>(A <tag class="attribute">p:expand-text</tag> attribute on an element in the
-XProc namespace is an error. If it occurs on other elements that are
-not descendants of <tag>p:inline</tag>, the attribute has no
-effect.)</para>
-
+<para>The text-node descendants of a <tag>p:inline</tag> may be
+<link linkend="text-value-templates">text value templates</link>.</para>
 </section>
 
 <section xml:id="implicit-inlines">
@@ -6189,8 +6189,7 @@ name</link>. The value may be any XPath data model value.</para></glossdef></glo
           explicitly marked “<code>primary='true'</code>”, or if it has exactly one document output
           port and that port is <emphasis>not</emphasis> explicitly marked
             “<code>primary='false'</code>”, then that output port is the <firstterm>primary output
-            port</firstterm> of the step.</para></glossdef></glossentry><glossentry><glossterm>proxy document</glossterm><glossdef><para>A <firstterm>proxy document</firstterm> is
-an empty document node.</para></glossdef></glossentry><glossentry><glossterm>readable
+            port</firstterm> of the step.</para></glossdef></glossentry><glossentry><glossterm>readable
                 ports</glossterm><glossdef><para>The <firstterm>readable
                 ports</firstterm> are a set of step name/port name pairs.</para></glossdef></glossentry><glossentry><glossterm>representation</glossterm><glossdef><para>A <firstterm>representation</firstterm>
 is a data structure used by an XProc processor to refer to the actual
