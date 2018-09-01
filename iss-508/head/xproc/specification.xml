@@ -2230,6 +2230,37 @@ templates. If it has the value “<code>true</code>”, or if no
 <code>expand-text</code> attribute is present among the text node’s
 ancestors, then the text nodes are text value templates.</para>
 
+<para>When an <tag class="attribute">expand-text</tag> or
+<tag class="attribute">p:expand-text</tag> attribute occurs on elements
+that are descendants of a <tag>p:inline</tag> (explicit or implicit),
+they control the expand text behavior of thier descendants, but are removed
+from the elements on which they occur.</para>
+
+<para>The following step:</para>
+
+<programlisting language="xml">&lt;p:identity&gt;
+  &lt;p:with-input port="source"&gt;
+    &lt;p:inline expand-text="true"&gt;
+      &lt;doc sum="{3+7}" p:expand-text="false"&gt;
+        &lt;inner sum="{2+4}"/&gt;
+      &lt;/doc&gt;
+    &lt;/p:inline&gt;
+  &lt;/p:with-input&gt;
+&lt;/p:identity&gt;</programlisting>
+
+<para>produces the following result document:</para>
+
+<programlisting language="xml">&lt;doc sum="10"&gt;
+  &lt;inner sum="{2+4}"/&gt;
+&lt;/doc&gt;</programlisting>
+
+<para>If a pipeline requires explicit 
+<tag class="attribute">expand-text</tag> or
+<tag class="attribute">p:expand-text</tag> 
+attributes in a result that is constructed with a <tag>p:inline</tag>,
+add them in a different namespace and then use <tag>p:rename</tag>
+to rename them.</para>
+
 <!-- feature="no-p-expand-text-on-p"-->
 <para><error code="S0084">It is a <glossterm>static error</glossterm> if the
 <tag class="attribute">p:expand-text</tag> attribute appears on any element
@@ -4408,12 +4439,11 @@ port as primary.</error></para>
   if a document arrives on an output port whose content type is not accepted
   by the output port specification.</error></para>
 
-<note role="editorial">
-<title>Editorial Note</title>
-<para>Implementations are free to perform a static checking of the
-connected ports and indicate, that the content types of the connected
-ports will not match, however they <rfc2119>must not</rfc2119> raise a
-static error.
+<note>
+<para>Implementations are free to perform static checking of the
+connected ports and indicate that the content types of the connected
+ports will not match, however they <rfc2119>must not</rfc2119> raise an
+error statically.
 </para>
 </note>
 
