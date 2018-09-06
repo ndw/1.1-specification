@@ -4487,8 +4487,7 @@ document</emphasis> and provide it on the output port. It
 attribute allows the user to request serialization parameters on an
 output port. These parameters control XML serialization as defined
 by <biblioref linkend="xpath-serialization"/>.
-The attribute value is an XPath expression which returns
-a map from strings to atomic values.</para>
+</para>
 
 <para>If the pipeline processor serializes the output on a port, it
 <rfc2119 feature="ser-must-use">must</rfc2119> use the serialization
@@ -5431,7 +5430,7 @@ preceding variables, including those in the prologue.)
 
 <para>The prologue ends with additional <tag>p:declare-step</tag>
 elements, if any, and is followed by the subpipeline. Any step
-imported or declared in the prologue of a pipeine may be invoked as a
+imported or declared in the prologue of a pipeline may be invoked as a
 step within the subpipeline of that pipeline.</para>
 
 <para>The environment inherited by the
