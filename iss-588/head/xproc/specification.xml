@@ -68,7 +68,7 @@ and have no substructure as far as the pipeline is concerned. Compound
 steps and multi-container steps control the execution of other steps,
 which they include in the form of one or more subpipelines.</para>
 
-<para><biblioref linkend="xproc30-steps"/>
+<para><biblioref linkend="steps30"/>
 defines a standard library of steps. Pipeline implementations
 <rfc2119>may</rfc2119> support additional types of steps as well.
 </para>
@@ -207,7 +207,7 @@ performs XSLT processing; a Validate with XML Schema step validates
 one input with respect to some set of XML Schemas, etc.</para>
 
       <para>There are many <emphasis>types</emphasis> of atomic steps. The standard library of
-        atomic steps is described in <biblioref linkend="std-components"/>, but implementations
+        atomic steps is described in <biblioref linkend="steps30"/>, but implementations
           <rfc2119>may</rfc2119> provide others as well. <impl>It is
             <glossterm>implementation-defined</glossterm> what additional step types, if any, are
           provided. </impl> Each use, or instance, of an atomic step invokes the processing defined
@@ -364,54 +364,39 @@ defined properties.</para>
 <title>Document Types</title>
 
 <para>XProc 3.0 has been designed to make it possible to process any kind of
-document. Practically speaking, there are five kinds of documents:</para>
+document. Each document has a representation in the <biblioref linkend="xpath-datamodel"/>.
+This is necessary so that any kind of document can be passed as an argument to XPath functions,
+such as <tag>p:document-properties</tag>.
+Practically speaking, there are five kinds of documents:</para>
 
-<variablelist>
-<varlistentry><term>XML documents</term>
+<orderedlist>
 <listitem>
-<para>These are XML documents, instances of the <biblioref linkend="xpath-datamodel"/>.
-They are accessible via XPath expressions in the pipeline (for example, in the
-<tag class="attribute">select</tag> expression of a variable declaration).
+<para><link linkend="xml-documents">XML documents</link>
 </para>
 </listitem>
-</varlistentry>
-<varlistentry><term>HTML documents</term>
 <listitem>
-<para>Within XProc, these are XML documents, instances of the <biblioref linkend="xpath-datamodel"/>.
-They are accessible via XPath expressions in the pipeline. HTML documents are
-parsed with an HTML parser to produce their tree model in the XDM.
+<para><link linkend="html-documents">HTML documents</link>
 </para>
 </listitem>
-</varlistentry>
-<varlistentry><term>Text documents</term>
 <listitem>
-<para>Text documents are represented as a single text node in the XDM.
-They are accessible via XPath expressions in the pipeline.
+<para><link linkend="text-documents">Text documents</link>
 </para>
 </listitem>
-</varlistentry>
-<varlistentry><term>JSON documents</term>
 <listitem>
-<para>JSON documents are represented as maps, arrays, or atomic values in the XDM.
-They are accessible via XPath expressions in the pipeline.
+<para><link linkend="json-documents">JSON documents</link>
 </para>
 </listitem>
-</varlistentry>
-<varlistentry><term>Other documents</term>
 <listitem>
-<para>Other documents (JPEG images, ZIP files, CSV documents, etc.) are represented
-as empty document nodes in the XDM. They aren’t generally accessible in XPath expressions,
-although the <tag>p:document-properties</tag> family of functions can be used to access
-their document properties.
+<para><link linkend="other-documents">Other documents</link>
 </para>
 </listitem>
-</varlistentry>
-</variablelist>
+</orderedlist>
 
 <section xml:id="xml-documents">
 <title>XML Documents</title>
 
-<para>Representations of XML documents are instances of the <biblioref linkend="xpath-datamodel"/>. They are documents that contain a mixture
+<para>Representations of XML documents are general instances of the XDM.
+They are documents that contain a mixture
 of other node types (elements, text, comments, and processing
 instructions). This definition is intentionally broader than the
 definition of a well-formed XML document because it is often
@@ -444,7 +429,8 @@ in an XProc pipeline is <glossterm>implementation-defined</glossterm>.</impl>
 <section xml:id="html-documents">
 <title>HTML Documents</title>
 
-<para>Representations of HTML documents are instances of the <biblioref linkend="xpath-datamodel"/>. The must conform to the constraints of
+<para>Representations of HTML documents are general instances of the XDM.
+Within XProc, they are
 <xref linkend="xml-documents"/>.
 HTML documents are identified by an HTML media type.
 <termdef xml:id="dt-HTML-media-type">The
@@ -454,16 +440,36 @@ are <firstterm baseform="HTML media type">HTML media types</firstterm>.
 </termdef>
 </para>
 
-<para>When a document with an HTML media type is parsed, an
-HTML parser <rfc2119>must</rfc2119> be used.</para>
+<para>The distinction between XML documents and HTML documents is apparent
+in two places:</para>
+
+<orderedlist>
+<listitem>
+<para>When an HTML document is <emphasis>parsed</emphasis>, for example when it
+is the result of querying a web service or is loaded from a file on disk, an
+HTML parser <rfc2119>must</rfc2119> be used. An HTML parser will construct a
+balanced tree even if the HTML document would not be seen as
+well-formed XML if it was parsed by an XML parser.  An HTML parser may also
+add elements not found in the original (for example table body elements inside tables).
+</para>
+<note xml:id="inline-html">
+<para>The HTML parsing rules only apply when the content is parsed. HTML content
+in an unencoded <tag>p:inline</tag> must be well-formed XML (because it is literally
+in the pipeline) and will not be transformed in any way.</para>
+</note>
+</listitem>
+<listitem>
+<para>When an HTML document is serialized, it may be serialized using the
+HTML serializer (see <xref linkend="xml-serializer-31"/>) by default.
+</para>
+</listitem>
+</orderedlist>
 </section>
 
 <section xml:id="text-documents">
 <title>Text Documents</title>
 
-<para>Representations of text documents are instances of
-the <biblioref linkend="xpath-datamodel"/>. They are documents that
-contain a single text node.
+<para>Representations of text documents are XDM documents that contain a single text node.
 Text documents are identified by a
 text media type.
 <termdef xml:id="dt-text-media-type">Media types of the form
@@ -478,8 +484,8 @@ and “<literal>text/html</literal>” which is an HTML media type.
 <section xml:id="json-documents">
 <title>JSON Documents</title>
 
-<para>Representations of JSON documents are instances of
-the <biblioref linkend="xpath-datamodel"/>. They are maps, arrays, or
+<para>Representations of JSON documents are instances of the XDM.
+They are maps, arrays, or
 atomic values.
 JSON documents are identified by a
 JSON media type.
@@ -502,8 +508,7 @@ can’t contain maps or arrays). Can we get away with that?</para>
 <section xml:id="other-documents">
 <title>Other documents</title>
 
-<para>Representations of other kinds of documents are instances of the
-<biblioref linkend="xpath-datamodel"/>. They are empty document nodes.
+<para>Representations of other kinds of documents are empty XDM documents.
 <impl>The <emphasis>underlying</emphasis> representations of other
 kinds of documents are
 <glossterm>implementation-defined</glossterm>.</impl>
@@ -850,7 +855,7 @@ value template in a <tag>p:inline</tag>.
           for <glossterm>namespace fixup</glossterm>. In particular, processors are encouraged to
           take account of prefix information in creating new namespace bindings, to minimize
           negative impact on prefixed names in content.</para>
-        <para><impl>Except for cases which are specifically called out in <biblioref linkend="std-components"/>, the extent to which namespace fixup, and other checks for
+        <para><impl>Except for cases which are specifically called out in <biblioref linkend="steps30"/>, the extent to which namespace fixup, and other checks for
             outputs which cannot be serialized, are performed on intermediate outputs is
               <glossterm>implementation-defined</glossterm>.</impl></para>
         <para>Whenever an implementation serializes pipeline contents, for example for pipeline
@@ -3250,8 +3255,8 @@ are allowed anywhere, and attributes that are
     </para>
   </listitem>
   <listitem>
-    <para><type>QNameList</type>: As a whitespace separated list of
-    QNames, per the definition above.
+    <para><type>EQNameList</type>: As a whitespace separated list of
+    EQNames, per the definition above.
     </para>
   </listitem>
   <listitem>
@@ -3374,7 +3379,7 @@ are allowed anywhere, and attributes that are
     <title>Steps</title>
     <para>This section describes the core language steps of XProc; the full
 vocabulary of standard, atomic steps is described in
-<biblioref linkend="std-components"/>.</para>
+<biblioref linkend="steps30"/>.</para>
 
 <para>The following dynamic errors are described in the atomic step vocabulary.
 They are repeated here so that the list of dynamic errors is wholly contained
@@ -3944,9 +3949,9 @@ If there is no matching <tag>p:catch</tag>, the <tag>p:try</tag> fails.
 <error code="S0064">It is a <glossterm>static error</glossterm>
 if the <tag class="attribute">code</tag> attribute is missing from
 any but the last <tag>p:catch</tag> or if any error code is
-repeated.</error> <error code="XS0083">It is a <glossterm>static 
+repeated.</error> <error code="S0083">It is a <glossterm>static 
 error</glossterm> if the value of the <tag class="attribute">code</tag>
-attribute is not a whitespace separated list of QNames.</error></para>
+attribute is not a whitespace separated list of EQNames.</error></para>
 
 <para>If the recovery subpipeline is evaluated, the outputs of the
 recovery subpipeline are the outputs of the <tag>p:try</tag> step. If
@@ -4177,7 +4182,7 @@ can provide some sort of default for the rest of the pipeline.</para>
 
 <section xml:id="p.atomic"><title>Atomic Steps</title><para>In addition to the six step types
         described in the preceding sections, XProc provides a standard library of atomic step types.
-        The full vocabulary of standards steps is described in <biblioref linkend="std-components"/>.</para>
+        The full vocabulary of standards steps is described in <biblioref linkend="steps30"/>.</para>
 <para>All of the standard, atomic steps are invoked in the same way:</para>
       <e:rng-pattern name="OtherAtomicStep"/>
       <para>Where “<replaceable>p:atomic-step</replaceable>” <rfc2119>must</rfc2119> be in the XProc
@@ -6339,11 +6344,10 @@ in the PSVI, are preserved between steps.</impl></para>
 <section xml:id="normative-references">
   <title>Normative References</title>
   <bibliolist>
-    <bibliomixed xml:id="std-components"><abbrev>XProc 2.0: Standard Step Library</abbrev>
-<citetitle xlink:href="http://www.w3.org/TR/xproc20-steps/">XProc 2.0:
-Standard Step Library</citetitle>.
-Alex Milowski, Henry Thompson, and Norman Walsh editors.
-W3C Working Group Note 21 July 2016.
+    <bibliomixed xml:id="steps30"><abbrev>Steps 3.0</abbrev>
+<citetitle xlink:href="http://spec.xproc.org/">XProc 3.0: Standard
+Step Library</citetitle>.
+Norman Walsh, Achim Berndzen, Gerrit Imsieke and Erik Siegel, editors.
 </bibliomixed>
     <bibliomixed xml:id="xml-infoset-rec"><abbrev>Infoset</abbrev>
 <citetitle xlink:href="http://www.w3.org/TR/xml-infoset/">XML
@@ -6370,9 +6374,6 @@ editors. W3C Recommendation 16 August 2006.</bibliomixed>
 in XML 1.1 (Second Edition)</citetitle>. Tim Bray,
 Dave Hollander, Andrew Layman, et. al.,
 editors. W3C Recommendation 16 August 2006.</bibliomixed>
-    <bibliomixed xml:id="lastcall-xslt30"><abbrev>XSLT 3.0</abbrev>
-   <citetitle xlink:href="http://www.w3.org/TR/xslt-30/">XSL Transformations (XSLT) Version 3.0</citetitle>. Michael Kay,
-   W3C Recommendation 8 June 2017</bibliomixed>
     <bibliomixed xml:id="xpath31"><abbrev>XPath 3.1</abbrev>
 <citetitle xlink:href="http://www.w3.org/TR/xpath31/">XML Path Language (XPath)
 	3.1</citetitle>. Jonathan Robie, Michael Dyck, Josh Spiegel, editors.
@@ -6383,7 +6384,10 @@ Model (XDM)</abbrev>
 XPath 2.0 Data Model (XDM)</citetitle>.
 Mary Fernández, Ashok Malhotra, Jonathan Marsh, <foreignphrase>et. al.</foreignphrase>, editors.
 W3C Recommendation. 23 January 2007.</bibliomixed>
-    <bibliomixed role="error" xml:id="xml-serialization-31">@@FIXME:MISSING </bibliomixed>
+    <bibliomixed xml:id="xml-serialization-31"><abbrev>Serialization</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/xslt-xquery-serialization-31/">XSLT
+and XQuery Serialization 3.1</citetitle>.
+Andrew Coleman and C. M. Sperberg-McQueen, editors. W3C Recommendation. 21 March 2017.</bibliomixed>
     <bibliomixed xml:id="xpath31-functions"><abbrev>XPath and XQuery Functions and Operators 3.1</abbrev>
 <citetitle xlink:href="https://www.w3.org/TR/xpath-functions-31/">XPath and XQuery Functions and  Operators 3.1</citetitle>. Michael Kay, editor.
 W3C Recommendation. 21 March 2017</bibliomixed>
