@@ -7,6 +7,9 @@
 <bibliorelation type="isformatof" xlink:href="specification.xml">XML</bibliorelation>
 <authorgroup>
   <author>
+    <personname>Norman Walsh</personname>
+  </author>
+  <author>
     <personname>Achim Berndzen</personname>
   </author>
   <author>
@@ -14,9 +17,6 @@
   </author>
   <author>
     <personname>Erik Siegel</personname>
-  </author>
-  <author>
-    <personname>Norman Walsh</personname>
   </author>
 </authorgroup>
 
@@ -168,18 +168,37 @@ compatible versions.</para>
     <type>xs:string</type> (or a type 
     derived from <type>xs:string</type>) the QName is constructed using the <link xlink:href="https://www.w3.org/TR/xpath-31/#doc-xpath31-EQName">XPath EQName production rules</link>. That is, it can be written
     as a local-name only, as a prefix plus local-name or as a URI plus
-    local-name (using the <code>Q{}</code> syntax). <error code="D0061">It is a 
-    <glossterm>dynamic error</glossterm> if the string value cannot be converted 
-    into a QName.</error> <error code="D0034">It is a <glossterm>dynamic 
-    error</glossterm> to specify a new namespace or prefix if the lexical value 
-    of the specified name contains a colon.</error> The corresponding expanded name 
-    is used to construct the attribute. <error code="D0067">It is a 
-    <glossterm>dynamic error</glossterm> to specify a namespace using the namespace
-    supplying option if the <code>Q{}</code> syntax is used.</error>
-    </para>
+    local-name (using the <code>Q{}</code> syntax). The following errors may occur:</para>
+    <itemizedlist>
+      <listitem>
+        <para><error code="D0061">It is a 
+          <glossterm>dynamic error</glossterm> if the string value cannot be converted 
+          into a QName.</error></para>
+      </listitem>
+      <listitem>
+        <para><error code="D0034">It is a <glossterm>dynamic 
+          error</glossterm> to specify a new namespace or prefix if the lexical value 
+          of the specified name contains a colon.</error> The corresponding expanded name 
+          is used to construct the attribute.</para>
+      </listitem>
+      <listitem>
+        <para><error code="D0069">It is a <glossterm>dynamic
+          error</glossterm> if the lexical value of the specified name contains a colon and the
+          prefix is not bound to a namespace URI.</error> </para>
+      </listitem>
+      <listitem>
+        <para><error code="D0070">It is a <glossterm>dynamic error</glossterm> if a prefix suggestion
+        is supplied, but no namespace URI is provided.</error></para>
+      </listitem>
+      <listitem>
+        <para><error code="D0067">It is a 
+          <glossterm>dynamic error</glossterm> to specify a namespace using the namespace
+          supplying option if the <code>Q{}</code> syntax is used.</error></para>
+      </listitem>
+    </itemizedlist>
   </listitem>
   <listitem>
-  	<para><error code="D0067">It is a <glossterm>dynamic error</glossterm> if
+  	<para><error code="D0068">It is a <glossterm>dynamic error</glossterm> if
   	the supplied value is neither an instance of <type>xs:QName</type> nor an
   	instance of <type>xs:string</type>.</error>
   	</para>
@@ -267,12 +286,12 @@ Mar 1997.
   <bibliomixed xml:id="xproc30"><abbrev>XProc 3.0</abbrev>
 <citetitle xlink:href="http://spec.xproc.org/">XProc 3.0:
 An XML Pipeline Language</citetitle>.
-Achim Berndzen, Gerrit Imsieke, Erik Siegel and Norman Walsh, editors.
+Norman Walsh, Achim Berndzen, Gerrit Imsieke and Erik Siegel, editors.
 </bibliomixed>
   <bibliomixed xml:id="steps30"><abbrev>Steps 3.0</abbrev>
 <citetitle xlink:href="http://spec.xproc.org/">XProc 3.0: Standard
 Step Library</citetitle>.
-Achim Berndzen, Gerrit Imsieke, Erik Siegel and Norman Walsh, editors.
+Norman Walsh, Achim Berndzen, Gerrit Imsieke and Erik Siegel, editors.
 </bibliomixed>
   <bibliomixed xml:id="xmlschema-2"><abbrev>W3C XML Schema: Part 2</abbrev>
 <citetitle xlink:href="http://www.w3.org/TR/xmlschema-2/">XML Schema Part 2:
