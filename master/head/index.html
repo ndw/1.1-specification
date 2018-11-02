@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0 Overview</title><meta charset="utf-8" /><link rel="alternate" title="XML" href="specification.xml" /><link rel="alternate" title="Latest editor's draft" href="http://www.w3.org/XML/XProc/docs/langspec.html" /><link rel="alternate" title="Latest Public Working Draft" href="http://www.w3.org/TR/xproc/" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.3.6" /><meta name="description" content="Abstract This specification provides an overview of the XProc specifications." /><link href="css/prism.css" rel="stylesheet" type="text/css" /><link href="css/db-prism.css" rel="stylesheet" type="text/css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><link rel="stylesheet" type="text/css" href="css/xproc.css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><script type="text/javascript" src="js/dbmodnizr.js"></script></head><body><div class="specification"><div class="head" id="spec.head"><h1>XProc 3.0 Overview</h1><h2>Editor's Draft  <time datetime="2018-09-01T11:12:52Z">1 September 2018 at 11:12 UTC (<a href="https://github.com/ndw/3.0-specification/commit/1461764182178768ee65489102b710510d332be9">build 278</a>)</time></h2><dl><dt>This Version:</dt><dd><a href="https://ndw.github.io/3.0-specification/master/head/">https://ndw.github.io/3.0-specification/master/head/</a></dd><dt>Latest Version:</dt><dd><a href="http://spec.xproc.org/master/head/">http://spec.xproc.org/master/head/</a></dd><dt>Editors:</dt><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Erik Siegel</span></dd><dd><span class="personname">Norman Walsh</span></dd><dt>Repository:</dt><dd><a href="http://github.com/ndw/3.0-specification">This specification on GitHub</a></dd><dd><a href="http://github.com/xproc/3.0-specification/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="http://github.com/ndw/3.0-specification/commits/master">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="specification.xml">XML</a>.</p><p class="copyright"><span class="copyright">Copyright © <span class="years">2018</span> <span class="holders"><span class="holder">@@FIXME:</span></span></span></p><hr /><div class="abstract"><h2>Abstract</h2>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0 Overview</title><meta charset="utf-8" /><link rel="alternate" title="XML" href="specification.xml" /><link rel="alternate" title="Latest editor's draft" href="http://www.w3.org/XML/XProc/docs/langspec.html" /><link rel="alternate" title="Latest Public Working Draft" href="http://www.w3.org/TR/xproc/" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.3.7" /><meta name="description" content="Abstract This specification provides an overview of the XProc specifications." /><link href="css/prism.css" rel="stylesheet" type="text/css" /><link href="css/db-prism.css" rel="stylesheet" type="text/css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><link rel="stylesheet" type="text/css" href="css/xproc.css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><script type="text/javascript" src="js/dbmodnizr.js"></script></head><body><div class="specification"><div class="head" id="spec.head"><h1>XProc 3.0 Overview</h1><h2>Editor's Draft  <time datetime="2018-11-02T12:38:19Z">2 November 2018 at 12:38 UTC (<a href="https://github.com/ndw/3.0-specification/commit/b42be70ffc74757e77186b4b5dc1802604c78363">build 338</a>)</time></h2><dl><dt>This Version:</dt><dd><a href="https://ndw.github.io/3.0-specification/master/head/">https://ndw.github.io/3.0-specification/master/head/</a></dd><dt>Latest Version:</dt><dd><a href="http://spec.xproc.org/master/head/">http://spec.xproc.org/master/head/</a></dd><dt>Editors:</dt><dd><span class="personname">Norman Walsh</span></dd><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Erik Siegel</span></dd><dt>Repository:</dt><dd><a href="http://github.com/ndw/3.0-specification">This specification on GitHub</a></dd><dd><a href="http://github.com/xproc/3.0-specification/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="http://github.com/ndw/3.0-specification/commits/master">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="specification.xml">XML</a>.</p><p class="copyright"><span class="copyright">Copyright © <span class="years">2018</span> <span class="holders"><span class="holder">@@FIXME:</span></span></span></p><hr /><div class="abstract"><h2>Abstract</h2>
   <p>This specification provides an overview of the XProc specifications.</p>
 </div><div class="status"><h2>Status of this Document</h2><p><strong>This document is an editor's  draft that has no official standing.</strong></p>
 
@@ -23,10 +23,9 @@ See also
 <section id="language" class="section"><div class="section-titlepage"><h2>2 XProc 3.0</h2></div><div class="content">
 
 
-<p>XProc 3.0 is defined normatively by three specifications:</p>
+<p>XProc 3.0 is defined normatively by two specifications:</p>
 
 <div class="itemizedlist">
-
 
 
 <ul><li>
@@ -37,10 +36,6 @@ defines the semantics of XProc pipelines.</p>
 defines the required atomic steps. All conformant implementations implement
 these steps.
 </p>
-</li><li>
-<p><cite><a href="steps-intro/">XProc 3.0 Steps: An Introduction</a></cite>
-describes general features of atomic steps common to both the required
-and all optional steps.</p>
 </li></ul></div>
 </div></section>
 
@@ -56,7 +51,7 @@ and all optional steps.</p>
 
 
 <ul><li>
-<p><cite><a href="validation/">XProc 3.0: Optional Validation Steps</a></cite>
+<p><cite><a href="validation/">XProc 3.0: Validation Steps</a></cite>
 </p>
 </li><li>
 <p><cite><a href="exec/">XProc 3.0: Exec</a></cite>
