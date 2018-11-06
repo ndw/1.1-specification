@@ -739,7 +739,8 @@ content types, that they accept. Input documents must
           step</glossterm> in its subpipeline has an unconnected primary output, then an implicit
         primary output port will be added to the compound step (and consequently the last step's
         primary output will be connected to it). This implicit output port has no name. It inherits
-        the <tag class="attribute">sequence</tag> property of the port connected to it. This rule
+        the <tag class="attribute">sequence</tag> and the <tag class="attribute">content-types</tag>
+        properties of the port connected to it. This rule
         does not apply to <tag>p:declare-step</tag>; step declarations must provide explicit names
         for all of their outputs.</para>
     </section>
@@ -4010,9 +4011,8 @@ on the <tag>p:if</tag> will produce any documents.</para>
 </section>
 
     <section xml:id="p.group"><title>p:group</title><para>A group is specified by the
-          <tag>p:group</tag> element. In a <tag>p:try</tag>, it is a non-step wrapper, everywhere
-        else, it is a <glossterm>compound step</glossterm>. A group encapsulates the behavior of its
-          <glossterm>subpipeline</glossterm>.</para>
+          <tag>p:group</tag> element. It is a <glossterm>compound step</glossterm> that
+           encapsulates the behavior of its <glossterm>subpipeline</glossterm>.</para>
       <e:rng-pattern name="Group"/>
       <para>A <tag>p:group</tag> is a convenience wrapper for a collection of steps. </para><section xml:id="example-group" role="tocsuppress">
         <title>Example</title>
@@ -4072,13 +4072,12 @@ the <tag>p:try</tag> step. However, if any errors occur, the
 that it might have generated, and considers the recovery
 subpipelines.</para>
 
-<para>Each <tag>p:catch</tag> pipeline is considered in document
-order. All except the last <rfc2119>must</rfc2119> have a
-<tag class="attribute">code</tag> attribute. If any of the specified error
+<para>All except the last <tag>p:catch</tag> pipeline <rfc2119>must</rfc2119> 
+have a <tag class="attribute">code</tag> attribute. If any of the specified error
 codes matches the error that was raised in the initial subpipeline, then
 that <tag>p:catch</tag> is selected as the recovery pipeline.
 If the last <tag>p:catch</tag> does not have a <tag class="attribute">code</tag>
-attribute, it is selected if no preceding <tag>p:catch</tag> has a
+attribute, it is selected if no other <tag>p:catch</tag> has a
 matching error code.
 If there is no matching <tag>p:catch</tag>, the <tag>p:try</tag> fails.
 <error code="S0064">It is a <glossterm>static error</glossterm>
@@ -5969,7 +5968,10 @@ step.</para>
 another step. It identifies the readable port to which it connects
 with the name of the step in the <tag class="attribute">step</tag>
 attribute and the name of the port on that step in the
-<tag class="attribute">port</tag> attribute.</para>
+<tag class="attribute">port</tag> attribute. <error code="S0099">It
+is a <glossterm>static error</glossterm> if <tag class="attribute">step</tag> 
+or <tag class="attribute">port</tag> are not valid instances of 
+<literal>NCName</literal>.</error></para>
 
 <para>If the <tag class="attribute">step</tag> attribute is not specified,
 it defaults to the step which provides the default readable port.
