@@ -3390,10 +3390,8 @@ are allowed anywhere, and attributes that are
               value does not satisfy the type required for that attribute.</error></para>
         </listitem>
         <listitem>
-          <para><error code="S0044">It is a <glossterm>static error</glossterm> if any element in
-              the XProc namespace or any step has element children other than those specified for it
-              by this specification. In particular, the presence of atomic steps for which there is
-              no visible declaration may raise this error. </error></para>
+          <para><error code="S0044">It is a <glossterm>static error</glossterm> if any step contains 
+            an atomic step for which there is no visible declaration.</error></para>
         </listitem>
         <listitem>
           <para><error code="S0037">It is a <glossterm>static error</glossterm> if any user extension 
@@ -5524,15 +5522,19 @@ static.</para>
 <section xml:id="varopt-types">
 <title>XProc sequence type</title>
 
-<para>Variables and options may declare that they have a type using an XProc sequence type.
-<error code="S0096">It is a <glossterm>static error</glossterm> if
-the sequence type is not syntactically valid.</error></para>
+<para>Variables and options may declare that they have a type using an
+XProc sequence type. <error code="S0096">It is a <glossterm>static
+error</glossterm> if the sequence type is not syntactically
+valid.</error> The sequence type <literal>item()*</literal> is assumed if
+no explicit type is provided.
+</para>
 
-<para>If a variable or option declares a type, the value provided for the
-variable or option will be atomized according to the standard XPath rules.
-<error code="D0036">It is a <glossterm>dynamic error</glossterm> if
-the computed value does not match the specified sequence
-type.</error></para>
+<para>If a variable or option declares a type, the supplied value 
+ of the variable or option is converted to the required type, 
+ using the function conversion rules specified by XPath 3.1.
+ <error code="D0036">It is a <glossterm>dynamic error</glossterm> if 
+ the supplied value of a variable or option cannot be converted 
+ to the required type.</error></para>
 
 <para>XProc extends the syntax of sequence types slightly.
 The type of a variable or
