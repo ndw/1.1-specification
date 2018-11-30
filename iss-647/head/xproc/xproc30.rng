@@ -1066,37 +1066,65 @@
       <ref name="common.attributes"/>
       <ref name="global.attributes"/>
       <ref name="step.attributes"/>
-      <zeroOrMore>
+      <group>
+        <zeroOrMore>
+          <choice>
+            <ref name="Documentation"/>
+            <ref name="PipeInfo"/>
+          </choice>
+        </zeroOrMore>
+        <optional>
+          <ref name="WithInput"/>
+        </optional>
         <choice>
-          <ref name="Documentation"/>
-          <ref name="PipeInfo"/>
+          <group>
+            <oneOrMore>
+              <zeroOrMore>
+                <choice>
+                  <ref name="Documentation"/>
+                  <ref name="PipeInfo"/>
+                </choice>
+              </zeroOrMore>
+              <ref name="When"/>
+            </oneOrMore>
+            <optional>
+              <zeroOrMore>
+                <choice>
+                  <ref name="Documentation"/>
+                  <ref name="PipeInfo"/>
+                </choice>
+              </zeroOrMore>
+              <ref name="Otherwise"/>
+            </optional>
+          </group>
+          <group>
+            <zeroOrMore>
+              <zeroOrMore>
+                <choice>
+                  <ref name="Documentation"/>
+                  <ref name="PipeInfo"/>
+                </choice>
+              </zeroOrMore>
+              <ref name="When"/>
+            </zeroOrMore>
+            <group>
+              <zeroOrMore>
+                <choice>
+                  <ref name="Documentation"/>
+                  <ref name="PipeInfo"/>
+                </choice>
+              </zeroOrMore>
+              <ref name="Otherwise"/>
+            </group>
+          </group>
         </choice>
-      </zeroOrMore>
-      <optional>
-        <ref name="WithInput"/>
-      </optional>
-      <zeroOrMore>
-        <choice>
-          <ref name="Documentation"/>
-          <ref name="PipeInfo"/>
-          <ref name="When"/>
-        </choice>
-      </zeroOrMore>
-      <zeroOrMore>
-        <choice>
-          <ref name="Documentation"/>
-          <ref name="PipeInfo"/>
-        </choice>
-      </zeroOrMore>
-      <optional>
-        <ref name="Otherwise"/>
-      </optional>
-      <zeroOrMore>
-        <choice>
-          <ref name="Documentation"/>
-          <ref name="PipeInfo"/>
-        </choice>
-      </zeroOrMore>
+        <zeroOrMore>
+          <choice>
+            <ref name="Documentation"/>
+            <ref name="PipeInfo"/>
+          </choice>
+        </zeroOrMore>
+      </group>
     </element>
   </define>
   <define name="When" sa:class="language-construct">
