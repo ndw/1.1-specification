@@ -2052,64 +2052,6 @@ non-XML document.</para>
 normally during static analysis.</para>
 </section>
 
-<section xml:id="f.force-qname-keys">
-<title>Force QName keys</title>
-
-<para>This function forces a <type>map(*)</type> into a
-<type>map(xs:QName, item()*)</type>.</para>
-
-<methodsynopsis>
-  <type>map(xs:Qname, item()*)</type>
-  <methodname>p:force-qname-keys</methodname>
-  <methodparam>
-    <type>map(*)</type>
-    <parameter>map</parameter>
-  </methodparam>
-</methodsynopsis>
-
-<para>The <function>p:force-qname-keys</function> takes as its input a
-map of type <type>map(*)</type> (so any map) and forces this into a
-map with <type>xs:Qname</type> keys. Every key/value entry in
-<code>$map</code> is processed as follows:</para>
-
-<itemizedlist>
-  <listitem>
-    <para>If the entry's key is of type <type>xs:QName</type>, the entry
-    is copied to the function's result map, unchanged.</para>
-  </listitem>
-  <listitem>
-    <para>If the entry's key is an instance of type <type>xs:string</type> 
-      (or a type derived from <type>xs:string</type>) it is
-    transformed into an <type>xs:Qname</type> using the <link xlink:href="https://www.w3.org/TR/xpath-31/#doc-xpath31-EQName">XPath EQName production rules</link>. That is, it can be written
-    as a local-name only, as a prefix plus local-name or as a URI plus
-    local-name (using the <code>Q{}</code> syntax). An entry with this
-    QName as key and the original entry's value is added to the
-    function's result map.</para>
-    <para>
-      <error code="D0061">It is a <glossterm>dynamic error</glossterm>
-        if <code>$key</code> is of type <type>xs:string</type> and cannot be converted into a <type>xs:Qname</type>.</error>
-    </para>
-  </listitem>
-  <listitem>
-    <para>If the entry's key is of any other type, the entry is ignored
-    and will <emphasis>not</emphasis> be copied to the function's
-    result map.</para>
-  </listitem>
-</itemizedlist>
-
-<note>
-  <para>This function is <emphasis>forced</emphasis> on any step options that have a
-  <type>map()</type> datatype with <type>xs:QName</type> keys
-  (<code>as="map(xs:QName, ...)</code>). This allows
-  passing maps with (easier to specify) <type>xs:string</type> type
-  keys that are converted automatically into the required
-  <type>xs:QName</type> keys. See also <xref linkend="p.option"/>.</para>
-</note>
-
-<para>The <function>p:force-qname-keys</function> function behaves
-normally during static analysis.</para>
-</section>
-
 <section xml:id="other-xpath-extension-functions">
   <title>Other XPath Extension Functions</title>
   <para><impl>It is <glossterm>implementation-defined</glossterm> if the processor supports
@@ -2121,7 +2063,7 @@ static analysis is <glossterm>implementation-defined</glossterm>.</impl></para>
 </section>
 </section>
 
-    <section xml:id="psvi-support">
+  <section xml:id="psvi-support">
       <title>PSVIs in XProc</title>
       <para>XML documents flow between steps in an XProc pipeline. <xref linkend="infoset-conformance"/> identifies the properties of those documents that
           <rfc2119>must</rfc2119> be available. Implementations <rfc2119>may</rfc2119> also have the
@@ -2665,14 +2607,35 @@ to separately specify a namespace URI if the value is a URI qualified name.</err
 </listitem>
 </orderedlist>
 
-<para>As an additional convenience, if the specified sequence type is
-a map with <type>xs:QName</type> keys
-(<type>map(xs:QName, …)</type>),
-the <function>p:force-qname-keys</function> function is
-automatically applied to the value. This makes it possible to pass in
-maps using (easier to write) <type>xs:string</type> type keys that are
-converted automatically into the required <type>xs:QName</type>
-keys in a manner analgous to <type>#QName</type> values.</para>
+<para>As an additional convenience, if the specified sequence type of an option
+or a variable is a map with <type>xs:QName</type> keys
+(<type>map(xs:QName, …)</type>), the supplied map value is processed specially.
+This makes it possible to pass in maps using (easier to write) <type>xs:string</type> 
+type keys that are converted automatically into the required <type>xs:QName</type>
+keys in a manner analogous to <type>#QName</type> values.</para>
+<para>Every key/value pair in a map supplied to a variable or an option with sequence
+type <type>map(xs:QName, …)</type> is processed as follows:</para>
+  <itemizedlist>
+    <listitem>
+      <para>If the entry's key is of type <type>xs:QName</type>, the entry
+        is left unchanged.</para>
+    </listitem>
+    <listitem>
+      <para>If the entry's key is an instance of type <type>xs:string</type> 
+        (or a type derived from <type>xs:string</type>) it is
+        transformed into an <type>xs:Qname</type> using the <link xlink:href="https://www.w3.org/TR/xpath-31/#doc-xpath31-EQName">XPath EQName production rules</link>. That is, it can be written
+        as a local-name only, as a prefix plus local-name or as a URI plus
+        local-name (using the <code>Q{}</code> syntax).</para>
+      <para>
+        <error code="D0061">It is a <glossterm>dynamic error</glossterm>
+          if <code>$key</code> is of type <type>xs:string</type> and cannot be converted into a <type>xs:Qname</type>.</error>
+      </para>
+    </listitem>
+    <listitem>
+      <para>If the entry's key is of any other type, the entry is ignored
+        and will be removed from the map.</para>
+    </listitem>
+  </itemizedlist>
 </section>
 
 <!-- ============================================================ -->
@@ -4083,8 +4046,8 @@ are union of all of the outputs declared in any of its alternative
 subpipelines. In order to maintain consistency with respect to the
 <glossterm>default readable port</glossterm>, if any subpipeline has a
 <glossterm>primary output port</glossterm>, even implicitly, then
-<emphasis>every</emphasis> subpipline must have exactly the same
-primary output port. In some cases, this may require making the implicit
+<emphasis>every</emphasis> subpipline must have a primary output
+port with the same name. In some cases, this may require making the implicit
 primary output explicit in order to assure that it has the same name.
 <error code="S0102">It is a <glossterm>static error</glossterm> if alternative
 subpipelines have different primary output ports.</error>
@@ -4102,8 +4065,8 @@ not. Each output of the <tag>p:choose</tag> is declared to produce a
 sequence if that output is declared to produce a sequence in any of
 its subpipelines.
 Similarly, the content types that can appear on the port are the union
-of the content types that might be produced by the initial subpipeline and
-any of the recovery subpipelines.
+of the content types that might be produced by any of the <tag>p:when</tag> 
+or the <tag>p:otherwise</tag>.
 </para>
 
 <para>The <tag>p:choose</tag> can specify the context node against
@@ -4309,8 +4272,8 @@ has a primary output port) in any of its alternative
 subpipelines. In order to maintain consistency with respect to the
 <glossterm>default readable port</glossterm>, if any subpipeline has a
 <glossterm>primary output port</glossterm>, even implicitly, then
-<emphasis>every</emphasis> subpipline must have exactly the same
-primary output port. In some cases, this may require making the implicit
+<emphasis>every</emphasis> subpipline must have a primary output
+port with the same name. In some cases, this may require making the implicit
 primary output explicit in order to assure that it has the same name.
 <error code="S0102">It is a <glossterm>static error</glossterm> if alternative
 subpipelines have different primary output ports.</error>
@@ -4856,7 +4819,10 @@ undefined.</error></para>
 The <tag class="attribute">select</tag> expression, if specified, applies the
 specified XPath select expression to the document(s) that are read.</para>
 
-<para>Each selected node is wrapped in a document (unless it is a document)
+<para>If the result from applying the select expression to the document(s) is
+ an atomic value, a text node with the corresponding string value is created.</para>
+
+  <para>Each selected node is wrapped in a document (unless it is a document)
 and provided to the input port. In other words,</para>
 
 <programlisting language="xml">&lt;p:with-input port="source"&gt;
@@ -4884,7 +4850,8 @@ each of the documents) that is read from the <literal>result</literal>
 port of the step named <literal>origin</literal>.</para>
 
 <para>The base URI of the document that results from a select
-expression is the base URI of the matched element or document.</para>
+expression is the base URI of the matched element or document. The document
+does not have a base URI if it results from selecting an atomic value.</para>
 
 <para>If a document constructed by selection consists exclusively of
 text nodes, then it has a content type of
@@ -4892,7 +4859,7 @@ text nodes, then it has a content type of
 <literal>application/xml</literal>. <error code="D0016">It is a
 <glossterm>dynamic error</glossterm> if the select expression on a p:input or
 p:with-input returns anything other than document nodes, element nodes,
-processing instruction nodes, comment nodes, text nodes or an
+processing instruction nodes, comment nodes, text nodes, atomic values or an
 empty sequence.</error></para>
 </listitem>
 </varlistentry>
@@ -6300,94 +6267,82 @@ value templates are never expanded. The value of
 <para>The interpretation of the (possibily decoded) content
 depends on the document's content type.
 </para>
-
-<section xml:id="inline-non-xml">
-<title>Inline non-XML content</title>
-
-<para>If the document's content type is not an <glossterm>XML media
-type</glossterm>, then the content is non-XML.</para>
-
-<para><impl>The representation of non-XML content is
-<glossterm>implementation-dependent</glossterm></impl>.</para>
-
-<note>
-<para>In the presence of <glossterm baseform="text value template">text value templates</glossterm>, it is not possible to
-interpret the non-XML characters until the templates have been
-expanded.</para>
-</note>
-
-</section>
-
-<section xml:id="inline-xml-content">
-<title>Inline XML content</title>
-
-<para>If the <tag class="attribute">document-properties</tag> is not
-specified or the map does not contain a key "content-type" or specifies
-an <glossterm>XML media type</glossterm>, then
-the content is XML. A new XML document is created by wrapping a document node
-around the nodes which appear as children of <tag>p:inline</tag>. Any preceding or
-following whitespace-only text nodes will be discarded.</para>
-
-<para>The in-scope namespaces of the inline document differ from the
-in-scope namespace of the content of the <tag>p:inline</tag> element
-in that bindings for all its <emphasis>excluded namespaces</emphasis>,
-as defined below, are removed:</para>
-
-<itemizedlist>
-                  <listitem>
-                      <para>The XProc namespace itself (<uri>http://www.w3.org/ns/xproc</uri>) is
-                          excluded.</para>
-                  </listitem>
-                  <listitem>
-                      <para>A namespace URI designated by using an <tag class="attribute">exclude-inline-prefixes</tag> attribute on the enclosing <tag>p:inline</tag> is
-                          excluded.</para>
-                  </listitem>
-                  <listitem>
-                      <para>A namespace URI designated by using an <tag class="attribute">exclude-inline-prefixes</tag> attribute on any ancestor <tag>p:declare-step</tag> or <tag>p:library</tag> is also excluded. (In other words, the
-                          effect of several <tag class="attribute">exclude-inline-prefixes</tag> attributes among
-                          the ancestors of <tag>p:inline</tag> is cumulative.)</para>
-                  </listitem>
-              </itemizedlist>
-
-          <para>The value of each prefix in the <tag class="attribute">exclude-inline-prefixes</tag> attribute is
-              interpreted as follows:</para>
-
-          <itemizedlist>
-              <listitem>
-                  <para>The value of the attribute is either <literal>#all</literal>, or
-                      a whitespace-separated list of tokens, each of which is either a
-                      namespace prefix or <literal>#default</literal>. The namespace bound
-                      to each of the prefixes is designated as an excluded namespace. <error code="S0057">It is a <glossterm>static error</glossterm> if the <tag class="attribute">exclude-inline-prefixes</tag> attribute does not
-                          contain a list of tokens or if any of those tokens (except
-                          <literal>#all</literal> or <literal>#default</literal>) is not a
-                          prefix bound to a namespace in the in-scope namespaces of the element
-                          on which it occurs.</error></para>
-              </listitem>
-              <listitem>
-                  <para>The default namespace of the element on which <tag class="attribute">exclude-inline-prefixes</tag> occurs may be
-                      designated as an excluded namespace by including
-                      <literal>#default</literal> in the list of namespace prefixes. <error code="S0058">It is a <glossterm>static error</glossterm> if the value
-                          <literal>#default</literal> is used within the <tag class="attribute">exclude-inline-prefixes</tag> attribute and there is no default
-                          namespace in scope.</error>
-                  </para>
-              </listitem>
-              <listitem>
-                  <para>The value <literal>#all</literal> indicates that all namespaces
-                      that are in scope for the element on which <tag class="attribute">exclude-inline-prefixes</tag> occurs are designated
-                      as excluded namespaces.</para>
-              </listitem>
-          </itemizedlist>
-
-          <para>The XProc processor <rfc2119>must</rfc2119> include all in-scope
-              prefixes that are not explicitly excluded. If the namespace associated with
-              an excluded prefix is used in the expanded-QName of a descendant
-              element or attribute,
-              the processor <rfc2119>may</rfc2119> include that prefix anyway, or it may
-              generate a new prefix.</para>
-
-          <para>Consider this example:</para>
-
-          <programlisting language="xml">&lt;p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+  <note>
+    <para>In the presence of <glossterm baseform="text value       template">text value templates</glossterm>, it is not possible to
+      interpret the non-XML characters until the templates have been
+      expanded.</para>
+  </note>
+  
+  <section xml:id="inline-xml-content">
+    <title>Inline XML content</title>
+    
+    <para>If the <tag class="attribute">document-properties</tag> is not
+      specified or the map does not contain a key "content-type" or specifies
+      an <glossterm>XML media type</glossterm>, then
+      the content is XML. A new XML document is created by wrapping a document node
+      around the nodes which appear as children of <tag>p:inline</tag>. Any preceding or
+      following whitespace-only text nodes will be discarded.</para>
+    
+    <para>The in-scope namespaces of the inline document differ from the
+      in-scope namespace of the content of the <tag>p:inline</tag> element
+      in that bindings for all its <emphasis>excluded namespaces</emphasis>,
+      as defined below, are removed:</para>
+    
+    <itemizedlist>
+      <listitem>
+        <para>The XProc namespace itself (<uri>http://www.w3.org/ns/xproc</uri>) is
+          excluded.</para>
+      </listitem>
+      <listitem>
+        <para>A namespace URI designated by using an <tag class="attribute">exclude-inline-prefixes</tag> attribute on the enclosing <tag>p:inline</tag> is
+          excluded.</para>
+      </listitem>
+      <listitem>
+        <para>A namespace URI designated by using an <tag class="attribute">exclude-inline-prefixes</tag> attribute on any ancestor <tag>p:declare-step</tag> or <tag>p:library</tag> is also excluded. (In other words, the
+          effect of several <tag class="attribute">exclude-inline-prefixes</tag> attributes among
+          the ancestors of <tag>p:inline</tag> is cumulative.)</para>
+      </listitem>
+    </itemizedlist>
+    
+    <para>The value of each prefix in the <tag class="attribute">exclude-inline-prefixes</tag> attribute is
+      interpreted as follows:</para>
+    
+    <itemizedlist>
+      <listitem>
+        <para>The value of the attribute is either <literal>#all</literal>, or
+          a whitespace-separated list of tokens, each of which is either a
+          namespace prefix or <literal>#default</literal>. The namespace bound
+          to each of the prefixes is designated as an excluded namespace. <error code="S0057">It is a <glossterm>static error</glossterm> if the <tag class="attribute">exclude-inline-prefixes</tag> attribute does not
+            contain a list of tokens or if any of those tokens (except
+            <literal>#all</literal> or <literal>#default</literal>) is not a
+            prefix bound to a namespace in the in-scope namespaces of the element
+            on which it occurs.</error></para>
+      </listitem>
+      <listitem>
+        <para>The default namespace of the element on which <tag class="attribute">exclude-inline-prefixes</tag> occurs may be
+          designated as an excluded namespace by including
+          <literal>#default</literal> in the list of namespace prefixes. <error code="S0058">It is a <glossterm>static error</glossterm> if the value
+            <literal>#default</literal> is used within the <tag class="attribute">exclude-inline-prefixes</tag> attribute and there is no default
+            namespace in scope.</error>
+        </para>
+      </listitem>
+      <listitem>
+        <para>The value <literal>#all</literal> indicates that all namespaces
+          that are in scope for the element on which <tag class="attribute">exclude-inline-prefixes</tag> occurs are designated
+          as excluded namespaces.</para>
+      </listitem>
+    </itemizedlist>
+    
+    <para>The XProc processor <rfc2119>must</rfc2119> include all in-scope
+      prefixes that are not explicitly excluded. If the namespace associated with
+      an excluded prefix is used in the expanded-QName of a descendant
+      element or attribute,
+      the processor <rfc2119>may</rfc2119> include that prefix anyway, or it may
+      generate a new prefix.</para>
+    
+    <para>Consider this example:</para>
+    
+    <programlisting language="xml">&lt;p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:c="http://www.w3.org/ns/xproc-step"
                 version="3.0"&gt;
   &lt;p:output port="result" serialization="map { 'indent': true() }"/&gt;
@@ -6405,27 +6360,56 @@ as defined below, are removed:</para>
   &lt;/p:identity&gt;
 
 &lt;/p:declare-step&gt;</programlisting>
-
-          <para>which might produce a result like this:</para>
-
-          <programlisting language="xml">&lt;doc xmlns:c="http://example.com/c"&gt;
+    
+    <para>which might produce a result like this:</para>
+    
+    <programlisting language="xml">&lt;doc xmlns:c="http://example.com/c"&gt;
    &lt;b:part xmlns:b="http://example.com/b"/&gt;
  &lt;/doc&gt;</programlisting>
+    
+    <para>The declaration for “<literal>c</literal>” must
+      be present because it was not excluded. The “<literal>part</literal>” element
+      uses the namespace bound to “<literal>b</literal>”, so <emphasis>some</emphasis>
+      binding must be present. In this example, the original
+      prefix has been preserved, but it would be equally correct if a different
+      prefix had been used.</para>
+    
+    <para>The text-node descendants of a <tag>p:inline</tag> may be
+      <link linkend="text-value-templates">text value templates</link>. Attribute descendants may be <link linkend="attribute-value-templates">attribute value templates</link>. This is controlled by the
+      <tag class="attribute">[p:]expand-text</tag> and the <tag class="attribute">p:inline-expand-text</tag> attribute. See
+      <xref linkend="expand-text-attribute"/>.</para>
+    
+  </section>
 
-          <para>The declaration for “<literal>c</literal>” must
-              be present because it was not excluded. The “<literal>part</literal>” element
-              uses the namespace bound to “<literal>b</literal>”, so <emphasis>some</emphasis>
-              binding must be present. In this example, the original
-              prefix has been preserved, but it would be equally correct if a different
-              prefix had been used.</para>
+<section xml:id="inline-text">
+<title>Inline text content</title>
 
-<para>The text-node descendants of a <tag>p:inline</tag> may be
-  <link linkend="text-value-templates">text value templates</link>. Attribute descendants may be <link linkend="attribute-value-templates">attribute value templates</link>. This is controlled by the
-  <tag class="attribute">[p:]expand-text</tag> and the <tag class="attribute">p:inline-expand-text</tag> attribute. See
-  <xref linkend="expand-text-attribute"/>.</para>
+<para>If the document's content type is a <glossterm>text media
+  type</glossterm>, then the content is text. A new text document is created by 
+  joining the text nodes which appear as children of p:inline together to a single
+  text node and wrapping a document node around it. Any preceding or following whitespace-only 
+  text nodes will be preserved.</para>
+
+</section>
+
+<section xml:id="inline-json">
+  <title>Inline JSON content</title>
+  
+<para>If the document's content type is a <glossterm>JSON media type</glossterm>,
+then the context is JSON. A new JSON document is created by joining the 
+text values of children of p:inline together and parse it as JSON.</para>
+  
+<para><error code="D0057">It is a <glossterm>dynamic error</glossterm> if the text content
+    does not conform to the JSON grammar.</error></para>
   
 </section>
 
+<section xml:id="inline-others">
+  <title>Other inline content</title>
+  <para><impl>How a processor interprets other media types is <glossterm>implementation-defined</glossterm>.
+  </impl></para>
+</section>
+  
 <section xml:id="implicit-inlines">
 <title>Implicit inlines</title>
 
