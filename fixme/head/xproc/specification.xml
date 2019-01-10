@@ -1112,6 +1112,9 @@ See <xref linkend="external-docs"/> for further discussion.</para>
 <para>The results of XProc extension functions may differ during static analysis,
 as described in the description of each function.</para>
 
+<para>Any errors that occur while evaluating expressions during static analysis will
+be raised statically.</para>
+
 </section>
 
 <section xml:id="dynamic-evaluation">
@@ -1796,6 +1799,29 @@ return them unchanged, to silently omit them, or to raise an error. It
   </simplesect>
 </section>
 
+<section xml:id="f.function-library-importable">
+<title>Function library importable</title>
+
+<para>The <function>p:function-library-importable</function> function
+reports whether or not function libraries of a particular type can be imported.
+</para>
+
+<methodsynopsis>
+<type>xs:boolean</type>
+<methodname>p:function-library-importable</methodname>
+<methodparam><type>xs:string</type><parameter>library-type</parameter></methodparam>
+</methodsynopsis>
+
+<para>The <varname>$library-type</varname> string is interpreted as a content type.
+If the processor understands
+(<foreignphrase>i.e.</foreignphrase> if <tag>p:import-functions</tag> understands)
+how to load function libraries of that type, this function returns
+<literal>true()</literal>, otherewise it returns <literal>false()</literal>.
+</para>
+
+<para>The <function>p:function-library-importable</function> function behaves
+normally during static analysis.</para>
+</section>
 
 <section xml:id="other-xpath-extension-functions">
   <title>Other XPath Extension Functions</title>
@@ -3021,11 +3047,6 @@ excluded</firstterm> from the pipeline document.</termdef> If a node is
 effectively excluded, the processor <rfc2119>must</rfc2119> behave as
 if the element was not present in the document.
 </para>
-  
-<para>Exception: <tag class="attribute">[p:]use-when</tag> attributes
-on descendant <tag>p:inline</tag> elements and in implicit inlines
-carry no special meaning and are considered part of the inlined
-contents.</para>
 
 <para>Conditional element exclusion occurs during <link linkend="initiating">static analysis</link> of the pipeline.</para>
 
@@ -4402,7 +4423,9 @@ author to exclude some namespace declarations in inline content, see <tag>p:inli
 <para>On a <tag>p:declare-step</tag> for an atomic step, the
 <tag>p:input</tag> can only declare the input port. <error code="S0042">It is a <glossterm>static error</glossterm> to attempt to
 provide a connection for an input port on the declaration of an atomic
-step.</error></para>
+step.</error> On <tag>p:declare-step</tag>, any binding provided in
+<tag>p:input</tag> is a default connection for the port, if no other
+connection is provided, see <xref linkend="conn-prec"/>.</para>
 
 <para xml:id="note-pipe-excl">The <tag>p:pipe</tag> element is
 explicitly excluded from a declaration because it would make the
@@ -4561,37 +4584,69 @@ author to exclude some namespace declarations in inline content, see <tag>p:inli
 </varlistentry>
 </variablelist>
 
-<para>An input declaration may include a default connection. If no
-connection is provided for an input port which has a default
-connection, then the input is treated as if the default connection
-appeared.</para>
-
 <para>A <tag>p:with-input</tag> element with no children
 (<foreignphrase>e.g.</foreignphrase>, “<code>&lt;p:with-input/&gt;</code>”)
-is equivalent to an
-input connection that contains only “<code>&lt;p:pipe/&gt;</code>”, which is
+is treated implicitly as if it contained only “<code>&lt;p:pipe/&gt;</code>”, which is
 in turn equivalent to a binding to the default readable port.
 </para>
 
-<para>An input declaration may contain foreign element, scoped outside of XProc vocabulary
-(<uri type="xmlnamespace">http://www.w3.org/ns/xproc</uri>) namespace. Each element is treated
-as if wrapped with a <tag>p:inline</tag> element. For definition of this implicit behaviour
-see <tag>p:inline</tag>.</para>
+<para>If the <tag>p:with-input</tag> contains elements not in the XProc namespace,
+they are <link linkend="implicit-inlines">implicit inlines</link>.</para>
 
-<para>A default connection does not satisfy the requirement that a
-primary input port is automatically connected by the processor, nor is
-it used when no default readable port is defined. In other words, a
-<tag>p:declare-step</tag> can define
-defaults for all of its inputs, whether they are primary or not, but
-defining a default for a primary input usually has no effect. It's
-never used by an atomic step since the step, when it's called, will
-always connect the primary input port to the default readable port (or
-cause a static error). The only case where it has value is on a
-<tag>p:declare-step</tag> when that pipeline is invoked directly by the
-processor. In that case, the processor <rfc2119>must</rfc2119> use the
-default connection if no external connection is provided for the
-port.</para>
+<section xml:id="conn-prec">
+<title>Connection precedence</title>
 
+<para>XProc 3.0 introduces a number of new connection defaulting
+mechanisms to make pipeline authoring easier. Defaults only apply
+if there’s no explicit connection, and they apply differently to
+primary and secondary inputs.</para>
+
+<variablelist>
+<varlistentry>
+<term>Primary input ports</term>
+<listitem>
+<para>For a given primary input port:</para>
+<orderedlist>
+<listitem>
+<para>If there is a <tag>p:with-input</tag> for that port and it provides a
+binding, even an implicit one, that binding is used.
+</para>
+</listitem>
+<listitem>
+<para>If there’s no <tag>p:with-input</tag> for that port and there is a default
+readable port, the input will be connected to the default readable port.
+</para>
+</listitem>
+<listitem>
+<para>If there’s no <tag>p:with-input</tag> for that port and there’s no default
+readable port, then the default connection from the declaration’s <tag>p:input</tag>
+will be used. It will be a static error if there is no default connection.
+</para>
+</listitem>
+</orderedlist>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>Secondary input ports</term>
+<listitem>
+<para>For a given secondary input port:</para>
+<orderedlist>
+<listitem>
+<para>If there is a <tag>p:with-input</tag> for that port and it provides a
+binding, even an implicit one, that binding is used.
+</para>
+</listitem>
+<listitem>
+<para>If there’s no <tag>p:with-input</tag> for that port
+then the default connection from the declaration’s <tag>p:input</tag>
+will be used. It will be a static error if there is no default connection.
+</para>
+</listitem>
+</orderedlist>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
 </section>
 
 <!-- ============================================================ -->
@@ -5791,15 +5846,16 @@ import.</error>
 <varlistentry><term><tag class="attribute">content-type</tag></term>
 <listitem>
 <para>The <tag class="attribute">content-type</tag> specifies what kind of library
-is expected at the URI. If the processor does not understand libraries of that type, it
-is free to raise <code>err:XS0103</code> immediately.
+is expected at the URI. <impl>If no type is specified, the way that the processor
+determines the type of the library is <glossterm>implementation-defined</glossterm>.</impl>
 </para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">namespace</tag></term>
 <listitem>
-<para>If a <tag class="attribute">namespace</tag> is specified, then only functions
-in that namespace will be loaded.
+<para>If a <tag class="attribute">namespace</tag> is specified, it provides a list
+of namespace URIs. Only functions
+in those namespaces will be loaded.
 </para>
 </listitem>
 </varlistentry>
@@ -5807,8 +5863,31 @@ in that namespace will be loaded.
 
 <para>The ability to import functions is optional. <impl>Whether or not a processor
 can import functions, and if it can, what kinds of function libraries it can import
-from is <glossterm>implementation-defined</glossterm>.</impl>
+from is <glossterm>implementation-defined</glossterm>.</impl> Pipeline authors can
+use <function>p:function-library-importable</function> to test whether or not a particular
+kind of library can be loaded.
 </para>
+
+<para>Importing functions from a library implies loading and processing that library
+according to its conventions (loading imports, resolving dependencies, etc.).
+<error code="S0104">It is a <glossterm>static error</glossterm> if the processor
+cannot load the function library.</error> This may occur because the format is
+unknown, because it is a version of the library that the processor does
+not recognize, or if it’s uninterpretable for any other reason.
+<error code="S0106">It is a
+<glossterm>static error</glossterm> if the processor detects that a
+particular library is unloadable.</error> This may occur
+if the processor is, in principle, able to load libraries of the specified format,
+but detects that the particuar library requested is somehow ill-formed
+(syntactically invalid, has unsatisfiable dependencies or circular
+imports, etc.).
+</para>
+
+<para>Imported functions must be unique (they must have the same name, namespace, and
+arity). <error code="S0105">It is a <glossterm>static error</glossterm> if a function
+imported from a library has the same name and arity as a function already imported.</error>
+</para>
+
 
 </section>
 

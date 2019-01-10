@@ -355,7 +355,9 @@
       </optional>
       <optional>
         <attribute name="namespace">
-          <data type="anyURI"/>
+          <oneOrMore>
+            <data type="anyURI"/>
+          </oneOrMore>
         </attribute>
       </optional>
       <zeroOrMore>
