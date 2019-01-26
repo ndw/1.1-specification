@@ -1655,13 +1655,22 @@ normally during static analysis.</para>
    <title>Transform filesystem paths into URIs</title>
   <para><function>p:urify</function> is a function that attempts to transform file system paths into file URIs (<biblioref linkend="rfc2396"/>). If a URI is already given as an argument, it <rfc2119>should</rfc2119> return it unchanged, 
     apart from character escaping and path normalizations that are permitted for (presumptive) file URIs.</para>
+
   <methodsynopsis>
     <type>xs:string</type>
     <methodname>p:urify</methodname>
     <methodparam><type>xs:string</type><parameter>filepath</parameter></methodparam>
     <methodparam><type>xs:string?</type><parameter>basedir</parameter></methodparam>
   </methodsynopsis>
+  
+    <methodsynopsis>
+      <type>xs:string</type>
+      <methodname>p:urify</methodname>
+      <methodparam><type>xs:string</type><parameter>filepath</parameter></methodparam>
+    </methodsynopsis>
 
+<para>If the single-argument version of the function is used, the result is the same as calling 
+the two-argument version with <parameter>basedir</parameter> set to empty sequence.</para>
 <para>The function may be implemented as an operation on strings; it
 need not try to determine the existence of a file or directory, and it
 <rfc2119>should not</rfc2119> follow symbolic links. <impl>How <function>p:urify</function>
@@ -1706,9 +1715,9 @@ return them unchanged, to silently omit them, or to raise an error. It
 <rfc2119>must not</rfc2119> return <literal>?</literal> and
 <literal>#</literal> escaped though.</para>
 
-<para>If the <parameter>$basedir</parameter> argument is omitted or is the empty sequence, the current working directory should be used
-    if available. The <parameter>$basedir</parameter> argument or the current working directory need only be considered if the
-      <parameter>$filepath</parameter> is determined to be a relative path or URI.</para>
+<para>If the <parameter>basedir</parameter> argument is omitted or is the empty sequence, the current working directory should be used
+    if available. The <parameter>basedir</parameter> argument or the current working directory need only be considered if the
+      <parameter>filepath</parameter> is determined to be a relative path or URI.</para>
   <note xml:id="note-urify-encoding">
     <para>Sometimes file names are created in an encoding that does not match the system’s locale. This function does not aim at
       solving these issues. Implementations should not try to correct apparent errors that originate from garbled encodings
@@ -3078,12 +3087,6 @@ templates. If it has the value “<code>true</code>”, or if no such
 attribute is present among ancestors, then the text and attribute
 nodes <emphasis>are</emphasis> value templates.</para>
 
-<!-- feature="no-p-expand-text-on-p"-->
-<para><error code="S0084">It is a <glossterm>static error</glossterm>
-if the <tag class="attribute">[p:]inline-expand-text</tag> attribute appears on
-any element that is not a descendant of a
-<tag>p:inline</tag> element or implicit inline.</error>
-</para>
 </section>
 
 <section xml:id="use-when">
@@ -4851,7 +4854,7 @@ document</emphasis> and provide it on the output port. It
 <para xml:id="p.serialization">The <tag class="attribute">serialization</tag>
 attribute allows the user to request serialization parameters on an
 output port. These parameters control XML serialization as defined
-by <biblioref linkend="xpath-serialization"/>.
+by <biblioref linkend="xml-serialization-31"/>.
 </para>
 
 <para>If the pipeline processor serializes the output on a port, it
@@ -4862,10 +4865,40 @@ example, the pipeline has been called from another pipeline), then the
 <rfc2119 feature="ser-must-ignore">must</rfc2119> be
 ignored.</para>
 
-<para><impl>The default value of any serialization parameters not
-specified on a particular output is
-<glossterm>implementation-defined</glossterm>.</impl>
-<error code="D0020">It is a <glossterm>dynamic error</glossterm> if
+<para><impl>The default value of any serialization parameters not specified on a particular output
+            is <glossterm>implementation-defined</glossterm>.</impl> However if the serialization
+          parameter <literal>method</literal> is not specified the processor
+            <rfc2119>should</rfc2119> select a method based on the document's
+            <literal>content-type</literal> property:</para>
+  <itemizedlist>
+    <listitem>
+      <para>For documents with content types <literal>application/xml</literal>,
+                <literal>text/xml</literal>, and <literal>application/*+xml</literal> (except for
+                <literal>application/xhtml+xml</literal>), serialization method
+                <literal>xml</literal> should be used.</para>
+    </listitem>
+    <listitem>
+      <para>For documents with content type <literal>application/xhtml+xml</literal> serialization
+              method <literal>xhtml</literal> should be used.</para>
+    </listitem>
+    <listitem>
+      <para>For documents with content type <literal>text/html</literal> serialization method
+                <literal>html</literal> should be used.</para>
+    </listitem>
+    <listitem>
+      <para>For documents with <glossterm>text media types</glossterm> serialization method
+                <literal>text</literal> should be used.</para>
+    </listitem>
+    <listitem>
+      <para>For documents with <glossterm>JSON media types</glossterm> serialization method
+                <literal>json</literal> should be used.</para>
+    </listitem>
+    <listitem>
+      <para>The serialization method for documents with other media types is 
+        <glossterm>implementation-defined</glossterm>.</para>
+    </listitem>
+  </itemizedlist>
+<para><error code="D0020">It is a <glossterm>dynamic error</glossterm> if
 the combination of serialization options specified or defaulted is not
 allowed.</error> Implementations <rfc2119>must</rfc2119> check that
 all of the specified serialization options are allowed if they
@@ -4979,10 +5012,13 @@ default varies according to the <option>method</option>:</para>
 <varlistentry><term><literal>text</literal></term>
 <listitem><simpara><literal>text/plain</literal></simpara></listitem>
 </varlistentry>
+  <varlistentry><term><literal>json</literal></term>
+    <listitem><simpara><literal>application/json</literal></simpara></listitem>
+  </varlistentry>
 </variablelist>
 
 <para><impl>For methods other than <literal>xml</literal>, <literal>html</literal>,
-<literal>xhtml</literal>, and <literal>text</literal>; the
+<literal>xhtml</literal>, <literal>text</literal>, and <literal>json</literal>; the
 <option>media-type</option> is <glossterm>implementation-defined</glossterm>.
 </impl></para>
 </listitem>
@@ -5060,7 +5096,7 @@ semantics is implied by this different spelling.</para>
 
 <para>The <option>method</option> option controls the serialization
 method used by this component with standard values of 'html', 'xml',
-'xhtml', and 'text' but only the 'xml' value is required to be
+'xhtml', 'text' and 'json' but only the 'xml' value is required to be
 supported. The interpretation of the remaining options is as
 specified in <biblioref linkend="xml-serialization-31"/>.</para>
 
@@ -5075,7 +5111,8 @@ values:</para>
 <itemizedlist>
    <listitem><para>The <code>version</code> must support the value <code>1.0</code>.</para></listitem>
    <listitem><para>The <code>encoding</code> must support the values <code>UTF-8</code>.</para></listitem>
-   <listitem><para>The <code>omit-xml-declaration</code> must be supported.  If the value is not specified or has the value <code>no</code>, an XML declaration must be produced.</para></listitem>
+   <listitem><para>The <code>omit-xml-declaration</code> must be supported.  If the value is not 
+     specified or has the value <code>no</code>, an XML declaration must be produced.</para></listitem>
 </itemizedlist>
 
 <para>All other option values may be ignored for the <code>xml</code>
@@ -7113,10 +7150,6 @@ W3C Recommendation. 9 September 2005.</bibliomixed>
 (Second Edition)</citetitle>.
 Jonathan Marsh and Richard Tobin, editors.
 W3C Recommendation. 28 January 2009.</bibliomixed>
-    <bibliomixed xml:id="xpath-serialization"><abbrev>Serialization</abbrev>
-<citetitle xlink:href="http://www.w3.org/TR/xslt-xquery-serialization-30/">XSLT and XQuery Serialization 3.0</citetitle>.
-Henry Zongaro, Andrew Coleman, and C. M. Sperberg-McQueen, editors.
-W3C Recommendation. 8 April 2014.</bibliomixed>
     <bibliomixed xml:id="rfc2119"><abbrev>RFC 2119</abbrev>
 <citetitle xlink:href="http://www.ietf.org/rfc/rfc2119.txt">Key words for use in RFCs to Indicate Requirement Levels</citetitle>.
 S. Bradner.
