@@ -4911,6 +4911,14 @@ parameters.
         <glossterm>implementation-defined</glossterm>.</impl></para>
     </listitem>
   </itemizedlist>
+<para>If serialization method <literal>xml</literal> is choosen either explicitly or
+implicitly, the following default values <rfc2119>must</rfc2119> be used:</para>
+<itemizedlist>
+  <listitem><para>Parameter <literal>version</literal> is set to <literal>1.0</literal>.</para></listitem>
+  <listitem><para>Parameter <literal>encoding</literal> is set to <literal>UTF-8</literal>.</para></listitem>
+  <listitem><para>Parameter <literal>omit-xml-declaration</literal> is set to <literal>true</literal>.</para></listitem>
+</itemizedlist>
+<para>These default values also apply to serialization method <literal>XHTML</literal> (if it is supported).</para>
 <para><error code="D0020">It is a <glossterm>dynamic error</glossterm> if
 the combination of serialization options specified or defaulted is not
 allowed.</error> Implementations <rfc2119>must</rfc2119> check that
@@ -5316,11 +5324,7 @@ appears on the connection that provides the context.</error>
 
 <para>Since all <glossterm>in-scope bindings</glossterm> are present
 in the Processor XPath Context as variable bindings, <tag class="attribute">select</tag> expressions may refer to the value of
-<glossterm>in-scope bindings</glossterm> by variable reference.
-<error code="S0071">It is a <glossterm>static error</glossterm>
-if the XPath expression refers to the name of a variable that is
-not present in the <glossterm>in-scope bindings</glossterm>.</error>
-</para>
+<glossterm>in-scope bindings</glossterm> by variable reference.</para>
 </section>
 
 <!-- ============================================================ -->
@@ -5422,9 +5426,6 @@ expression on the <tag>p:declare-step</tag> that defines the step
 signature. It must be a statically valid expression at that point.
 Consequently, if it contains variable references, they can only be
 references to preceding options on the step.
-<error code="S0071">It is a <glossterm>static error</glossterm>
-if the XPath expression refers to the name of a variable that is
-not present in the <glossterm>in-scope bindings</glossterm>.</error>
 <error code="D0026">It is a <glossterm>dynamic error</glossterm> if
 the <tag class="attribute">select</tag> expression makes reference to
 the context node, size, or position.</error></para>
@@ -5587,9 +5588,6 @@ appears on the connection that provides the context.</error>
 <para>Since all <glossterm>in-scope bindings</glossterm> are present
 in the Processor XPath Context as variable bindings, <tag class="attribute">select</tag> expressions may refer to the value of
 <glossterm>in-scope bindings</glossterm> by variable reference.
-<error code="S0071">It is a <glossterm>static error</glossterm>
-if the XPath expression refers to the name of a variable that is
-not present in the <glossterm>in-scope bindings</glossterm>.</error>
 </para>
 
 <para><error code="S0092">It is a <glossterm>static
