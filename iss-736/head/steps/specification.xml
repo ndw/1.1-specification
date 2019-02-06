@@ -1641,7 +1641,7 @@ of the step or protocol.</error>
 <title>Request Entity body conversion</title>
 
 <para>The <code>c:multipart</code> element specifies a multi-part
-body, per <biblioref linkend="rfc2045"/>, either for inclusion in a
+body, per <biblioref linkend="rfc2046"/>, either for inclusion in a
 request or as received in a response.</para>
 
 <e:rng-pattern name="VocabMultipart" xml:id="cv.multipart"/>
@@ -1910,7 +1910,7 @@ authentication protocol.</para>
 <section xml:id="c.response_body">
 <title>Converting Response Entity Bodies</title>
 
-<para>The entity of a response may be multipart per <biblioref linkend="rfc2045"/>. In those situations, the result document will be
+<para>The entity of a response may be multipart per <biblioref linkend="rfc2046"/>. In those situations, the result document will be
 a <tag>c:multipart</tag> element that contains multiple
 <tag>c:body</tag> elements inside.</para>
 
@@ -3973,11 +3973,11 @@ MIME (Multipurpose Internet Mail Extensions) Part One: Mechanisms for
 Specifying and Describing the Format of Internet Message
 Bodies</citetitle>. N. Freed, N. Borenstein, editors. Internet
 Engineering Task Force. November, 1996.</bibliomixed>
-    <bibliomixed xml:id="rfc2046"><abbrev>Media Types</abbrev>
-<citetitle xlink:href="http://www.ietf.org/rfc/rfc2046.txt">RFC 2046:
-Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</citetitle>.
-N. Freed, et. al.. Network Working Group, IETF,
-November, 1996.</bibliomixed>
+    <bibliomixed xml:id="rfc2046"><abbrev>RFC 2046</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC2046">RFC 2046:
+Multipurpose Internet Mail Extensions (MIME) Part Two: Media
+Types</citetitle>. N. Freed, N. Borenstein, editors. Internet
+Engineering Task Force. November, 1996.</bibliomixed>
     <bibliomixed xml:id="rfc2119"><abbrev>RFC 2119</abbrev>
 <citetitle xlink:href="http://www.ietf.org/rfc/rfc2119.txt">Key words for use in RFCs to Indicate Requirement Levels</citetitle>.
 S. Bradner.
