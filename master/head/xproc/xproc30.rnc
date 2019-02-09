@@ -689,7 +689,6 @@ StandardStep =
   | Step-hash
   | Step-http-request
   | Step-identity
-  | Step-in-scope-names
   | Step-insert
   | Step-label-elements
   | Step-load
@@ -697,7 +696,6 @@ StandardStep =
   | Step-make-absolute-uris
   | Step-namespace-rename
   | Step-pack
-  | Step-parameters
   | Step-rename
   | Step-replace
   | Step-set-attributes
@@ -915,14 +913,6 @@ Step-identity =
     step.attributes,
     (WithInput* & (Documentation | PipeInfo)*)
   }
-Step-in-scope-names =
-  element in-scope-names {
-    name.ncname.attr?,
-    common.attributes,
-    use-when.attr?,
-    step.attributes,
-    (Documentation | PipeInfo)*
-  }
 Step-insert =
   element insert {
     name.ncname.attr?,
@@ -999,15 +989,6 @@ Step-pack =
     step.attributes,
     attribute wrapper { xsd:QName }?,
     (WithInput* & WithOption* & (Documentation | PipeInfo)*)
-  }
-Step-parameters =
-  element parameters {
-    name.ncname.attr?,
-    common.attributes,
-    use-when.attr?,
-    step.attributes,
-    attribute parameters { xsd:string }?,
-    (WithOption* & (Documentation | PipeInfo)*)
   }
 Step-rename =
   element rename {
@@ -1283,9 +1264,8 @@ Step-text-head =
     common.attributes,
     use-when.attr?,
     step.attributes,
-    attribute href { xsd:anyURI }?,
     attribute count { xsd:integer }?,
-    (WithOption* & (Documentation | PipeInfo)*)
+    (WithInput* & WithOption* & (Documentation | PipeInfo)*)
   }
 Step-text-join =
   element text-join {
@@ -1293,7 +1273,9 @@ Step-text-join =
     common.attributes,
     use-when.attr?,
     step.attributes,
-    attribute href { xsd:anyURI }?,
+    attribute separator { xsd:string }?,
+    attribute prefix { xsd:string }?,
+    attribute suffix { xsd:string }?,
     (WithOption* & (Documentation | PipeInfo)*)
   }
 Step-text-tail =
@@ -1302,9 +1284,8 @@ Step-text-tail =
     common.attributes,
     use-when.attr?,
     step.attributes,
-    attribute href { xsd:anyURI }?,
     attribute count { xsd:integer }?,
-    (WithOption* & (Documentation | PipeInfo)*)
+    (WithInput* & WithOption* & (Documentation | PipeInfo)*)
   }
 Step-validate-with-relax-ng =
   element validate-with-relax-ng {

@@ -143,9 +143,6 @@
       <p:input port="source" sequence="true" content-types="*/*"/>
       <p:output port="result" sequence="true" content-types="*/*"/>
    </p:declare-step>
-   <p:declare-step type="p:in-scope-names" xml:id="in-scope-names">
-      <p:output port="result" content-types="application/xml"/>
-   </p:declare-step>
    <p:declare-step type="p:insert" xml:id="insert">
       <p:input port="source"
                primary="true"
@@ -242,10 +239,6 @@
       <p:output port="result" sequence="true"/>
       <p:option name="wrapper" required="true" as="xs:QName"/>
    </p:declare-step>
-   <p:declare-step type="p:parameters" xml:id="parameters">
-      <p:output port="result" content-types="application/xml"/>
-      <p:option name="parameters" as="xs:string"/>
-   </p:declare-step>
    <p:declare-step type="p:rename" xml:id="rename">
       <p:input port="source" content-types="application/xml text/xml */*+xml"/>
       <p:output port="result" content-types="application/xml"/>
@@ -334,20 +327,38 @@
       <p:option name="enable" as="xs:boolean" select="true()"/>
    </p:declare-step>
    <p:declare-step type="p:text-head" xml:id="text-head">
-      <p:output port="result" primary="true" content-types="text/plain"/>
-      <p:option name="href" required="true" as="xs:anyURI"/>
+      <p:input port="source"
+               primary="true"
+               sequence="false"
+               content-types="text/*"/>
+      <p:output port="result"
+                primary="true"
+                sequence="false"
+                content-types="text/*"/>
       <p:option name="count" required="true" as="xs:integer"/>
    </p:declare-step>
    <p:declare-step type="p:text-join" xml:id="text-join">
-      <p:output port="result"
+      <p:output port="source"
                 primary="true"
                 sequence="true"
-                content-types="text/plain"/>
-      <p:option name="href" required="true" as="xs:anyURI"/>
+                content-types="text/*"/>
+      <p:output port="result"
+                primary="true"
+                sequence="false"
+                content-types="text/*"/>
+      <p:option name="separator" required="false" as="xs:string"/>
+      <p:option name="prefix" required="false" as="xs:string"/>
+      <p:option name="suffix" required="false" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:text-tail" xml:id="text-tail">
-      <p:output port="result" primary="true" content-types="text/plain"/>
-      <p:option name="href" required="true" as="xs:anyURI"/>
+      <p:input port="source"
+               primary="true"
+               sequence="false"
+               content-types="text/*"/>
+      <p:output port="result"
+                primary="true"
+                sequence="false"
+                content-types="text/*"/>
       <p:option name="count" required="true" as="xs:integer"/>
    </p:declare-step>
    <p:declare-step type="p:unescape-markup" xml:id="unescape-markup">
