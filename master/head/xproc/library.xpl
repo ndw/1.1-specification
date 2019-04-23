@@ -17,6 +17,20 @@
       <p:option name="all" as="xs:boolean" select="false()"/>
       <p:option name="relative" as="xs:boolean" select="true()"/>
    </p:declare-step>
+   <p:declare-step type="p:archive" xml:id="archive">
+      <p:input port="source"
+               primary="true"
+               content-types="*/*"
+               sequence="true"/>
+      <p:input port="manifest" content-types="application/xml" sequence="false"/>
+      <p:output port="result"
+                primary="true"
+                content-types="application/*"
+                sequence="false"/>
+      <p:output port="report" content-types="application/xml" sequence="false"/>
+      <p:option name="format" as="xs:QName" required="false" select="'zip'"/>
+      <p:option name="parameters" as="xs:string" required="false"/>
+   </p:declare-step>
    <p:declare-step type="p:cast-content-type" xml:id="cast-content-type">
       <p:input port="source" content-types="*/*"/>
       <p:output port="result" content-types="*/*"/>
@@ -55,8 +69,8 @@
       <p:output port="result" content-type="application/xml"/>
       <p:option name="path" required="true" as="xs:anyURI"/>
       <p:option name="detailed" as="xs:boolean" select="false()"/>
-      <p:option name="include-filter" as="xs:string" e:type="RegularExpression"/>
-      <p:option name="exclude-filter" as="xs:string" e:type="RegularExpression"/>
+      <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
+      <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
    </p:declare-step>
    <p:declare-step type="p:error" xml:id="error">
       <p:input port="source"
@@ -425,6 +439,26 @@
                 content-types="text/*"/>
       <p:option name="count" required="true" as="xs:integer"/>
    </p:declare-step>
+   <p:declare-step type="p:unarchive" xml:id="unarchive">
+      <p:input port="source"
+               primary="true"
+               content-types="*/*"
+               sequence="false"/>
+      <p:output port="result"
+                primary="true"
+                content-types="*/*"
+                sequence="true"/>
+      <p:option name="include-filter"
+                as="xs:string"
+                e:type="RegularExpression"
+                required="false"/>
+      <p:option name="exclude-filter"
+                as="xs:string"
+                e:type="RegularExpression"
+                required="false"/>
+      <p:option name="format" as="xs:QName" required="false" select="'zip'"/>
+      <p:option name="parameters" as="xs:string" required="false"/>
+   </p:declare-step>
    <p:declare-step type="p:unescape-markup" xml:id="unescape-markup">
       <p:input port="source" content-types="application/xml text/xml */*+xml text/*"/>
       <p:output port="result" content-types="application/xml text/xml */*+xml"/>
@@ -547,15 +581,15 @@
    </p:declare-step>
    <p:declare-step type="p:xslt" xml:id="xslt">
       <p:input port="source"
-               content-types="application/xml text/xml */*+xml"
+               content-types="*/*"
                sequence="true"
                primary="true"/>
       <p:input port="stylesheet" content-types="application/xml text/xml */*+xml"/>
       <p:output port="result"
                 primary="true"
-                sequence="true"
+                sequence="false"
                 content-types="*/*"/>
-      <p:output port="secondary" sequence="true"/>
+      <p:output port="secondary" sequence="true" content-types="*/*"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="initial-mode" as="xs:QName?"/>
       <p:option name="template-name" as="xs:QName?"/>

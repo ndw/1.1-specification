@@ -638,14 +638,102 @@ wrapped around the node and the document's content-type is
 <para>If the result is a document node, content-type "application/xml" is used.</para>
 </listitem>
 <listitem>
-<para>If the result is a <code>map</code> or an <code>array</code>, a JSON document
+<para>If the result is a <code>map</code>, <code>array</code> or any atomic value, a JSON document
 is created and content-type <literal>application/json</literal> is used.</para>
 </listitem>
+
+</itemizedlist>
+</section>
+
+<section xml:id="specified-content-types">
+<title>Specifying content types</title>
+
+<para>In some contexts (step inputs, step outputs, and inline
+elements, for example), XProc allows the pipeline author to specify a
+list of content types to identify what kinds of documents are allowed.
+Each content type in this list must have one of the following
+forms:</para>
+
+<itemizedlist>
 <listitem>
-<para>If the result is an atomic value, a binary document is created and content-type
-<literal>application/vnd.xproc+atomic</literal> is used.</para>
+<para>A fully qualified type of the form
+“<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”
+where “<literal>+<replaceable>ext</replaceable></literal>” is optional and any of <replaceable>type</replaceable>,
+<replaceable>subtype</replaceable>, and <replaceable>ext</replaceable>
+can be specified as “<literal>*</literal>” meaning “any”.
+For example:
+<literal>text/plain</literal> (only plain text documents),
+<literal>text/*</literal> (any “text” content type),
+<literal>*/*+xml</literal> (any “+xml” content type),
+and <literal>*/*</literal> (any content type).
+</para>
+</listitem>
+<listitem>
+<para>A fully qualified type preceded by a minus sign (“-”) indicates that the specified type is forbidden.
+For example:
+<literal>-image/svg</literal> forbids SVG images,
+<literal>-text/*</literal> forbids “text” content types,
+and <literal>-text/html</literal> forbids HTML documents.
+</para>
+</listitem>
+<listitem>
+<para>A single token (without a “/”), is considered a shortcut form.
+The following shortcuts <rfc2119>must</rfc2119> be supported by the processor:</para>
+<variablelist>
+<varlistentry><term><literal>xml</literal></term>
+<listitem>
+<para>Expands to “<literal>application/xml text/xml application/*+xml -application/xhtml+xml</literal>”.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>html</literal></term>
+<listitem>
+<para>Expands to “<literal>text/html application/xhtml+xml</literal>”.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>text</literal></term>
+<listitem>
+<para>Expands to: “<literal>text/* -text/html -text/xml</literal>”.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>json</literal></term>
+<listitem>
+<para>Expands to “<literal>application/json</literal>”.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>any</literal></term>
+<listitem>
+<para>Expands to “<literal>*/*</literal>”.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
 </listitem>
 </itemizedlist>
+
+<para><impl>It is <glossterm>implementation-defined</glossterm> if a processor accepts any other content type shortcuts.</impl>
+<error code="S0111">It is a <glossterm>static error</glossterm> if an unrecognized content type shortcut is specified.</error>
+</para>
+
+<para>To determine if a document is acceptable, the (expanded) list of
+content types is considered from left to right. If the actual content
+type matches an acceptable content type, the document is acceptable.
+If it matches a forbidden content type, then it is not. A content type
+that isn’t matched is ignored. The document is considered acceptable
+if and only if it matches at least one acceptable content type
+and the last content type that matched was not forbidden.</para>
+
+<para>For example: a document with the content type “<literal>image/svg</literal>” is acceptable if the content type list expands
+to “<literal>image/* application/xml</literal>” but it is not acceptable if the content type list expands
+to “<literal>image/* -image/svg</literal>”. (Note that order matters; the document would be considered acceptable
+if the content type list expands to “<literal>-image/svg image/*</literal>”.)
+</para>
+
+<para>In the particular case of shortcut values, note that “<literal>application/xhtml+xml</literal>” is acceptable if the
+content type list is “<literal>xml html</literal>” but not if it is “<literal>html xml</literal>”.</para>
 </section>
 
 <section xml:id="media-type-match">
@@ -2406,7 +2494,9 @@ Variable names are always expressed as
           <para>If the value supplied for the option is an instance of <type>xs:string</type> (or a type derived from
             <type>xs:string</type>), the QName is constructed by following the <link xlink:href="https://www.w3.org/TR/xpath-31/#doc-xpath31-EQName">EQName production rules</link> in
             <biblioref linkend="xpath31"/>. That is, it can be written as a local-name only, as a prefix plus
-            local-name, or as a URI qualified name (using the <code>Q{namespace}local-name</code> syntax). <error code="D0061">It is a <glossterm>dynamic error</glossterm> if the string value is not syntactically an
+            local-name, or as a URI qualified name (using the <code>Q{namespace}local-name</code> syntax). If it
+            is written as local-name only, the constructed QName will not have a namespace URI, i.e. the default 
+            namespace is not applied here. <error code="D0061">It is a <glossterm>dynamic error</glossterm> if the string value is not syntactically an
               EQName.</error>
             <error code="D0069">It is a <glossterm>dynamic error</glossterm> if the string value contains a colon and
               the designated prefix is not declared in the in-scope namespaces.</error>
@@ -3735,16 +3825,17 @@ of the content types that might be produced by any of the <tag>p:when</tag>
 or the <tag>p:otherwise</tag>.
 </para>
 
-<para>The <tag>p:choose</tag> can specify the context node against
+<para>The <tag>p:choose</tag> can specify the context item against
 which the XPath expressions that occur on each branch are evaluated.
-The context node is specified as a <glossterm>connection</glossterm>
+The context item is specified as a <glossterm>connection</glossterm>
 in the <tag>p:with-input</tag>. If no explicit connection is provided,
 the <glossterm>default readable port</glossterm> is used. If the
-context node is connected to <tag>p:empty</tag>, or is unconnected and
+context item is connected to <tag>p:empty</tag>, or is connected to
+more than one document, or is unconnected and
 the <glossterm>default readable port</glossterm> is undefined, the
-context item is undefined. <error code="D0005">It is a
-<glossterm>dynamic error</glossterm> if more than one document appears
-on the connection for this input port.</error>
+  context item is undefined. <error code="D0001">It is a <glossterm>dynamic error</glossterm>
+    if the XPath expression makes use of the context item, but the context item is
+    undefined.</error>
 </para>
 
 <para>Each conditional <glossterm>subpipeline</glossterm> is
@@ -3753,6 +3844,29 @@ represented by a <tag>p:otherwise</tag> element. These elements are not
 sibling steps in the usual sense, the names of sibling <tag>p:when</tag>
 elements and the <tag>p:otherwise</tag> element are not in
 <link linkend="scoping">the same scope</link>.</para>
+  
+  <para>If the following conditions apply:</para>
+      <itemizedlist>
+        <listitem>
+          <para>The <tag>p:choose</tag> does not contain a <tag>p:otherwise</tag> child element</para>
+        </listitem>
+        <listitem>
+          <para>The <tag>p:when</tag> branches all define a primary output port (either implicitly or explicitly)</para>
+        </listitem>
+        <listitem>
+          <para>None of the effective boolean values of the <tag>p:when</tag> test expressions evaluates to
+              <code>true</code></para>
+        </listitem>
+
+      </itemizedlist>
+      <para>Then the <tag>p:choose</tag> copies any documents that appear on its default readable port to its primary output
+        port. No documents will be written to the primary output port if there isn’t a default readable port, but that
+        is not an error in this case. No documents will ever be written to any non-primary output ports in this case.</para>
+      <para>Informally: the default sub-pipeline for a missing <tag>p:otherwise</tag> is a <tag>p:identity</tag> step
+        (with the additional feature that it isn’t an error if there’s no default readable port). A primary output port
+        on the <tag>p:when</tag> branches for this is required.</para>
+  
+  
 
 <section xml:id="p.when"><title>p:when</title><para>A
           when specifies one subpipeline guarded by a test expression. </para>
@@ -3762,17 +3876,17 @@ elements and the <tag>p:otherwise</tag> element are not in
             <glossterm>subpipeline</glossterm> contained within that
           <tag>p:when</tag>.</para>
 
-<para>The <tag>p:when</tag> can specify a context node against which
+<para>The <tag>p:when</tag> can specify a context item against which
 its <tag class="attribute">test</tag> expression is to be evaluated.
-That context node is specified as a <glossterm>connection</glossterm>
+That context item is specified as a <glossterm>connection</glossterm>
 for the <tag>p:with-input</tag>. If no context is specified on the
 <tag>p:when</tag>, the context of the <tag>p:choose</tag> is
-used.</para>
-<para><error code="D0005">If the <tag class="attribute">collection</tag> attribute is not specified, or if
-its value is false,
-it is a <glossterm>dynamic error</glossterm> if
-more than one document appears on the connection for the <tag>p:when</tag>
-test expression.</error> If the collection attribute has the value true,
+used. The context item is undefined if the connection or
+the context of the <tag>p:choose</tag> provides no or more than one document.
+<error code="D0001">It is a <glossterm>dynamic error</glossterm>
+    if the XPath expression makes use of the context item, but the context item is
+    undefined.</error></para>
+<para>If the <tag class="attribute">collection</tag> attribute has the value true,
 then the default collection will contain all of the documents that appeared
 on that input and the context item will be undefined.
 </para>
@@ -3832,18 +3946,19 @@ That XPath expression's effective boolean value is the guard for the
 <glossterm>subpipeline</glossterm> contained within it.
 </para>
 
-<para>The <tag>p:if</tag> step can specify a context node against which
+<para>The <tag>p:if</tag> step can specify a context item against which
 its <tag class="attribute">test</tag> expression is to be evaluated.
 That context node is specified as a <glossterm>connection</glossterm>
 for the <tag>p:with-input</tag>. If no context is specified on the
 <tag>p:if</tag>, the context comes from the
-<glossterm>default readable port</glossterm>.</para>
+<glossterm>default readable port</glossterm>. If no context is specified and
+there is no default readable port, the context item is undefined. The context
+item is also undefined, if no or more than one document is provided. 
+<error code="D0001">It is a <glossterm>dynamic error</glossterm>
+  if the XPath expression makes use of the context item, but the context item is
+  undefined.</error></para>
 
-<para><error code="D0005">If the <tag class="attribute">collection</tag> attribute is not specified, or if
-its value is false,
-it is a <glossterm>dynamic error</glossterm> if
-more than one document appears on the connection for the <tag>p:if</tag>
-test expression.</error> If the collection attribute has the value true,
+<para>If the <tag class="attribute">collection</tag> attribute has the value true,
 then the default collection will contain all of the documents that appeared
 on that input and the context item will be undefined.
 </para>
@@ -3874,8 +3989,8 @@ ports if the test expression is false.</para>
 </itemizedlist>
 
 <para>Informally, if the test expression is false, then
-<tag>p:if</tag> acts like the identity step. (With the additional
-feature that it isn’t an error if there’s no default readable port.) A
+<tag>p:if</tag> acts like the identity step (with the additional
+feature that it isn’t an error if there’s no default readable port). A
 primary output port is required in order to make these semantics
 meaningful and consistent.</para>
 </section>
@@ -4415,31 +4530,9 @@ expression is ignored.</para>
 <listitem>
 <para>The <tag class="attribute">content-types</tag> attribute lists one
 or more (space separated) content types that this input port will
-accept. If the attribute is not specified, <literal>*/*</literal> is assumed. 
-A content type must be of the form
-“<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”
-where any of <replaceable>type</replaceable>,
-<replaceable>subtype</replaceable>, and <replaceable>ext</replaceable>
-can be specified as “<literal>*</literal>” meaning “any”. The
-“<literal>+<replaceable>ext</replaceable></literal>” is optional. Here
-are some examples of content types for matching:</para>
-
-<itemizedlist>
-<listitem><simpara><literal>text/plain</literal>, plain text
-documents</simpara>
-</listitem>
-<listitem><simpara><literal>text/*</literal>, any kind of text
-document.</simpara>
-</listitem>
-<listitem><simpara><literal>*/*+xml</literal>, any XML content type.
-</simpara>
-</listitem>
-<listitem><simpara><literal>*/*</literal>, any content type.
-</simpara>
-</listitem>
-</itemizedlist>
-
-<para>The media type of input documents must
+accept. If the attribute is not specified, <literal>*/*</literal> is assumed.
+See <xref linkend="specified-content-types"/>.
+The media type of input documents must
 <link linkend="media-type-match">match</link> the allowed content types.</para>
 </listitem>
 </varlistentry>
@@ -6702,10 +6795,11 @@ recent bindings are visible.</para>
               <listitem>
 <para>The context item. The context item is either specified with a
 <glossterm>connection</glossterm> or is taken from the
-<glossterm>default readable port</glossterm>. <error code="D0008">It
-is a <glossterm>dynamic error</glossterm> if a sequence of items
-appears where an item to be used as the context item is
-expected.</error>
+  <glossterm>default readable port</glossterm>.  If the explicit connection or
+the default readable port provides no or more than one document then the context 
+item is undefined. <error code="D0001">It is a <glossterm>dynamic error</glossterm>
+if the XPath expression makes use of the context item, but the context item is
+undefined.</error>
 </para>
 
 <para>The context item used for an XML, text, or JSON document is
@@ -6714,7 +6808,7 @@ the XDM representation of that item.
 <glossterm>implementation-defined</glossterm>.</impl></para>
 
 <para>If there is no explicit connection and there is no default
-readable port then the context node is undefined.</para>
+readable port then the context item is undefined.</para>
               </listitem>
             </varlistentry>
             <varlistentry>
@@ -7860,17 +7954,33 @@ February 2019
 “<link xlink:href="http://spec.xproc.org/lastcall-2019-02/head/xproc/">last call</link>”
 draft:</para>
 
-<itemizedlist>
-<listitem>
-<para>The semantics of <tag>p:if</tag> have been changed. If the test expression
-is false, <tag>p:if</tag> behaves roughly like an identity step. Previously it produced
-no outputs.</para>
-</listitem>
-<listitem>
-<para>It is no longer a static error (XS0093), if <tag>p:option</tag> or <tag>p:variable</tag>
-have an attribute <literal>visibility</literal> and are not children of a <tag>p:library</tag>.</para>
-</listitem>
-</itemizedlist>
+    <itemizedlist>
+      <listitem>
+        <para>The semantics of <tag>p:if</tag> have been changed. If the test expression is false, <tag>p:if</tag>
+          behaves roughly like an identity step. Previously it produced no outputs.</para>
+      </listitem>
+      <listitem>
+        <para>It is no longer a static error (XS0093), if <tag>p:option</tag> or <tag>p:variable</tag> have an attribute
+            <literal>visibility</literal> and are not children of a <tag>p:library</tag>.</para>
+      </listitem>
+      <listitem>
+        <para>The semantics of <tag>p:choose</tag> have been changed. The default sub-pipeline for a missing
+            <tag>p:otherwise</tag> is a <tag>p:identity</tag> step (with the additional feature that it isn’t an error
+          if there’s no default readable port). A primary output port on the <tag>p:when</tag> branches for this is
+          required.</para>
+      </listitem>
+      <listitem>
+        <para>The way the context item for XPath expressions is provided has been changed. It is now provided if and only 
+        if the connection delivers exactly one document, otherwise the context item is undefined. A new error (XD0001) is
+        introduced. It is raised if an XPath expression makes use of the context item, but the context item is undefined.
+        Two dynamic errors (XD0005 and XD0008) were removed.</para>
+      </listitem>
+      <listitem>
+        <para>Content type shortcuts and the notion of forbidden content types have been added.
+        See <xref linkend="specified-content-types"/>.
+        </para>
+      </listitem>
+    </itemizedlist>
 </appendix>
 
 </specification>
