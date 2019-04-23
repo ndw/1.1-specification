@@ -63,8 +63,8 @@
       <p:output port="result" content-type="application/xml"/>
       <p:option name="path" required="true" as="xs:anyURI"/>
       <p:option name="detailed" as="xs:boolean" select="false()"/>
-      <p:option name="include-filter" as="xs:string" e:type="RegularExpression"/>
-      <p:option name="exclude-filter" as="xs:string" e:type="RegularExpression"/>
+      <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
+      <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
    </p:declare-step>
    <p:declare-step type="p:error" xml:id="error">
       <p:input port="source"
@@ -447,15 +447,15 @@
    </p:declare-step>
    <p:declare-step type="p:xslt" xml:id="xslt">
       <p:input port="source"
-               content-types="application/xml text/xml */*+xml"
+               content-types="*/*"
                sequence="true"
                primary="true"/>
       <p:input port="stylesheet" content-types="application/xml text/xml */*+xml"/>
       <p:output port="result"
                 primary="true"
-                sequence="true"
+                sequence="false"
                 content-types="*/*"/>
-      <p:output port="secondary" sequence="true"/>
+      <p:output port="secondary" sequence="true" content-types="*/*"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="initial-mode" as="xs:QName?"/>
       <p:option name="template-name" as="xs:QName?"/>
