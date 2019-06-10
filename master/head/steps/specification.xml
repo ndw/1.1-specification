@@ -169,8 +169,8 @@ with the specified value.
 </para>
 
 <p:declare-step type="p:add-attribute">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
   <p:option name="attribute-name" required="true" as="xs:QName"/>
   <p:option name="attribute-value" required="true" as="xs:string"/>
@@ -228,8 +228,8 @@ with <code>xml:base</code> attributes added to or corrected on each element as s
 by the options on this step.</para>
 
 <p:declare-step type="p:add-xml-base">
-   <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:input port="source" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
    <p:option name="all" as="xs:boolean" select="false()"/>
    <p:option name="relative" as="xs:boolean" select="true()"/>
 </p:declare-step>
@@ -248,7 +248,7 @@ if the <option>all</option> and <option>relative</option> options are
 
 <itemizedlist>
 <listitem>
-<para>For the document element: force the element to have an <tag class="attribute">xml:base</tag>
+<para>For every element that is a child of the document node: force the element to have an <tag class="attribute">xml:base</tag>
 attribute with the document's [base URI] property's value as its value.</para>
 </listitem>
 <listitem>
@@ -285,24 +285,26 @@ element's [base URI].</para>
   <title>p:archive</title>
 
   <para>The <code>p:archive</code> step outputs on its <port>result</port> port an archive (usually binary) document,
-    for instance a ZIP file. A specification of the contents of the archive must be specified in a manifest XML document
-    on the <port>manifest</port>. The contents of the archive itself can come from documents provided on the
-      <port>source</port> port, from a URI, from documents specified inline in the manifest or any combination of these.
+    for instance a ZIP file. A specification of the contents of the archive may be specified in a manifest XML document
+    on the <port>manifest</port>. The contents of the archive can come from documents provided on the
+      <port>source</port> and <port>archive</port> ports, from documents specified inline in the manifest, or from a combination of these.
     The step produces a report on the <port>report</port> port, which contains the manifest, amended with additional
     information about the archiving. </para>
 
   <p:declare-step type="p:archive">
     <p:input port="source" primary="true" content-types="*/*" sequence="true"/>
-    <p:input port="manifest" content-types="application/xml" sequence="false"/>
+    <p:input port="manifest" content-types="application/xml" sequence="true"/>
+    <p:input port="archive" content-types="application/*" sequence="true"/>
     <p:output port="result" primary="true" content-types="application/*" sequence="false"/>
     <p:output port="report" content-types="application/xml" sequence="false"/>
     <p:option name="format" as="xs:QName" required="false" select="'zip'"/>
+    <p:option name="relative-to" as="xs:anyURI" required="false"/>
     <p:option name="parameters" as="map(xs:Qname, item()*)" required="false"/>
   </p:declare-step>
 
   <para>The <code>p:archive</code> step takes the document appearing on its <port>manifest</port> port as a
     specification for an archive file. It outputs this archive on its <port>result</port> port.</para>
-
+  
   <para>The format of the archive can be specified using the <option>format</option> option. Implementations
       <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/> format, specified with the value <code>zip</code>.
       <impl>It is <glossterm>implementation-defined</glossterm> what other formats are supported.</impl></para>
@@ -311,6 +313,72 @@ element's [base URI].</para>
       of the keys and the allowed values for these keys are <glossterm>implementation-defined</glossterm>.</impl>
     <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map <option>parameters</option> contains an
       entry whose key is defined by the implementation and whose value is not valid for that key.</error></para>
+  
+  <para>For the 'zip' format, the following parameters <rfc2119>must</rfc2119> be supported:</para>
+
+  <variablelist>
+    <varlistentry>
+      <term><code>command</code></term>
+      <listitem>
+        <para>“update” | “freshen” | “create” | “delete”</para>
+        <para>If no command is given, “update” (add entries that do not exist, freshen entries whose timestamp is older
+          than the underlying resource’s) will be assumed.</para>
+        <para>“update”, “freshen” and “create” will work with or without a manifest (see below).</para>
+        <para>“update” does not require an existing archive to be submitted on the <port>archive</port> port.</para>
+        <para>“freshen” and “delete” require that exactly one zip archive is supplied on the <port>archive</port> port.</para>
+        <para>“delete” informs <code>p:archive</code> to remove the entries that are specified in the manifest by
+          the <code>c:entry/@name</code>.</para>
+        <para>If an entry that should be deleted or freshened is not found in the document on the <port>archive</port>
+          port, no error is raised and nothing is changed.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><code>compression-level</code></term>
+      <listitem>
+        <para>“<code>smallest</code>” | “<code>fastest</code>” | “<code>default</code>” | “<code>huffman</code>” 
+          | “<code>none</code>”</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><code>compression-method</code></term>
+      <listitem>
+        <para>“<code>stored</code>” | “<code>deflated</code>”</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  
+  <para>Implementations of other archive formats <rfc2119>should</rfc2119> use the same parameter names if applicable. 
+    The value spaces for these parameters may be format-specific though. They are 
+    <glossterm>implementation-defined</glossterm>.</para>
+  
+  <para>Whether other archive formats and implementations support modifications of <port>archive</port> inputs
+  is <glossterm>implementation-defined</glossterm>.</para>
+  
+  <para><error code="C0080">It is a <glossterm>dynamic error</glossterm> if the number of documents on
+      the <port>archive</port> does not match the expected number of archive input documents for the
+      given <code>format</code> and <code>command</code>.</error></para>
+  
+  <note>
+    <para>The expected number of documents on the <port>archive</port> may be zero for formats such as gzip that do not 
+      allow manipulation of existing archives.</para>
+    <para>A hypothetical archive merging implementation, on the other hand, may accept more than one document
+    on the <port>archive</port> port.</para>
+  </note>
+  
+  <para><error code="C0081">It is a <glossterm>dynamic error</glossterm> if the content type of a document on the 
+    <port>archive</port> does not match the given archive <code>format</code>.</error></para>
+
+  <para>If no manifest entry is given for a <port>source</port> document, the step will manufacture
+    a manifest entry from the document’s <code>base-uri</code> property. If no document arrives on
+    the <port>manifest</port>, it will create a complete manifest document (see below for the
+    manifest document specification). The option <option>relative-to</option> can be used to derive
+    the entry’s <tag role="attribute">name</tag> attribute from the <port>source</port> document’s
+      <code>base-uri</code> property, which in turn will used for the entry’s <tag role="attribute">href</tag> attribute. Both the URI that is given in <option>relative-to</option> and the value of the 
+  <code>base-uri</code> property should be normalized with respect to slash deduplication, parent path
+    elimination, and drive letter case folding. The the step will remove the leading (normalized) 
+    <option>relative-to</option> option value from the <port>source</port> document’s (normalized) base URI. 
+    If there is no match, the manifest entry’s <tag role="attribute">name</tag> attribute should consist of the 
+    path part of the <port>source</port> document’s base URI, without any leading slashes.</para>
 
   <para>The <port>report</port> port outputs a copy of the manifest, optionally amended with additional attributes
     and/or elements. <impl>The semantics of any additional attributes, elements and their values are
@@ -322,22 +390,14 @@ element's [base URI].</para>
 
     <para>An archive manifest is represented by a <tag>c:archive</tag> root element.</para>
 
-    <note role="editorial">
-      <para>TBD: Specify <tag>c:archive</tag> root element using schemas. Proposal:</para>
-      <programlisting>&lt;c:archive&gt; &lt;c:file&gt;* &lt;/c:archive&gt;</programlisting>
-    </note>
-    <!--<e:rng-pattern name="..."/>-->
+    <e:rng-pattern name="VocabArchive" xml:id="cv.archive"/>
 
     <para><impl>The <code>c:archive</code> root element may contain additional <glossterm>implementation-defined</glossterm>
       attributes.</impl></para>
 
-    <para>All entries in the archive must be present as <tag>c:file</tag> child elements:</para>
+    <para>All entries in the archive must be present as <tag>c:entry</tag> child elements:</para>
 
-    <note role="editorial">
-      <para>TBD: Specify <tag>c:file</tag> elements using schemas. Proposal:</para>
-      <programlisting>&lt;c:entry name="..." href?="..." compression-method?="..."&gt; ...optional contents... &lt;/c:entry&gt;</programlisting>
-    </note>
-    <!--<e:rng-pattern name="..."/>-->
+    <e:rng-pattern name="VocabEntry" xml:id="cv.entry"/>
 
     <para>The <code>name</code> attribute specifies the name of the entry in the archive. It <rfc2119>must</rfc2119> be
       specified as a relative path.</para>
@@ -348,17 +408,26 @@ element's [base URI].</para>
             present and its value is not a valid <type>xs:anyURI</type>.</error></para>
       </listitem>
       <listitem>
-        <para>When the <tag>c:file</tag> elements has any child nodes, it is ignored.</para>
+        <para>When the <tag>c:entry</tag> elements has any child nodes, it is ignored.</para>
+        <note role="editorial">
+          <para>Why should the entry be ignored if it has content? Shouldn’t the entry’s content rather be ignored?</para>
+        </note>
       </listitem>
       <listitem>
         <para>The <code>p:archive</code> step checks the documents appearing on its <port>source</port> port for any
           documents with exactly the same base URI as the contents of the <code>href</code> attribute. If any such
           documents are found, the <emphasis>first</emphasis> of these is used as entry for the archive.</para>
+        <note role="editorial">
+          <para>In the interest of portability and reproducibility, shouldn’t we raise a dynamic
+            error if the same <code>href</code> attribute is used on another manifest entry? If the
+            documents are, for example, taken from the <port>secondary</port> port of a
+              <code>p:xslt</code> step, the document order may be different among implementations,
+            file systems, etc.</para>
+        </note>
       </listitem>
       <listitem>
         <para>If the above doesn't apply, the value of the <code>href</code> attribute is interpreted as a URI and the
-          document is loaded from this.</para>
-
+          document is loaded from this location.</para>
         <para><error code="D0011">It is a <glossterm>dynamic error</glossterm> if the resource referenced by the
               <option>href</option> option does not exist, cannot be accessed or is not a file</error></para>
         <para> If the <option>href</option> option is relative, it is made absolute against the base URI of the
@@ -378,11 +447,11 @@ element's [base URI].</para>
     <para>When the <code>c:file</code> element has any child nodes this is taken as the contents of the archive's entry.
       The <code>href</code> attribute is ignored in this case.</para>
 
-    <para>The <code>p:archive</code> step should strive to retain the order of the <tag>c:file</tag> elements when
-      constructing the archive. For instance, an e-book in EPub format has a non-compressed entry that must be first in
+    <para>The <code>p:archive</code> step <rfc2119>should</rfc2119> strive to retain the order of the <tag>c:entry</tag> elements when
+      constructing the archive. For instance, an e-book in EPUB format has a non-compressed entry that must be first in
       the archive. It should be possible to construct such an archive using <code>p:archive</code>.</para>
 
-    <para><impl>The <code>c:file</code> elements may contain additional <glossterm>implementation-defined</glossterm>
+    <para><impl>The <code>c:entry</code> elements may contain additional <glossterm>implementation-defined</glossterm>
       attributes.</impl></para>
     <note role="editorial">
       <para>Do we need to say anything about serialization options for XML contents?</para>
@@ -615,8 +684,8 @@ pattern from the
 with the deleted items removed, on the <port>result</port> port.</para>
 
 <p:declare-step type="p:delete">
-   <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:input port="source" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
 
@@ -638,7 +707,7 @@ of the element on which it occurred.</para>
 <para feature="delete-preserves-all">All document properties are preserved.</para>
 </simplesect>
 </section>
-<section xml:id="c.directory-list">
+<?xml-model href="../../../../../schema/dbspec.rnc" type="application/relax-ng-compact-syntax"?><section xml:id="c.directory-list">
 <title>p:directory-list</title>
 
   <para>The <code>p:directory-list</code> step produces a list of the contents
@@ -648,6 +717,7 @@ of the element on which it occurred.</para>
   <p:output port="result" content-type="application/xml"/>
   <p:option name="path" required="true" as="xs:anyURI"/>
   <p:option name="detailed" as="xs:boolean" select="false()"/>
+  <p:option name="recursive" as="xs:boolean" select="false()"/>
   <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
   <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
 </p:declare-step>
@@ -674,21 +744,58 @@ environment in which the pipeline is run.</error></para>
 <para>If the <option>detailed</option> option is true, the pipeline
 author is requesting additional information about the matching entries,
 see <xref linkend="dir-list-details"/>.</para>
+  
+  <para>If the <option>recursive</option> option is true, a <tag>c:directory</tag> element in the result document 
+    will include <tag>c:file</tag>, <tag>c:other</tag>, and <tag>c:directory</tag> elements for the corresponding
+    items in the given directory, if there are any.</para>
 
 <para>If present, the value of the <option>include-filter</option> or
 <option>exclude-filter</option> option <rfc2119>must</rfc2119> be a sequence of strings, each
 one representing a regular expressions as specified in <biblioref linkend="xpath31-functions"/>,
     section 7.61 “<literal>Regular Expression Syntax</literal>”.</para>
 
-<para>If any <option>include-filter</option> pattern matches a
-directory entry's name, the entry is included in the output. If any
-<option>exclude-filter</option> pattern matches a directory entry's
-name, the entry is excluded in the output. If both options are
+<para>The regular expressions will be matched against an item’s file system path relative to the top-level path that was
+  given in the <option>path</option> option. If the item is a directory, a trailing slash will be appended.</para>
+  <para>Examples: A file <literal>file.txt</literal> in the directory specified by <option>path</option> will remain
+    <literal>file.txt</literal>, a relative path <literal>dir1/file.txt</literal> will remain
+      <literal>dir1/file.txt</literal>, while a relative path <literal>dir1/dir2</literal> will become
+      <literal>dir1/dir2/</literal> id <literal>dir2</literal> is a directory.</para>
+  <para>Regular expressions that match <literal>a/a/b/file.txt</literal> are, for example,
+  <literal>^/(\w+/){2,3}.+\.txt$</literal>, <literal>a/a/b/</literal>, or <literal>/file\.[^/]+$</literal>.</para>
+
+<para>If any <option>include-filter</option> pattern matches the slash-augmented relative path, the entry is included in the output. 
+  If a directory’s path matches the inclusion regex, the directory’s content will not automatically be included, too.
+  They need to match, the regular expression, too. So the filter regex <literal>^dir/</literal> will match the directory
+  content but <literal>^dir/$</literal> won’t, and as a consequence the directory’s content will not be included in the result.</para>
+  <para>If a relative path is matched by an include filter,
+    all its ancestor directories starting from the initial directory (but not their content if not included explicitly) 
+    will be included, too. Example: for a file <literal>a/a/b/file.txt</literal> below the initial directory 
+    <literal>/home/jane</literal>, this output will be produced, omitting content that might be present in the 
+    intermediate directories:<literallayout>&lt;c:directory xml:base="file:/home/jane/` uri="." name="jane"&gt;
+  &lt;c:directory uri="a/" name="a"&gt;
+    &lt;c:directory uri="a/a/" name="a"&gt;
+      &lt;c:directory uri="a/a/b/" name="b"&gt;
+        &lt;c:file uri="a/a/b/file.txt" name="file.txt"/&gt;
+      &lt;/c:directory&gt;
+    &lt;/c:directory&gt;
+  &lt;/c:directory&gt;
+&lt;/c:directory&gt;</literallayout></para>
+  <para>If the <option>exclude-filter</option> pattern matches the slash-augmented relative path, the entry (and all of
+    its content in case of a directory) is excluded in the output.</para>
+  <para>If both options are
 provided, the include filter is processed first, then the exclude
 filter. As a result: an item is included if it matches (at least) one
 of the <option>include-filter</option> values and none of the
 <option>exclude-filter</option> values.</para>
+  <para>If no <option>include-filter</option> is given, that is, if <option>include-filter</option> is an empty
+  sequence, any item will be included in the result (unless it is excluded by <option>exclude-filter</option>).</para>
 
+  <para>The augmented relative path will also be stored as a <tag role="attribute">uri</tag> attribute on the respective
+      <tag>c:directory</tag>, <tag>c:file</tag>, and <tag>c:other</tag> elements. This relative URI, if resolved against
+    the top-level directory’s <tag role="attirubte">xml:base</tag> attribute value, will give the absolute URI for the
+    resource. The top-level <tag>c:directory</tag> will always have the relative URI <literal>.</literal> attached to
+    it, while its <tag role="attribute">xml:base</tag> will also undergo trailing-slash normalization, which is to say,
+    it always must end in a slash.</para>
 <note>
 <para>There is no way to specify a list of values using attribute value
 templates. If the option shortcut syntax is used to provide the
@@ -735,15 +842,19 @@ special are <glossterm>implementation-defined</glossterm>.</impl>
 </listitem>
 </itemizedlist>
 
-<para>When a directory entry is a subdirectory, that directory's entries are not
-output as part of that entry's <tag>c:directory</tag>.  A user must apply this step
-again to the subdirectory to list subdirectory contents.</para>
+<para>When a directory entry is a subdirectory, unless the <option>recursive</option> is <literal>true</literal>,
+  that directory's entries are not output as part of that entry's <tag>c:directory</tag>.</para>
 
 <para>Each of the elements <tag>c:file</tag>, <tag>c:directory</tag>,
 and <tag>c:other</tag> has a <code>name</code> attribute when it
-appears within the top-level <tag>c:directory</tag> element, whose
+appears within a <tag>c:directory</tag> element, whose
 value is a relative IRI reference, giving the (local) file or
 directory name.</para>
+  <para>Each item in the result document, apart from the top-level <tag>c:directory</tag>, gets an
+      <code>xml:base</code> attribute that contains its path relative to the base URI of the
+    top-level <tag>c:directory</tag> element. In the case of immediate children of the top-level element,
+  the value of this <code>xml:base</code> attribute is identical to the value of the <code>name</code>
+  attribute.</para>
 
 <section xml:id="dir-list-details">
 <title>Directory list details</title>
@@ -807,8 +918,8 @@ are <glossterm>implementation-defined</glossterm>.</impl></para>
 to the step.</para>
 
 <p:declare-step type="p:error">
-    <p:input port="source" sequence="true" content-types="application/xml text/xml */*+xml text/*"/>
-    <p:output port="result" sequence="true" content-types="application/xml text/xml */*+xml text/*"/>
+    <p:input port="source" sequence="true" content-types="text xml"/>
+    <p:output port="result" sequence="true" content-types="any"/>
     <p:option name="code" required="true" as="xs:QName"/>
 </p:declare-step>
 
@@ -860,14 +971,14 @@ element in the pipeline.</para>
 <title>p:escape-markup</title>
 
 <para>The <code>p:escape-markup</code> step applies XML serialization to the
-children of the document element and replaces those children with their
-serialization. The outcome is a single element with text content that
+children of the all elements that are children of the document node and 
+replaces those children with their serialization. The outcome is a list of elements with text content that
 represents the "escaped" syntax of the children as they were
 serialized.</para>
 
 <p:declare-step type="p:escape-markup">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="serialization" as="map(xs:QName,item()*)?"/>
 </p:declare-step>
 
@@ -904,7 +1015,7 @@ XML declaration in the escaped result.</para>
 
 <simplesect>
 <title>Document properties</title>
-<para feature="escape-markup-preserves-none">No document properties are preserved.</para>
+<para feature="escape-markup-preserves-all">All document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.filter">
@@ -914,8 +1025,8 @@ XML declaration in the escaped result.</para>
 based on a (possibly dynamically constructed) XPath select expression.</para>
 
 <p:declare-step type="p:filter">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" sequence="true" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" sequence="true" content-types="text xml html"/>
   <p:option name="select" required="true" as="xs:string" e:type="XPathExpression"/>
 </p:declare-step>
 
@@ -925,7 +1036,7 @@ expression is computed dynamically.</para>
 
 <simplesect>
 <title>Document properties</title>
-<para feature="filter-preserves-all">All document properties are preserved.</para>
+<para feature="filter-preserves-none">No document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.hash">
@@ -935,12 +1046,12 @@ expression is computed dynamically.</para>
 for some value and injects it into the <port>source</port> document.</para>
 
 <p:declare-step type="p:hash">
-  <p:input port="source" primary="true" content-types="*/*"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" primary="true" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
   <p:option name="value" required="true" as="xs:string"/>
   <p:option name="algorithm" required="true" as="xs:QName"/>
-  <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
+  <p:option name="match" as="xs:string" select="'/*/node()'" e:type="XSLTSelectionPattern"/>
   <p:option name="version" as="xs:string?"/>
 </p:declare-step>
 
@@ -989,7 +1100,9 @@ of the element <rfc2119>must</rfc2119> also be amended accordingly.</para>
 
 <para>If the expression matches any
 other kind of node, the entire node (and <emphasis>not</emphasis> just
-its contents) is replaced by the hash.</para>
+  its contents) is replaced by the hash. <error code="C0091">It is a
+    <glossterm>dynamic error</glossterm> if the result of <tag>p:hash</tag> contains only 
+text nodes.</error></para>
 
 <simplesect>
 <title>Document properties</title>
@@ -1598,8 +1711,8 @@ name=W3C&amp;amp;spec=XProc
 available on its output.</para>
 
 <p:declare-step type="p:identity">
-  <p:input port="source" sequence="true" content-types="*/*"/>
-  <p:output port="result" sequence="true" content-types="*/*"/>
+  <p:input port="source" sequence="true" content-types="any"/>
+  <p:output port="result" sequence="true" content-types="any"/>
 </p:declare-step>
 
 <para>If the implementation supports passing PSVI annotations between
@@ -1620,9 +1733,9 @@ port's document relative to the matching elements in the
 <code>source</code> port's document.</para>
 
 <p:declare-step type="p:insert">
-   <p:input port="source" primary="true" content-types="application/xml text/xml */*+xml"/>
-   <p:input port="insertion" sequence="true" content-types="application/xml text/* */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:input port="source" primary="true" content-types="xml html"/>
+   <p:input port="insertion" sequence="true" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
    <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
    <p:option name="position" required="true" as="xs:token" values="('first-child','last-child','before','after')"/>
 </p:declare-step>
@@ -1683,8 +1796,8 @@ as the source.</para>
 element and stores that label in the specified attribute.</para>
 
 <p:declare-step type="p:label-elements">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="attribute" as="xs:QName" select="'xml:id'"/>
   <p:option name="label" as="xs:string" select="'concat(&#34;_&#34;,$p:index)'" e:type="XPathExpression"/>
   <p:option name="match" as="xs:string" select="'*'" e:type="XSLTSelectionPattern"/>
@@ -1741,7 +1854,7 @@ remains the same.</para>
 result a document (or documents) specified by an IRI.</para>
 
 <p:declare-step type="p:load">
-  <p:output port="result" sequence="true" content-types="*/*"/>
+  <p:output port="result" sequence="true" content-types="any"/>
   <p:option name="href" required="true" as="xs:anyURI"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
   <p:option name="content-type" as="xs:string?"/>
@@ -1956,8 +2069,8 @@ attribute's value in the source document an absolute IRI value in the
 result document.</para>
 
 <p:declare-step type="p:make-absolute-uris">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
   <p:option name="base-uri" as="xs:anyURI?"/>
 </p:declare-step>
@@ -1990,8 +2103,7 @@ the document. This option value is resolved against the base URI of
 the <tag>p:option</tag> element used to set the option.</para>
 
 <para><impl>If the IRI reference specified by the <option>base-uri</option> option
-on <tag>p:make-absolute-uris</tag> is
-not valid, or if it is absent and the input document has no base URI,
+on <tag>p:make-absolute-uris</tag> is absent and the input document has no base URI,
 the results are <glossterm>implementation-dependent</glossterm>.</impl>
 </para>
 
@@ -2007,10 +2119,10 @@ the results are <glossterm>implementation-dependent</glossterm>.</impl>
 use of a namespace in a document to a new IRI value.</para>
 
  <p:declare-step type="p:namespace-rename">
-   <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
-   <p:option name="from" required="true" as="xs:anyURI"/>
-   <p:option name="to" required="true" as="xs:anyURI"/>
+   <p:input port="source" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
+   <p:option name="from" as="xs:anyURI"/>
+   <p:option name="to" as="xs:anyURI"/>
    <p:option name="apply-to" as="xs:token" select="'all'" values="('all','elements','attributes')"/>
 </p:declare-step>
 
@@ -2085,6 +2197,9 @@ not specified or has an empty string as its value) changed to have no value.</pa
    whose namespace name has no value, in the
    output its namespace name is set to the value of the
    <option>to</option> option.</para>
+      <para><error code="C0092">It is a <glossterm>dynamic error</glossterm>
+          if as a consequence of changing or removing the namespace of an attribute
+          the attribute's name is not unique on the respective element.</error></para>
   </listitem>
   <listitem>
    <para>Namespace attributes:  If the <option>from</option> option is present
@@ -2124,9 +2239,9 @@ XPath expressions, may end up with no appropriate namespace binding.</para></not
 fashion.</para>
 
 <p:declare-step type="p:pack">
-   <p:input port="source" content-types="application/xml text/xml */*+xml" sequence="true" primary="true"/>
-   <p:input port="alternate" sequence="true" content-types="application/xml"/>
-   <p:output port="result" sequence="true"/>
+   <p:input port="source" content-types="text xml html" sequence="true" primary="true"/>
+   <p:input port="alternate" sequence="true" content-types="text xml html"/>
+   <p:output port="result" sequence="true" content-types="application/xml"/>
    <p:option name="wrapper" required="true" as="xs:QName"/>
 </p:declare-step>
 
@@ -2160,8 +2275,8 @@ this step does not attempt to distinguish which one.</para>
 processing-instruction targets in a document.</para>
 
 <p:declare-step type="p:rename">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
   <p:option name="new-name" required="true" as="xs:QName"/>
 </p:declare-step>
@@ -2210,9 +2325,9 @@ its primary input with the document element of the
 <code>replacement</code> port's document.</para>
 
 <p:declare-step type="p:replace">
-   <p:input port="source" primary="true" content-types="application/xml text/xml */*+xml"/>
-   <p:input port="replacement" content-types="application/xml text/xml */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:input port="source" primary="true" content-types="xml html"/>
+   <p:input port="replacement" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
 
@@ -2241,9 +2356,9 @@ be matched.</para>
 matching elements.</para>
 
 <p:declare-step type="p:set-attributes">
-   <p:input port="source" primary="true" content-types="application/xml text/xml */*+xml"/>
-   <p:input port="attributes" content-types="application/xml text/xml */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:input port="source" primary="true" content-types="xml html"/>
+   <p:input port="attributes" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
    <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
 
@@ -2287,8 +2402,8 @@ of the element <rfc2119>must</rfc2119> also be amended accordingly.</para>
 properties on the source document.</para>
 
 <p:declare-step type="p:set-properties">
-   <p:input port="source" content-types="*/*"/>
-   <p:output port="result" content-types="*/*"/>
+   <p:input port="source" content-types="any"/>
+   <p:output port="result" content-types="any"/>
    <p:option name="properties" required="true" as="map(xs:QName,item()*)"/>
    <p:option name="merge" default="false()" as="xs:boolean"/>
 </p:declare-step>
@@ -2325,7 +2440,7 @@ the <option>properties</option> map.
 discards them. It has no output.</para>
 
 <p:declare-step type="p:sink">
-   <p:input port="source" content-types="*/*" sequence="true"/>
+   <p:input port="source" content-types="any" sequence="true"/>
 </p:declare-step>
 
 <simplesect>
@@ -2340,9 +2455,9 @@ discards them. It has no output.</para>
 documents and divides it into two sequences.</para>
 
 <p:declare-step type="p:split-sequence">
-  <p:input port="source" content-types="application/xml text/xml */*+xml" sequence="true"/>
-  <p:output port="matched" sequence="true" primary="true" content-types="application/xml"/>
-  <p:output port="not-matched" sequence="true" content-types="application/xml"/>
+  <p:input port="source" content-types="xml html" sequence="true"/>
+  <p:output port="matched" sequence="true" primary="true" content-types="xml html"/>
+  <p:output port="not-matched" sequence="true" content-types="xml html"/>
   <p:option name="initial-only" as="xs:boolean" select="false()"/>
   <p:option name="test" required="true" as="xs:string" e:type="XPathExpression"/>
 </p:declare-step>
@@ -2397,7 +2512,7 @@ version of) its input to a URI. This step outputs a reference to the
 location of the stored document.</para>
 
 <p:declare-step type="p:store">
-  <p:input port="source" content-types="*/*"/>
+  <p:input port="source" content-types="any"/>
   <p:output port="result" content-types="application/xml" primary="true"/>
   <p:option name="href" required="true" as="xs:anyURI"/>
   <p:option name="serialization" as="map(xs:QName,item()*)?"/>
@@ -2436,8 +2551,8 @@ document provided on the <port>source</port> port and replaces them
 with the string result of evaluating an XPath expression.</para>
 
 <p:declare-step type="p:string-replace">
-   <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:input port="source" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
    <p:option name="replace" required="true" as="xs:string" e:type="XPathExpression"/>
 </p:declare-step>
@@ -2479,8 +2594,8 @@ the string value of the <option>replace</option> expression.</para>
 version of) its input to a URI. The step outputs its input unchanged.</para>
 
   <p:declare-step type="p:tee">
-    <p:input port="source" content-types="*/*" sequence="true"/>
-    <p:output port="result" sequence="true" content-types="*/*"/>
+    <p:input port="source" content-types="any" sequence="true"/>
+    <p:output port="result" sequence="true" content-types="any"/>
     <p:option name="href" required="true" as="xs:anyURI"/>
     <p:option name="serialization" as="map(xs:QName,item()*)?"/>
     <p:option name="enable" as="xs:boolean" select="true()"/>
@@ -2517,7 +2632,7 @@ serialization of content when it is stored. Serialization is described in
     document containing that number.</para>
 
   <p:declare-step type="p:text-count">
-    <p:input port="source" primary="true" sequence="false" content-types="text/*"/>
+    <p:input port="source" primary="true" sequence="false" content-types="text"/>
     <p:output port="result" primary="true" sequence="false" content-types="application/xml"/>
   </p:declare-step>
 
@@ -2539,8 +2654,8 @@ serialization of content when it is stored. Serialization is described in
   <para>The <code>p:text-head</code> step returns lines from the beginning of a text document.</para>
 
   <p:declare-step type="p:text-head">
-    <p:input port="source" primary="true" sequence="false" content-types="text/*"/>
-    <p:output port="result" primary="true" sequence="false" content-types="text/*"/>
+    <p:input port="source" primary="true" sequence="false" content-types="text"/>
+    <p:output port="result" primary="true" sequence="false" content-types="text"/>
     <p:option name="count" required="true" as="xs:integer"/>
   </p:declare-step>
 
@@ -2574,8 +2689,8 @@ serialization of content when it is stored. Serialization is described in
   <para>The <code>p:text-join</code> step concatenates text documents.</para>
   
   <p:declare-step type="p:text-join">
-    <p:output port="source" primary="true" sequence="true" content-types="text/*"/>
-    <p:output port="result" primary="true" sequence="false" content-types="text/*"/>
+    <p:output port="source" primary="true" sequence="true" content-types="text"/>
+    <p:output port="result" primary="true" sequence="false" content-types="text"/>
     <p:option name="separator" required="false" as="xs:string"/>
     <p:option name="prefix" required="false" as="xs:string"/>
     <p:option name="suffix" required="false" as="xs:string"/>
@@ -2610,8 +2725,8 @@ serialization of content when it is stored. Serialization is described in
     supplied regular expression with a given replacement string.</para>
 
   <p:declare-step type="p:text-replace">
-    <p:input port="source" primary="true" sequence="false" content-types="text/*"/>
-    <p:output port="result" primary="true" sequence="false" content-types="text/*"/>
+    <p:input port="source" primary="true" sequence="false" content-types="text"/>
+    <p:output port="result" primary="true" sequence="false" content-types="text"/>
     <p:option name="pattern" required="true" as="xs:string"/>
     <p:option name="replacement" required="true" as="xs:string"/>
     <p:option name="flags" required="false" as="xs:string"/>
@@ -2638,8 +2753,8 @@ serialization of content when it is stored. Serialization is described in
   <para>The <code>p:text-sort</code> step sorts lines in a text document.</para>
 
   <p:declare-step type="p:text-sort">
-    <p:input port="source" primary="true" sequence="false" content-types="text/*"/>
-    <p:output port="result" primary="true" sequence="false" content-types="text/*"/>
+    <p:input port="source" primary="true" sequence="false" content-types="text"/>
+    <p:output port="result" primary="true" sequence="false" content-types="text"/>
     <p:option name="order" required="false" as="xs:string" select="'ascending'" values="('ascending', 'descending')"/>
     <p:option name="case-order" required="false" as="xs:string" values="('upper-first', 'lower-first')"/>
     <p:option name="lang" required="false" as="xs:language"/>
@@ -2698,8 +2813,8 @@ serialization of content when it is stored. Serialization is described in
   <para>The <code>p:text-tail</code> step returns lines from the end of a text document.</para>
   
   <p:declare-step type="p:text-tail">
-    <p:input port="source" primary="true" sequence="false" content-types="text/*"/>
-    <p:output port="result" primary="true" sequence="false" content-types="text/*"/>
+    <p:input port="source" primary="true" sequence="false" content-types="text"/>
+    <p:output port="result" primary="true" sequence="false" content-types="text"/>
     <p:option name="count" required="true" as="xs:integer"/>
   </p:declare-step>
   
@@ -2812,8 +2927,8 @@ same document element with children that result from the parse. This
 is the reverse of the <tag>p:escape-markup</tag> step.</para>
 
 <p:declare-step type="p:unescape-markup">
-  <p:input port="source" content-types="application/xml text/xml */*+xml text/*"/>
-  <p:output port="result" content-types="application/xml text/xml */*+xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="namespace" as="xs:anyURI?"/>
   <p:option name="content-type" as="xs:string" select="'application/xml'"/>
   <p:option name="encoding" as="xs:string?"/>
@@ -2914,7 +3029,7 @@ namespace, the following input:</para>
 children.</para>
 
 <p:declare-step type="p:unwrap">
-   <p:input port="source" content-types="application/xml text/xml */*+xml"/>
+   <p:input port="source" content-types="xml html"/>
    <p:output port="result" content-types="application/xml"/>
    <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
@@ -2952,8 +3067,8 @@ unwrapped, the result might not be well-formed XML.</para>
 the <port>source</port> document.</para>
 
 <p:declare-step type="p:uuid">
-  <p:input port="source" primary="true" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml"/>
+  <p:input port="source" primary="true" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
   <p:option name="version" as="xs:integer?"/>
 </p:declare-step>
@@ -3004,7 +3119,7 @@ documents and produces either a single document or a new sequence of
 documents.</para>
 
 <p:declare-step type="p:wrap-sequence">
-   <p:input port="source" content-types="application/xml */*+xml text/*" sequence="true"/>
+   <p:input port="source" content-types="text xml html" sequence="true"/>
    <p:output port="result" sequence="true" content-types="application/xml"/>
    <p:option name="wrapper" required="true" as="xs:QName"/>
    <p:option name="group-adjacent" as="xs:string?" e:type="XPathExpression"/>
@@ -3048,7 +3163,7 @@ element.
 <port>source</port> document with a new parent element.</para>
 
 <p:declare-step type="p:wrap">
-   <p:input port="source" content-types="application/xml text/xml */*+xml"/>
+   <p:input port="source" content-types="xml html"/>
    <p:output port="result" content-types="application/xml"/>
    <p:option name="wrapper" required="true" as="xs:QName"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
@@ -3148,7 +3263,7 @@ values as a <literal>x-www-form-urlencoded</literal> string and
 injects it into the <port>source</port> document.</para>
 
 <p:declare-step type="p:www-form-urlencode">
-  <p:input port="source" primary="true" content-types="application/xml text/xml */*+xml"/>
+  <p:input port="source" primary="true" content-types="xml html"/>
   <p:output port="result" content-types="application/xml"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
   <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
@@ -3190,8 +3305,8 @@ the encoded string.</para>
 <para>The <tag>p:xinclude</tag> step applies <biblioref linkend="xinclude"/> processing to the <port>source</port> document.</para>
 
 <p:declare-step type="p:xinclude">
-  <p:input port="source" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" content-types="application/xml text/xml */*+xml"/>
+  <p:input port="source" content-types="xml html"/>
+  <p:output port="result" content-types="xml html"/>
   <p:option name="fixup-xml-base" as="xs:boolean" select="false()"/>
   <p:option name="fixup-xml-lang" as="xs:boolean" select="false()"/>
 </p:declare-step>
@@ -3438,9 +3553,9 @@ validation before using XQuery:</para>
 <para>The <tag>p:xslt</tag> step applies an XSLT stylesheet to a document.</para>
 
 <p:declare-step type="p:xslt">
-  <p:input port="source" content-types="*/*" sequence="true" primary="true"/>
-  <p:input port="stylesheet" content-types="application/xml text/xml */*+xml"/>
-  <p:output port="result" primary="true" sequence="false" content-types="*/*"/>
+  <p:input port="source" content-types="any" sequence="true" primary="true"/>
+  <p:input port="stylesheet" content-types="xml"/>
+  <p:output port="result" primary="true" sequence="false" content-types="any"/>
   <p:output port="secondary" sequence="true" content-types="*/*"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
   <p:option name="initial-mode" as="xs:QName?"/>
