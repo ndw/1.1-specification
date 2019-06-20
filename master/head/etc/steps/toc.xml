@@ -11,7 +11,8 @@
       <tocentry role="section" xml:id="c.add-xml-base">p:add-xml-base</tocentry>
       <tocdiv role="section" xml:id="c.archive">
          <title>p:archive</title>
-         <tocentry role="section" xml:id="cv.manifest">Specifying an archive manifest</tocentry>
+         <tocentry role="section" xml:id="cv.archive-manifest">The archive manifest</tocentry>
+         <tocentry role="section" xml:id="cv.archive-zips">Handling of ZIP archives</tocentry>
       </tocdiv>
       <tocentry role="section" xml:id="c.cast-content-type">p:cast-content-type</tocentry>
       <tocentry role="section" xml:id="c.compare">p:compare</tocentry>
@@ -19,6 +20,7 @@
       <tocentry role="section" xml:id="c.delete">p:delete</tocentry>
       <tocdiv role="section" xml:id="c.directory-list">
          <title>p:directory-list</title>
+         <tocentry role="example" xml:id="ex.c.directory-list">Sample Directory List Output for a Single File</tocentry>
          <tocentry role="section" xml:id="dir-list-details">Directory list details</tocentry>
       </tocdiv>
       <tocentry role="section" xml:id="c.error">p:error</tocentry>
@@ -48,7 +50,6 @@
          <tocentry role="section" xml:id="c.load.html">Loading HTML data</tocentry>
          <tocentry role="section" xml:id="c.load.binary">Loading binary data</tocentry>
       </tocdiv>
-      <tocentry role="section" xml:id="c.load-directory-list">p:load-directory-list</tocentry>
       <tocentry role="section" xml:id="c.make-absolute-uris">p:make-absolute-uris</tocentry>
       <tocentry role="section" xml:id="c.namespace-rename">p:namespace-rename</tocentry>
       <tocentry role="section" xml:id="c.pack">p:pack</tocentry>
@@ -60,17 +61,13 @@
       <tocentry role="section" xml:id="c.split-sequence">p:split-sequence</tocentry>
       <tocentry role="section" xml:id="c.store">p:store</tocentry>
       <tocentry role="section" xml:id="c.string-replace">p:string-replace</tocentry>
-      <tocentry role="section" xml:id="c.tee">p:tee</tocentry>
       <tocentry role="section" xml:id="c.text-count">p:text-count</tocentry>
       <tocentry role="section" xml:id="c.text-head">p:text-head</tocentry>
       <tocentry role="section" xml:id="c.text-join">p:text-join</tocentry>
       <tocentry role="section" xml:id="c.text-replace">p:text-replace</tocentry>
       <tocentry role="section" xml:id="c.text-sort">p:text-sort</tocentry>
       <tocentry role="section" xml:id="c.text-tail">p:text-tail</tocentry>
-      <tocdiv role="section" xml:id="c.unarchive">
-         <title>p:unarchive</title>
-         <tocentry role="section">Archive content specification</tocentry>
-      </tocdiv>
+      <tocentry role="section" xml:id="c.unarchive">p:unarchive</tocentry>
       <tocentry role="section" xml:id="c.unescape-markup">p:unescape-markup</tocentry>
       <tocentry role="section" xml:id="c.unwrap">p:unwrap</tocentry>
       <tocentry role="section" xml:id="c.uuid">p:uuid</tocentry>

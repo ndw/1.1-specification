@@ -154,8 +154,8 @@ compatible versions.</para>
 
 <para>The <code>p:add-attribute</code> step adds a single attribute to
 a set of matching elements. The input document specified on the
-<code>source</code> is processed for matches specified by the match
-pattern in the <option>match</option> option. For each of these
+  <code>source</code> is processed for matches specified by the 
+    <glossterm>selection pattern</glossterm> in the <option>match</option> option. For each of these
 matches, the attribute whose name is specified by the
 <option>attribute-name</option> option is set to the attribute value
 specified by the <option>attribute-value</option> option.
@@ -178,7 +178,7 @@ with the specified value.
 
 <para>The value of the <option>match</option> option
 <rfc2119>must</rfc2119> be an XSLTSelectionPattern. <error code="C0023">It
-is a <glossterm>dynamic error</glossterm> if the match pattern matches a node
+is a <glossterm>dynamic error</glossterm> if the <glossterm>selection pattern</glossterm> matches a node
 which is not an element.</error></para>
 
 <para>The value of the <option>attribute-value</option> option
@@ -284,12 +284,13 @@ element's [base URI].</para>
 
   <title>p:archive</title>
 
-  <para>The <code>p:archive</code> step outputs on its <port>result</port> port an archive (usually binary) document,
-    for instance a ZIP file. A specification of the contents of the archive may be specified in a manifest XML document
-    on the <port>manifest</port>. The contents of the archive can come from documents provided on the
-      <port>source</port> and <port>archive</port> ports, from documents specified inline in the manifest, or from a combination of these.
-    The step produces a report on the <port>report</port> port, which contains the manifest, amended with additional
-    information about the archiving. </para>
+  <para>The <code>p:archive</code> step outputs on its <port>result</port> port an archive (usually
+    binary) document, for instance a ZIP file. A specification of the contents of the archive may be
+    specified in a manifest XML document on the <port>manifest</port>. The contents of the archive
+    can come from documents provided on the <port>source</port> and <port>archive</port> ports, from
+    documents specified inline in the manifest, or from a combination of these. The step produces a
+    report on the <port>report</port> port, which contains the manifest, amended with additional
+    information about the archiving.</para>
 
   <p:declare-step type="p:archive">
     <p:input port="source" primary="true" content-types="*/*" sequence="true"/>
@@ -302,168 +303,318 @@ element's [base URI].</para>
     <p:option name="parameters" as="map(xs:Qname, item()*)" required="false"/>
   </p:declare-step>
 
-  <para>The <code>p:archive</code> step takes the document appearing on its <port>manifest</port> port as a
-    specification for an archive file. It outputs this archive on its <port>result</port> port.</para>
-  
-  <para>The format of the archive can be specified using the <option>format</option> option. Implementations
-      <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/> format, specified with the value <code>zip</code>.
-      <impl>It is <glossterm>implementation-defined</glossterm> what other formats are supported.</impl></para>
+  <para>The <code>p:archive</code> step can perform several different operations on archives. The
+    most common one will likely be creating an archive, but it could also, depending on the archive
+    format, provide services like update, freshen or even merge. The only format implementations
+      <rfc2119>must</rfc2119> support is <biblioref linkend="zip"/>. Support for other formats is
+      <glossterm>implementation-defined</glossterm>.</para>
 
-  <para>The <option>parameters</option> can be used to supply parameters to control the archiving. <impl>The semantics
-      of the keys and the allowed values for these keys are <glossterm>implementation-defined</glossterm>.</impl>
-    <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map <option>parameters</option> contains an
-      entry whose key is defined by the implementation and whose value is not valid for that key.</error></para>
-  
-  <para>For the 'zip' format, the following parameters <rfc2119>must</rfc2119> be supported:</para>
-
+  <para>The <code>p:archive</code> step has the following input ports:</para>
   <variablelist>
     <varlistentry>
-      <term><code>command</code></term>
+      <term><port>source</port></term>
       <listitem>
-        <para>“update” | “freshen” | “create” | “delete”</para>
-        <para>If no command is given, “update” (add entries that do not exist, freshen entries whose timestamp is older
-          than the underlying resource’s) will be assumed.</para>
-        <para>“update”, “freshen” and “create” will work with or without a manifest (see below).</para>
-        <para>“update” does not require an existing archive to be submitted on the <port>archive</port> port.</para>
-        <para>“freshen” and “delete” require that exactly one zip archive is supplied on the <port>archive</port> port.</para>
-        <para>“delete” informs <code>p:archive</code> to remove the entries that are specified in the manifest by
-          the <code>c:entry/@name</code>.</para>
-        <para>If an entry that should be deleted or freshened is not found in the document on the <port>archive</port>
-          port, no error is raised and nothing is changed.</para>
+        <para>The (primary) <port>source</port> port is used to provide documents to be archived
+          (for instance constructed by other steps). How and which of these documents are processed
+          is governed by the document(s) appearing on the other input ports and the combination of
+          options and parameters. See below for details. <error code="C0084">It is a
+              <glossterm>dynamic error</glossterm> if documents appear on the <code>p:archive</code>
+            step's <port>source</port> port that have duplicate or no base URI's.</error></para>
       </listitem>
     </varlistentry>
     <varlistentry>
-      <term><code>compression-level</code></term>
+      <term><port>manifest</port></term>
       <listitem>
-        <para>“<code>smallest</code>” | “<code>fastest</code>” | “<code>default</code>” | “<code>huffman</code>” 
-          | “<code>none</code>”</para>
+        <para>The <port>manifest</port> port can receive a manifest document that tells the step how
+          to construct the archive. If no manifest document is provided on this port, a default
+          manifest is automatically constructed. See <xref linkend="cv.archive-manifest"/>.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
-      <term><code>compression-method</code></term>
+      <term><port>archive</port></term>
       <listitem>
-        <para>“<code>stored</code>” | “<code>deflated</code>”</para>
+        <para>The <port>archive</port> port is used to provide the step with existing archive(s) for
+          operations like update, freshen or merge. Handling of ZIP files supports modifying
+          archives appearing on the <port>archive</port> port (<xref linkend="cv.archive-zips"/>).
+          Whether other archive formats and implementations support modifications of
+            <port>archive</port> inputs is <glossterm>implementation-defined</glossterm>. A,
+          currently hypothetical, archive merging implementation may accept more than one document
+          on the <port>archive</port> port. <error code="C0081">It is a <glossterm>dynamic
+              error</glossterm> if the content type of a document on the <port>archive</port> does
+            not match the given archive format as specified in the <option>format</option>
+            option.</error></para>
       </listitem>
     </varlistentry>
   </variablelist>
-  
-  <para>Implementations of other archive formats <rfc2119>should</rfc2119> use the same parameter names if applicable. 
-    The value spaces for these parameters may be format-specific though. They are 
-    <glossterm>implementation-defined</glossterm>.</para>
-  
-  <para>Whether other archive formats and implementations support modifications of <port>archive</port> inputs
-  is <glossterm>implementation-defined</glossterm>.</para>
-  
-  <para><error code="C0080">It is a <glossterm>dynamic error</glossterm> if the number of documents on
-      the <port>archive</port> does not match the expected number of archive input documents for the
-      given <code>format</code> and <code>command</code>.</error></para>
-  
-  <note>
-    <para>The expected number of documents on the <port>archive</port> may be zero for formats such as gzip that do not 
-      allow manipulation of existing archives.</para>
-    <para>A hypothetical archive merging implementation, on the other hand, may accept more than one document
-    on the <port>archive</port> port.</para>
-  </note>
-  
-  <para><error code="C0081">It is a <glossterm>dynamic error</glossterm> if the content type of a document on the 
-    <port>archive</port> does not match the given archive <code>format</code>.</error></para>
 
-  <para>If no manifest entry is given for a <port>source</port> document, the step will manufacture
-    a manifest entry from the document’s <code>base-uri</code> property. If no document arrives on
-    the <port>manifest</port>, it will create a complete manifest document (see below for the
-    manifest document specification). The option <option>relative-to</option> can be used to derive
-    the entry’s <tag role="attribute">name</tag> attribute from the <port>source</port> document’s
-      <code>base-uri</code> property, which in turn will used for the entry’s <tag role="attribute">href</tag> attribute. Both the URI that is given in <option>relative-to</option> and the value of the 
-  <code>base-uri</code> property should be normalized with respect to slash deduplication, parent path
-    elimination, and drive letter case folding. The the step will remove the leading (normalized) 
-    <option>relative-to</option> option value from the <port>source</port> document’s (normalized) base URI. 
-    If there is no match, the manifest entry’s <tag role="attribute">name</tag> attribute should consist of the 
-    path part of the <port>source</port> document’s base URI, without any leading slashes.</para>
+  <para>The <code>p:archive</code> step has the following output ports:</para>
+  <variablelist>
+    <varlistentry>
+      <term><port>result</port></term>
+      <listitem>
+        <para>The (primary) <port>result</port> port will output the resulting archive.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><port>report</port></term>
+      <listitem>
+        <para>The <port>report</port> port will output a report about the archiving operation. This
+          will be the same as the manifest (as provided on the <port>manifest</port> port or
+          automatically created if there was no manifest provided), optionally amended with
+          additional attributes and/or elements. <impl>The semantics of any additional attributes,
+            elements and their values are
+          <glossterm>implementation-defined</glossterm>.</impl></para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
 
-  <para>The <port>report</port> port outputs a copy of the manifest, optionally amended with additional attributes
-    and/or elements. <impl>The semantics of any additional attributes, elements and their values are
-        <glossterm>implementation-defined</glossterm>.</impl>
-  </para>
+  <para>The <code>p:archive</code> step has the following options:</para>
+  <variablelist>
+    <varlistentry>
+      <term><option>format</option></term>
+      <listitem>
+        <para>The format of the archive can be specified using the <option>format</option> option.
+          Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/> format,
+          specified with the value <code>zip</code>. <impl>It is
+              <glossterm>implementation-defined</glossterm> what other formats are
+          supported.</impl></para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>parameters</option></term>
+      <listitem>
+        <para>The <option>parameters</option> option can be used to supply parameters to control the
+          archiving. <impl>The semantics of the keys and the allowed values for these keys are
+              <glossterm>implementation-defined</glossterm>.</impl>
+          <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+              <option>parameters</option> contains an entry whose key is defined by the
+            implementation and whose value is not valid for that key.</error></para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>relative-to</option></term>
+      <listitem>
+        <para>The <option>relative-to</option> option is used in creating a manifest when no
+          manifest is provided on the <port>manifest</port> port. See <xref linkend="cv.archive-manifest"/>.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
 
-  <section xml:id="cv.manifest">
-    <title>Specifying an archive manifest</title>
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <para>An archive manifest is represented by a <tag>c:archive</tag> root element.</para>
+  <section xml:id="cv.archive-manifest">
+    <title>The archive manifest</title>
+
+    <para>An archive manifest specifies what must be archived and how. It is represented by a
+        <tag>c:archive</tag> root element:</para>
 
     <e:rng-pattern name="VocabArchive" xml:id="cv.archive"/>
 
-    <para><impl>The <code>c:archive</code> root element may contain additional <glossterm>implementation-defined</glossterm>
-      attributes.</impl></para>
+    <para><impl>The <code>c:archive</code> root element may contain additional
+          <glossterm>implementation-defined</glossterm> attributes.</impl></para>
 
     <para>All entries in the archive must be present as <tag>c:entry</tag> child elements:</para>
 
     <e:rng-pattern name="VocabEntry" xml:id="cv.entry"/>
 
-    <para>The <code>name</code> attribute specifies the name of the entry in the archive. It <rfc2119>must</rfc2119> be
-      specified as a relative path.</para>
-    <para>The optional <code>href</code> attribute is interpreted as follows:</para>
     <itemizedlist>
       <listitem>
-        <para><error code="D0064">It is a <glossterm>dynamic error</glossterm> if the <option>href</option> attribute is
-            present and its value is not a valid <type>xs:anyURI</type>.</error></para>
+        <para>The mandatory <code>name</code> attribute specifies the name of the entry in the
+          archive. It <rfc2119>must</rfc2119> be specified as a relative path.</para>
       </listitem>
       <listitem>
-        <para>When the <tag>c:entry</tag> elements has any child nodes, it is ignored.</para>
-        <note role="editorial">
-          <para>Why should the entry be ignored if it has content? Shouldn’t the entry’s content rather be ignored?</para>
-        </note>
+        <para>The optional <code>href</code> attribute is interpreted as follows:</para>
+        <itemizedlist>
+          <listitem>
+            <para><error code="D0064">It is a <glossterm>dynamic error</glossterm> if the
+                  <option>c:entry/@href</option> attribute in a <code>p:archive</code> step manifest
+                is present and its value is not a valid <type>xs:anyURI</type>.</error></para>
+          </listitem>
+          <listitem>
+            <para>When the <tag>c:entry</tag> elements has any child nodes, the <code>href</code>
+              attribute is ignored.</para>
+          </listitem>
+          <listitem>
+            <para>The <code>p:archive</code> step checks the documents appearing on its
+                <port>source</port> port for any documents with exactly the same base URI as the
+              contents of the <code>href</code> attribute. If any such document is found, this is
+              used as entry for the archive.</para>
+            <para><error code="C0082">It is a <glossterm>dynamic error</glossterm> if more than one
+                document appears on the <port>source</port> port of a <code>p:archive</code> step
+                with a base URI mentioned in one of the non-ignored <code>c:entry/@href</code>
+                attributes.</error></para>
+          </listitem>
+          <listitem>
+            <para>If the above doesn't apply, the value of the <code>href</code> attribute is
+              interpreted as a URI and the document is loaded from this location. <error code="D0011">It is a <glossterm>dynamic error</glossterm> if the resource referenced
+                by the <option>href</option> option does not exist, cannot be accessed or is not a
+                file</error> If the <option>href</option> option is relative, it is made absolute
+              against the base URI of the manifest.</para>
+          </listitem>
+          <listitem>
+            <para><error code="C0083">It is a <glossterm>dynamic error</glossterm> if the
+                  <code>c:entry/@href</code> attribute in a <code>p:archive</code> step manifest is
+                not specified and the <tag>c:file</tag> element has no child nodes.</error></para>
+          </listitem>
+        </itemizedlist>
       </listitem>
       <listitem>
-        <para>The <code>p:archive</code> step checks the documents appearing on its <port>source</port> port for any
-          documents with exactly the same base URI as the contents of the <code>href</code> attribute. If any such
-          documents are found, the <emphasis>first</emphasis> of these is used as entry for the archive.</para>
-        <note role="editorial">
-          <para>In the interest of portability and reproducibility, shouldn’t we raise a dynamic
-            error if the same <code>href</code> attribute is used on another manifest entry? If the
-            documents are, for example, taken from the <port>secondary</port> port of a
-              <code>p:xslt</code> step, the document order may be different among implementations,
-            file systems, etc.</para>
-        </note>
+        <para>The <code>method</code> attribute specifies how the entry should be compressed.
+            <impl>The default compression method is <glossterm>implementation-defined</glossterm>.
+          </impl>Implementations <rfc2119>must</rfc2119> support no compression, specified with the
+          value <code>none</code>. <impl>It is <glossterm>implementation-defined</glossterm> what
+            other compression methods are supported.</impl></para>
       </listitem>
       <listitem>
-        <para>If the above doesn't apply, the value of the <code>href</code> attribute is interpreted as a URI and the
-          document is loaded from this location.</para>
-        <para><error code="D0011">It is a <glossterm>dynamic error</glossterm> if the resource referenced by the
-              <option>href</option> option does not exist, cannot be accessed or is not a file</error></para>
-        <para> If the <option>href</option> option is relative, it is made absolute against the base URI of the
-          manifest.</para>
-      </listitem>
-      <listitem>
-        <para><error code="TBDTBD">It is a <glossterm>dynamic error</glossterm> if the <code>href</code> attribute is
-            not specified and the <tag>c:file</tag> element has no child nodes.</error></para>
+        <para>The <code>level</code> attribute specifies the level of compression. <impl>The default
+            compression method is <glossterm>implementation-defined</glossterm>. </impl>
+          <impl>It is <glossterm>implementation-defined</glossterm> what compression levels are
+            supported.</impl></para>
       </listitem>
     </itemizedlist>
 
-    <para>The <code>compression-method</code> attribute specifies how the entry should be compressed. <impl>The default
-        compression method is <glossterm>implementation-defined</glossterm>. </impl>Implementations
-        <rfc2119>must</rfc2119> support no compression, specified with the value <code>none</code>. <impl>It is
-          <glossterm>implementation-defined</glossterm> what other compression methods are supported.</impl></para>
+    <para>When the <code>c:file</code> element has any child nodes this is taken as the contents of
+      the archive's entry. The <code>href</code> attribute is ignored in this case.</para>
 
-    <para>When the <code>c:file</code> element has any child nodes this is taken as the contents of the archive's entry.
-      The <code>href</code> attribute is ignored in this case.</para>
+    <para>The <code>p:archive</code> step <rfc2119>should</rfc2119> strive to retain the order of
+      the <tag>c:entry</tag> elements when constructing the archive. For instance, an e-book in EPUB
+      format has a non-compressed entry that must be first in the archive. It should be possible to
+      construct such an archive using <code>p:archive</code>.</para>
 
-    <para>The <code>p:archive</code> step <rfc2119>should</rfc2119> strive to retain the order of the <tag>c:entry</tag> elements when
-      constructing the archive. For instance, an e-book in EPUB format has a non-compressed entry that must be first in
-      the archive. It should be possible to construct such an archive using <code>p:archive</code>.</para>
+    <para><impl>The <code>c:entry</code> elements may contain additional
+          <glossterm>implementation-defined</glossterm> attributes.</impl></para>
 
-    <para><impl>The <code>c:entry</code> elements may contain additional <glossterm>implementation-defined</glossterm>
-      attributes.</impl></para>
-    <note role="editorial">
-      <para>Do we need to say anything about serialization options for XML contents?</para>
-      <para>Not sure whether JSON needs more specifications</para>
-    </note>
+    <para>If no manifest entry is provided for a document appearing on the <port>source</port> port,
+      the step will manufacture a manifest entry from the document’s <code>base-uri</code> property.
+      If no document arrives on the <port>manifest</port>, it will create a complete manifest
+      document.</para>
+    <para>The option <option>relative-to</option> can be used to derive the entry’s <tag role="attribute">name</tag> attribute from the <port>source</port> document’s
+        <code>base-uri</code> property, which in turn will be used for the entry’s <tag role="attribute">href</tag> attribute. Both the URI that is given in
+        <option>relative-to</option> and the value of the <code>base-uri</code> property should be
+      normalized with respect to slash deduplication, parent path elimination, and drive letter case
+      folding. The the step will remove the leading (normalized) <option>relative-to</option> option
+      value from the <port>source</port> document’s (normalized) base URI. If there is no match, the
+      manifest entry’s <tag role="attribute">name</tag> attribute will consist of the path part of
+      the <port>source</port> document’s base URI, without any leading slashes.</para>
+  </section>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+  <section xml:id="cv.archive-zips">
+    <title>Handling of ZIP archives</title>
+
+    <para>The format of the archive can be specified using the <option>format</option> option.
+      Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/> format,
+      specified with the value <code>zip</code>. </para>
+
+    <para>The <option>parameters</option> option can be used to supply parameters to control the
+      archiving. For the <code>zip</code> format, the following parameters <rfc2119>must</rfc2119>
+      be supported:</para>
+
+    <variablelist>
+      <varlistentry>
+        <term><code>command</code></term>
+        <listitem>
+          <para>Specifies what operation to perform. If not specified, its default value is
+              <code>update</code>. Possible values are:</para>
+          <variablelist>
+            <varlistentry>
+              <term><code>update</code></term>
+              <listitem>
+                <para>When the <code>command</code> parameter is set to <code>update</code> or not
+                  specified, zero or exactly one document in ZIP format can appear on the
+                    <port>archive</port> port. If there is no document on the <port>archive</port>
+                  port, an empty ZIP archive is assumed.</para>
+                <para>The contents of the manifest (either provided or (partially) constructed, see
+                    <xref linkend="cv.archive-manifest"/>) is held against the entries in the ZIP
+                  file provided on the <port>archive</port> port: </para>
+                <itemizedlist>
+                  <listitem>
+                    <para>Any entry in the manifest that does not exist in the ZIP file provided on
+                      the <port>archive</port> port is added.</para>
+                  </listitem>
+                  <listitem>
+                    <para>For any entry that does exist in the ZIP file provided on the
+                        <port>archive</port> port, a timestamp compare is done. When the entry in
+                      the manifest is newer than the entry in the ZIP file provided on the
+                        <port>archive</port> port, it is replaced. Documents that are either
+                      specified in the manifest or come from the <port>source</port> port have no
+                      timestamp and will <emphasis>always</emphasis> cause a replace to be
+                      done.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><code>create</code></term>
+              <listitem>
+                <para>When the <code>command</code> parameter is set to <code>create</code>, the
+                    <code>p:archive</code> step will behave exactly as for <code>update</code>,
+                  except that existing entries will <emphasis>always</emphasis> be updated,
+                  regardless of their timestamp.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><code>freshen</code></term>
+              <listitem>
+                <para>When the <code>command</code> parameter is set to <code>freshen</code>, the
+                    <code>p:archive</code> step will behave exactly as for <code>update</code>,
+                  except that no new entries will be added. Any entries in the manifest that do not
+                  match an entry in the archive are ignored.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term><code>delete</code></term>
+              <listitem>
+                <para>When the <code>command</code> parameter is set to <code>delete</code>, exactly
+                  one document in ZIP format must appear on the <port>archive</port> port. The
+                  contents of the manifest (either provided or (partially) constructed, see <xref linkend="cv.archive-manifest"/>) is held against the entries in the ZIP file
+                  provided on the <port>archive</port> port. Any entries in the manifest file that
+                  match an entry in the ZIP archive will be deleted. All other entries in the
+                  manifest are ignored.</para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><code>level</code></term>
+        <listitem>
+          <para>Specifies the default compression level for files added to or updated in the
+            archive. It can be overruled on a per-entry basis with a <code>c:entry/@level</code>
+            attribute in the manifest. Values that must be supported for ZIP files are:
+              “<code>smallest</code>” | “<code>fastest</code>” | “<code>default</code>” |
+              “<code>huffman</code>” | “<code>none</code>”.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><code>method</code></term>
+        <listitem>
+          <para>Specifies the default compression method for files added to or updated in the
+            archive. It can be overruled on a per-entry basis with a <code>c:entry/@method</code>
+            attribute in the manifest. Values that must be supported for ZIP files are:
+              “<code>none</code>” | “<code>deflated</code>”.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para><error code="C0080">It is a <glossterm>dynamic error</glossterm> if the number of
+        documents on the <port>archive</port> does not match the expected number of archive input
+        documents for the given <code>format</code> and <code>command</code>.</error></para>
+
+    <para>Implementations of other archive formats <rfc2119>should</rfc2119> use the same parameter
+      names if applicable. The value spaces for these parameters may be format-specific though. They
+      are <glossterm>implementation-defined</glossterm>.</para>
 
   </section>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
   <simplesect>
     <title>Document properties</title>
     <para feature="archive-preserves-none">No document properties are preserved.</para>
   </simplesect>
+
 </section>
 <section xml:id="c.cast-content-type">
 <title>p:cast-content-type</title>
@@ -482,7 +633,8 @@ of its input.</para>
 <error code="C0070">It is a <glossterm>dynamic
 error</glossterm> if the supplied <option>content-type</option> is not
 a valid media type of the form
-“<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”.</error>
+“<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”
+ where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error>
 <error code="C0071">It is a <glossterm>dynamic
 error</glossterm> if the <tag>p:cast-content-type</tag> step
 cannot perform the requested cast.</error>
@@ -678,23 +830,25 @@ continue.</para>
 <section xml:id="c.delete">
 <title>p:delete</title>
 
-<para>The <code>p:delete</code> step deletes items specified by a match
-pattern from the
+<para>The <code>p:delete</code> step deletes items specified by a <glossterm>selection pattern</glossterm> from the
 <code>source</code> input document and produces the resulting document,
 with the deleted items removed, on the <port>result</port> port.</para>
 
 <p:declare-step type="p:delete">
    <p:input port="source" content-types="xml html"/>
-   <p:output port="result" content-types="xml html"/>
+   <p:output port="result" content-types="text xml html"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
 
 <para>The value of the <option>match</option> option <rfc2119>must</rfc2119> be an
-XSLTSelectionPattern. A match pattern may match multiple items to be
+XSLTSelectionPattern. A <glossterm>selection pattern</glossterm> may match multiple items to be
 deleted.</para>
 
 <para>If an element is selected by the <option>match</option> option, the
 entire subtree rooted at that element is deleted.</para>
+
+<para><error code="C0023">It is a <glossterm>dynamic error</glossterm> if the
+<option>match</option> option matches the document node.</error></para>
 
 <para>This step cannot be used to remove namespaces. <error code="C0062">It is a <glossterm>dynamic error</glossterm> if the
 <option>match</option> option matches a namespace node.</error>
@@ -704,7 +858,10 @@ of the element on which it occurred.</para>
 
 <simplesect>
 <title>Document properties</title>
-<para feature="delete-preserves-all">All document properties are preserved.</para>
+   <para feature="delete-preserves-partially">If the resulting document contains exactly one text node,
+      the <literal>content-type</literal> property is changed to <literal>text/plain</literal> and the 
+      <literal>serialization</literal> property is removed, while all other document properties are 
+      preserved. For other document types, all document properties are preserved.</para>
 </simplesect>
 </section>
 <?xml-model href="../../../../../schema/dbspec.rnc" type="application/relax-ng-compact-syntax"?><section xml:id="c.directory-list">
@@ -717,7 +874,7 @@ of the element on which it occurred.</para>
   <p:output port="result" content-type="application/xml"/>
   <p:option name="path" required="true" as="xs:anyURI"/>
   <p:option name="detailed" as="xs:boolean" select="false()"/>
-  <p:option name="recursive" as="xs:boolean" select="false()"/>
+  <p:option name="max-depth" as="xs:string?" select="'1'"/>
   <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
   <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
 </p:declare-step>
@@ -745,9 +902,13 @@ environment in which the pipeline is run.</error></para>
 author is requesting additional information about the matching entries,
 see <xref linkend="dir-list-details"/>.</para>
   
-  <para>If the <option>recursive</option> option is true, a <tag>c:directory</tag> element in the result document 
-    will include <tag>c:file</tag>, <tag>c:other</tag>, and <tag>c:directory</tag> elements for the corresponding
-    items in the given directory, if there are any.</para>
+  <para>The <option>max-depth</option> option may contain either the string “<literal>unbounded</literal>” or a string
+    that may be cast to a non-negative integer. An integer value of <literal>0</literal> means that only information
+    about the directory that is given in the <option>path</option> option is returned. A <option>max-depth</option> of
+      <literal>1</literal>, which is the default, will effect that also information about the top-level directory’s
+    immediate children will be included. For larger values of <option>max-depth</option>, also the content of
+    directories will be considered recursively up to the maximum depth, and it will be included as children of the
+    corresponding <tag>c:directory</tag> elements.</para>
 
 <para>If present, the value of the <option>include-filter</option> or
 <option>exclude-filter</option> option <rfc2119>must</rfc2119> be a sequence of strings, each
@@ -759,7 +920,7 @@ one representing a regular expressions as specified in <biblioref linkend="xpath
   <para>Examples: A file <literal>file.txt</literal> in the directory specified by <option>path</option> will remain
     <literal>file.txt</literal>, a relative path <literal>dir1/file.txt</literal> will remain
       <literal>dir1/file.txt</literal>, while a relative path <literal>dir1/dir2</literal> will become
-      <literal>dir1/dir2/</literal> id <literal>dir2</literal> is a directory.</para>
+      <literal>dir1/dir2/</literal> if <literal>dir2</literal> is a directory.</para>
   <para>Regular expressions that match <literal>a/a/b/file.txt</literal> are, for example,
   <literal>^/(\w+/){2,3}.+\.txt$</literal>, <literal>a/a/b/</literal>, or <literal>/file\.[^/]+$</literal>.</para>
 
@@ -769,33 +930,32 @@ one representing a regular expressions as specified in <biblioref linkend="xpath
   content but <literal>^dir/$</literal> won’t, and as a consequence the directory’s content will not be included in the result.</para>
   <para>If a relative path is matched by an include filter,
     all its ancestor directories starting from the initial directory (but not their content if not included explicitly) 
-    will be included, too. Example: for a file <literal>a/a/b/file.txt</literal> below the initial directory 
+    will be included, too.</para>
+  <example xml:id="ex.c.directory-list">
+    <title>Sample Directory List Output for a Single File</title>
+    <para>For a file <literal>a/a/b/file.txt</literal> below the initial directory 
     <literal>/home/jane</literal>, this output will be produced, omitting content that might be present in the 
-    intermediate directories:<literallayout>&lt;c:directory xml:base="file:/home/jane/` uri="." name="jane"&gt;
-  &lt;c:directory uri="a/" name="a"&gt;
-    &lt;c:directory uri="a/a/" name="a"&gt;
-      &lt;c:directory uri="a/a/b/" name="b"&gt;
-        &lt;c:file uri="a/a/b/file.txt" name="file.txt"/&gt;
+    intermediate directories:</para>
+    <literallayout>&lt;c:directory xml:base="file:///home/jane/" name="jane"&gt;
+  &lt;c:directory xml:base="a/" name="a"&gt;
+    &lt;c:directory xml:base="a/" name="a"&gt;
+      &lt;c:directory xml:base="b/" name="b"&gt;
+        &lt;c:file xml:base="file.txt" name="file.txt"/&gt;
       &lt;/c:directory&gt;
     &lt;/c:directory&gt;
   &lt;/c:directory&gt;
-&lt;/c:directory&gt;</literallayout></para>
+&lt;/c:directory&gt;</literallayout>
+  </example>
   <para>If the <option>exclude-filter</option> pattern matches the slash-augmented relative path, the entry (and all of
     its content in case of a directory) is excluded in the output.</para>
   <para>If both options are
 provided, the include filter is processed first, then the exclude
-filter. As a result: an item is included if it matches (at least) one
+filter. As a result, an item is included if it matches (at least) one
 of the <option>include-filter</option> values and none of the
 <option>exclude-filter</option> values.</para>
   <para>If no <option>include-filter</option> is given, that is, if <option>include-filter</option> is an empty
   sequence, any item will be included in the result (unless it is excluded by <option>exclude-filter</option>).</para>
 
-  <para>The augmented relative path will also be stored as a <tag role="attribute">uri</tag> attribute on the respective
-      <tag>c:directory</tag>, <tag>c:file</tag>, and <tag>c:other</tag> elements. This relative URI, if resolved against
-    the top-level directory’s <tag role="attirubte">xml:base</tag> attribute value, will give the absolute URI for the
-    resource. The top-level <tag>c:directory</tag> will always have the relative URI <literal>.</literal> attached to
-    it, while its <tag role="attribute">xml:base</tag> will also undergo trailing-slash normalization, which is to say,
-    it always must end in a slash.</para>
 <note>
 <para>There is no way to specify a list of values using attribute value
 templates. If the option shortcut syntax is used to provide the
@@ -806,26 +966,22 @@ syntax.
 </para>
 </note>
 
-<para xml:id="cv.directory">The result document produced for
-the specified directory path has a <tag>c:directory</tag> document
-element whose base URI is the directory path and whose
-<tag class="attribute">name</tag> attribute is the last segment
-of the directory path (that is, the directory's (local) name).</para>
+  <para xml:id="cv.directory">The result document produced for the specified directory path has a <tag>c:directory</tag>
+    document element whose base URI, attached as an <tag role="attribute">xml:base</tag> attribute, is the absolute
+    directory path (expressed as a URI that ends in a slash) and whose <tag class="attribute">name</tag> attribute
+    (without a trailing slash) is the last segment of the directory path.</para>
 
 <e:rng-pattern name="VocabDirectory"/>
 
-<para>Its contents are determined as follows, based on the entries in
-the directory identified by the directory path. For each entry in the
-directory, if either no <option>filter</option> was specified, or the
-(local) name of the entry matches the filter pattern, a
-<tag>c:file</tag>, a <tag>c:directory</tag>, or a <tag>c:other</tag>
-element is produced, as follows:
-</para>
+  <para>Its contents are determined as follows, based on the entries in the directory identified by the directory path.
+    For each entry in the directory and subject to the rules that are imposed by the <option>max-depth</option>,
+      <option>include-filter</option>, and <option>exclude-filter</option> options, a <tag>c:file</tag>, a
+      <tag>c:directory</tag>, or a <tag>c:other</tag> element is produced, as follows: </para>
 
 <itemizedlist>
 <listitem>
-<para>A <tag>c:directory</tag> is produced for each subdirectory not
-determined to be special.</para>
+      <para>A <tag>c:directory</tag> is produced for each subdirectory not determined to be special. Depending on the
+        values of the three options, it may contain child elements for the directory’s content.</para>
 </listitem>
 <listitem>
 <para xml:id="cv.file">A <tag>c:file</tag> is produced for each file
@@ -842,30 +998,23 @@ special are <glossterm>implementation-defined</glossterm>.</impl>
 </listitem>
 </itemizedlist>
 
-<para>When a directory entry is a subdirectory, unless the <option>recursive</option> is <literal>true</literal>,
-  that directory's entries are not output as part of that entry's <tag>c:directory</tag>.</para>
-
 <para>Each of the elements <tag>c:file</tag>, <tag>c:directory</tag>,
-and <tag>c:other</tag> has a <code>name</code> attribute when it
-appears within a <tag>c:directory</tag> element, whose
+and <tag>c:other</tag> has a <code>name</code> attribute, whose
 value is a relative IRI reference, giving the (local) file or
 directory name.</para>
-  <para>Each item in the result document, apart from the top-level <tag>c:directory</tag>, gets an
-      <code>xml:base</code> attribute that contains its path relative to the base URI of the
-    top-level <tag>c:directory</tag> element. In the case of immediate children of the top-level element,
-  the value of this <code>xml:base</code> attribute is identical to the value of the <code>name</code>
-  attribute.</para>
+  
+  <para>Each of these element also contains the corresponding resource’s URI in an <tag role="attribute">xml:base</tag>
+    attribute, which may be a relative URI for any but the top-level <tag>c:directory</tag> element. In the case of
+      <tag>c:directory</tag>, it must end in a trailing slash. This way, users will always be able to compute the
+    absolute URI for any of these elements by applying <code>fn:base-uri()</code> to it.</para>
 
 <section xml:id="dir-list-details">
 <title>Directory list details</title>
 
 <para>If <option>detailed</option> is false, then only the
-<tag class="attribute">name</tag> attribute is expected on
+<tag class="attribute">name</tag> and <tag class="attribute">xml:base</tag> attributes are expected on
 <tag>c:file</tag>, <tag>c:directory</tag>, or <tag>c:other</tag>
-elements.
-<impl>Any other attributes on
-<tag>c:file</tag>, <tag>c:directory</tag>, or <tag>c:other</tag>
-are <glossterm>implementation-defined</glossterm>.</impl></para>
+elements.</para>
 
 <para>If <option>detailed</option> is true, then the pipeline author
 is expecting additional details about each entry. The following attributes
@@ -1047,7 +1196,7 @@ for some value and injects it into the <port>source</port> document.</para>
 
 <p:declare-step type="p:hash">
   <p:input port="source" primary="true" content-types="xml html"/>
-  <p:output port="result" content-types="xml html"/>
+  <p:output port="result" content-types="text xml html"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
   <p:option name="value" required="true" as="xs:string"/>
   <p:option name="algorithm" required="true" as="xs:QName"/>
@@ -1085,7 +1234,7 @@ parameters specified. <error code="C0036">It is a
 one that the processor understands or if the value or parameters are
 not appropriate for that algorithm.</error></para>
 
-<para>The matched nodes are specified with the match pattern in the
+<para>The matched nodes are specified with the <glossterm>selection pattern</glossterm> in the
 <option>match</option> option. For each matching node, the string
 value of the computed hash is used in the output (if more than one node
 matches, the <emphasis>same</emphasis> hash value is used in each match).
@@ -1100,14 +1249,15 @@ of the element <rfc2119>must</rfc2119> also be amended accordingly.</para>
 
 <para>If the expression matches any
 other kind of node, the entire node (and <emphasis>not</emphasis> just
-  its contents) is replaced by the hash. <error code="C0091">It is a
-    <glossterm>dynamic error</glossterm> if the result of <tag>p:hash</tag> contains only 
-text nodes.</error></para>
+  its contents) is replaced by the hash.</para>
 
-<simplesect>
-<title>Document properties</title>
-<para feature="hash-preserves-all">All document properties are preserved.</para>
-</simplesect>
+  <simplesect>
+    <title>Document properties</title>
+    <para feature="hash-preserves-partially">If the resulting document contains exactly one text node,
+      the <literal>content-type</literal> property is changed to <literal>text/plain</literal> and the 
+      <literal>serialization</literal> property is removed, while all other document properties are 
+      preserved. For other document types, all document properties are preserved.</para>
+  </simplesect>
 </section>
 <section xml:id="c.http-request">
 <title>p:http-request</title>
@@ -1737,7 +1887,7 @@ port's document relative to the matching elements in the
    <p:input port="insertion" sequence="true" content-types="xml html"/>
    <p:output port="result" content-types="xml html"/>
    <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
-   <p:option name="position" required="true" as="xs:token" values="('first-child','last-child','before','after')"/>
+   <p:option name="position" as="xs:token" values="('first-child','last-child','before','after')" select="'after'"/>
 </p:declare-step>
 
 <para>The value of the <option>match</option> option
@@ -1769,11 +1919,11 @@ the following list:
 </itemizedlist>
 
 <para><error code="C0025">It is a <glossterm>dynamic error</glossterm>
-if the match pattern matches anything other than an element or a document
+if the <glossterm>selection pattern</glossterm> matches anything other than an element or a document
 node and the value of the <option>position</option> option is
 “<literal>first-child</literal>” or
 “<literal>last-child</literal>”.</error> <error code="C0024">It is a
-<glossterm>dynamic error</glossterm> if the match pattern matches a document
+<glossterm>dynamic error</glossterm> if the <glossterm>selection pattern</glossterm> matches a document
 node and the value of the <option>position</option> is “<literal>before</literal>” or
 “<literal>after</literal>”.</error></para>
 
@@ -2012,55 +2162,6 @@ The properties specified in <option>document-properties</option> are applied.
 </para>
 </simplesect>
 </section>
-<section xml:id="c.load-directory-list">
-<title>p:load-directory-list</title>
-
-  <para>The <code>p:load-directory-list</code> step has no inputs but produces as its result a sequence of documents
-    loaded from a directory, specified by an IRI. If the directory's IRI is relative, it is made absolute against the
-    base URI of the element on which it is specified (<tag>p:with-option</tag> or <tag>p:load-directory-list</tag> in
-    the case of a syntactic shortcut value).</para>
-
-<p:declare-step type="p:load-directory-list">
-  <p:output port="result" content-type="application/xml"/>
-  <p:option name="path" required="true" as="xs:anyURI"/>
-  <p:option name="include-filter" as="xs:string" e:type="RegularExpression"/>
-  <p:option name="exclude-filter" as="xs:string" e:type="RegularExpression"/>
-</p:declare-step>
-
-<para><impl>Conformant processors <rfc2119>must</rfc2119> support directory paths whose
-scheme is <code>file</code>. It is
-<glossterm>implementation-defined</glossterm> what other schemes are
-supported by <tag>p:load-directory-list</tag>, and what the interpretation
-of 'directory', 'file' and 'contents' is for those schemes.</impl>
-</para>
-
-<para><error code="C0017">It is a
-<glossterm>dynamic error</glossterm> if the absolute path does not
-identify a directory.</error> <error code="C0012">It is a
-<glossterm>dynamic error</glossterm> if the contents of the directory
-path are not available to the step due to access restrictions in the
-environment in which the pipeline is run.</error></para>
-
-<para>If present, the value of the <option>include-filter</option>
-or <option>exclude-filter</option>
-option <rfc2119>must</rfc2119> be a whitespace separated list of regular expressions as specified in
-<biblioref linkend="xpath31-functions"/>,section 7.61 “<literal>Regular Expression
-Syntax</literal>”.</para>
-
-<para>If the <option>include-filter</option> pattern matches a
-directory entry's name, the entry is included in the output. If the
-<option>exclude-filter</option> pattern matches a directory entry's name,
-the entry is excluded in the output. If both options are provided, the
-include filter is processed first, then the exclude filter. As a result: An
-item is included if it matches (at least) one of the
-  <option>include-filter</option> values and none of the
-  <option>exclude-filter</option> values.</para>
-
-<simplesect>
-<title>Document properties</title>
-<para feature="directory-list-preserves-none">No document properties are preserved.</para>
-</simplesect>
-</section>
 <section xml:id="c.make-absolute-uris">
 <title>p:make-absolute-uris</title>
 
@@ -2287,7 +2388,7 @@ error</glossterm> if the pattern matches anything other than element,
 attribute or processing instruction nodes.</error></para>
 
 <para>Each element, attribute, or processing-instruction in the input
-matched by the match pattern specified in the <option>match</option>
+matched by the <glossterm>selection pattern</glossterm> specified in the <option>match</option>
 option is renamed in the output to the name specified by the
 <option>new-name</option> option.</para>
 
@@ -2321,13 +2422,13 @@ a processing instruction and the new name has a non-null namespace.</error>
 <title>p:replace</title>
 
 <para>The <code>p:replace</code> step replaces matching nodes in
-its primary input with the document element of the
+its primary input with the top-level node(s) of the
 <code>replacement</code> port's document.</para>
 
 <p:declare-step type="p:replace">
    <p:input port="source" primary="true" content-types="xml html"/>
-   <p:input port="replacement" content-types="xml html"/>
-   <p:output port="result" content-types="xml html"/>
+   <p:input port="replacement" content-types="text xml html"/>
+   <p:output port="result" content-types="text xml html"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
 
@@ -2339,14 +2440,17 @@ nodes. </error> Multiple matches are allowed, in which case multiple
 copies of the <port>replacement</port> document will occur.</para>
 
 <para>Every node in the primary input matching the specified
-pattern is replaced in the output is replaced by the document element
+   pattern is replaced in the output by the top-level node(s)
 of the <port>replacement</port> document. Only non-nested matches are
 replaced. That is, once a node is replaced, its descendants cannot
 be matched.</para>
 
 <simplesect>
 <title>Document properties</title>
-<para feature="replace-preserves-all">All document properties are preserved.</para>
+<para feature="replace-preserves-partially">If the resulting document contains exactly one text node,
+the <literal>content-type</literal> property is changed to <literal>text/plain</literal> and the 
+   <literal>serialization</literal> property is removed, while all other document properties are 
+   preserved. For other document types, all document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.set-attributes">
@@ -2377,7 +2481,7 @@ be copied already exists, the value specified on the
 this step produces a copy of the <port>source</port> port's document
 with the matching elements' attributes modified.</para>
 
-<para>The matching elements are specified by the match pattern in the
+<para>The matching elements are specified by the <glossterm>selection pattern</glossterm> in the
 <option>match</option> option. All matching elements are processed.
 If no elements match, the step will not change any elements.</para>
 
@@ -2552,7 +2656,7 @@ with the string result of evaluating an XPath expression.</para>
 
 <p:declare-step type="p:string-replace">
    <p:input port="source" content-types="xml html"/>
-   <p:output port="result" content-types="xml html"/>
+   <p:output port="result" content-types="text xml html"/>
    <p:option name="match" required="true" as="xs:string" e:type="XSLTSelectionPattern"/>
    <p:option name="replace" required="true" as="xs:string" e:type="XPathExpression"/>
 </p:declare-step>
@@ -2563,7 +2667,7 @@ XSLTSelectionPattern.</para>
 <para>The value of the <option>replace</option> option <rfc2119>must</rfc2119> be an
 XPathExpression.</para>
 
-<para>The matched nodes are specified with the match pattern in the
+<para>The matched nodes are specified with the <glossterm>selection pattern</glossterm> in the
 <option>match</option> option.
 For each matching node, the XPath
 expression provided by the <option>replace</option> option is
@@ -2584,45 +2688,10 @@ the string value of the <option>replace</option> expression.</para>
 
 <simplesect>
 <title>Document properties</title>
-<para feature="string-replace-preserves-all">All document properties are preserved.</para>
-</simplesect>
-</section>
-<section xml:id="c.tee">
-<title>p:tee</title>
-
-<para>The <tag>p:tee</tag> step stores (a possibly serialized
-version of) its input to a URI. The step outputs its input unchanged.</para>
-
-  <p:declare-step type="p:tee">
-    <p:input port="source" content-types="any" sequence="true"/>
-    <p:output port="result" sequence="true" content-types="any"/>
-    <p:option name="href" required="true" as="xs:anyURI"/>
-    <p:option name="serialization" as="map(xs:QName,item()*)?"/>
-    <p:option name="enable" as="xs:boolean" select="true()"/>
-  </p:declare-step>
-
-<para>The value of the <option>href</option> option <rfc2119>must</rfc2119> be an <type>anyURI</type>. If it is
-    relative, it is made absolute against the base URI of the element on which it is specified (<tag>p:with-option</tag>
-    or <tag>p:tee</tag> in the case of a syntactic shortcut value).</para>
-
-<para>The step attempts to store the document to the specified
-URI. <error code="C0050">It is a <glossterm>dynamic error</glossterm>
-if the URI scheme is not supported or the step cannot store to the
-specified location.</error></para>
-
-<para>The output of this step is what appears on its input port, unchanged.</para>
-
-<para>The <option>serialization</option> option is provided to control the
-serialization of content when it is stored. Serialization is described in
-<biblioref linkend="xproc30"/>.</para>
-
-  <para>If the <option>enabled</option> option is false, no attempt to store the document will be made. The step will
-    act exactly like a <tag>p:identity</tag> step. The values for <option>href</option> and
-      <option>serialization</option> will be ignored.</para>
-
-<simplesect>
-<title>Document properties</title>
-  <para feature="tee-preserves-all">All document properties are preserved.</para>
+   <para feature="string-replace-preserves-all">If the resulting document contains exactly one text node,
+      the <literal>content-type</literal> property is changed to <literal>text/plain</literal> and the 
+      <literal>serialization</literal> property is removed, while all other document properties are 
+      preserved. For other document types, all document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.text-count">
@@ -2690,10 +2759,11 @@ serialization of content when it is stored. Serialization is described in
   
   <p:declare-step type="p:text-join">
     <p:output port="source" primary="true" sequence="true" content-types="text"/>
-    <p:output port="result" primary="true" sequence="false" content-types="text"/>
+    <p:output port="result" primary="true" sequence="false" content-types="text/plain"/>
     <p:option name="separator" required="false" as="xs:string"/>
     <p:option name="prefix" required="false" as="xs:string"/>
     <p:option name="suffix" required="false" as="xs:string"/>
+    <p:option name="override-content-type" required="false" as="xs:string"/>
   </p:declare-step>
   
   <para>The <code>p:text-join</code> step concatenates the text documents appearing on its <port>source</port> port
@@ -2713,6 +2783,13 @@ serialization of content when it is stored. Serialization is described in
         port will always end with its value (also when there are no documents on the <port>source</port> port).</para>
     </listitem>
   </itemizedlist>
+  <para>When the <option>override-content-type</option> option is specified, the document appearing on the port <port>result</port>
+    will have this media type as part of its document properties. <error code="C0070">It is a <glossterm>dynamic
+      error</glossterm> if the supplied <option>content-type</option> is not
+      a valid media type of the form
+      “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+      where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error>
+  </para>
   <simplesect>
     <title>Document properties</title>
     <para feature="load-preserves-none">No document properties are preserved.</para>
@@ -2846,71 +2923,70 @@ serialization of content when it is stored. Serialization is described in
 
   <title>p:unarchive</title>
 
-  <para>The <code>p:unarchive</code> step outputs on its <port>result</port> port either a manifest file describing the
-    contents of an archive (for instance entries in a ZIP file) or specific entries in an archive.</para>
+  <para>The <code>p:unarchive</code> step outputs on its <port>result</port> port specific
+    entries in an archive (for instance from a zip file).</para>
 
   <p:declare-step type="p:unarchive">
     <p:input port="source" primary="true" content-types="*/*" sequence="false"/>
     <p:output port="result" primary="true" content-types="*/*" sequence="true"/>
-    <p:option name="include-filter" as="xs:string" e:type="RegularExpression" required="false"/>
-    <p:option name="exclude-filter" as="xs:string" e:type="RegularExpression" required="false"/>
+    <p:option name="include-filter" as="xs:string*" e:type="RegularExpression" required="false"/>
+    <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression" required="false"/>
     <p:option name="format" as="xs:QName" required="false" select="'zip'"/>
     <p:option name="parameters" as="map(xs:Qname, item()*)" required="false"/>
   </p:declare-step>
 
-  <para>The <code>p:unarchive</code> step takes the document appearing on its <port>source</port> port as an archive
-    (for instance a zip file). Depending on which options are set it either outputs a description of the contents of the
-    archive as an XML document or specific entries (files) from the archive.</para>
+  
 
-  <para>The format of the archive can be specified using the <option>format</option> option. Implementations
-      <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/> format, specified with the value <code>zip</code>.
-      <impl>It is <glossterm>implementation-defined</glossterm> what other formats are supported.</impl></para>
+  <para>The format of the archive can be specified using the <option>format</option> option.
+    Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/> format, specified
+    with the value <code>zip</code>. <impl>It is <glossterm>implementation-defined</glossterm> what
+      other formats are supported.</impl></para>
 
-  <para>The <option>parameters</option> can be used to supply parameters to control the unarchiving. <impl>The semantics
-      of the keys and the allowed values for these keys are <glossterm>implementation-defined</glossterm>.</impl>
-    <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map <option>parameters</option> contains an
-      entry whose key is defined by the implementation and whose value is not valid for that key.</error></para>
+  <para>The <option>parameters</option> option can be used to supply parameters to control the unarchiving.
+      <impl>The semantics of the keys and the allowed values for these keys are
+        <glossterm>implementation-defined</glossterm>.</impl>
+    <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+        <option>parameters</option> contains an entry whose key is defined by the implementation and
+      whose value is not valid for that key.</error></para>
 
-  <para>If present, the value of the <option>include-filter</option> or <option>exclude-filter</option> option
-      <rfc2119>must</rfc2119> be a whitespace separated list of regular expressions as specified in <biblioref linkend="xpath31-functions"/>, section 7.61 “<literal>Regular Expression Syntax</literal>”.</para>
+  <para>If present, the value of the <option>include-filter</option> or
+    <option>exclude-filter</option> option <rfc2119>must</rfc2119> be a sequence of strings, each
+    one representing a regular expressions as specified in <biblioref linkend="xpath31-functions"/>,
+    section 7.61 “<literal>Regular Expression Syntax</literal>”.</para>
 
-  <para>If neither the <option>include-filter</option> option nor the <option>exclude-filter</option> option is
-    specified, the <code>p:unarchive</code> step outputs on its <port>result</port> port a description of the contents of the
-    archive, as specified below.</para>
+  <para>If neither the <option>include-filter</option> option nor the
+      <option>exclude-filter</option> option is specified, the <code>p:unarchive</code> step outputs
+    on its <port>result</port> port all entries in the archive.</para>
 
-  <para>If the <option>include-filter</option> option or the <option>exclude-filter</option> option is specified, the
-      <code>p:archive</code> step outputs on the <port>result</port> port the entries from the archive that conform to the
-    following rules:</para>
+  <para>If the <option>include-filter</option> option or the <option>exclude-filter</option> option
+    is specified, the <code>p:archive</code> step outputs on the <port>result</port> port the
+    entries from the archive that conform to the following rules:</para>
   <itemizedlist>
     <listitem>
-      <para>If any <option>include-filter</option> pattern matches an archive entry's name, the entry is included in the
-        output.</para>
+      <para>If any <option>include-filter</option> pattern matches an archive entry's name, the
+        entry is included in the output.</para>
     </listitem>
     <listitem>
-      <para>If any <option>exclude-filter</option> pattern matches an archive entry's name, the entry is excluded in
-        the output.</para>
+      <para>If any <option>exclude-filter</option> pattern matches an archive entry's name, the
+        entry is excluded in the output.</para>
     </listitem>
     <listitem>
-      <para>If both options are provided, the include filter is processed first, then the exclude filter. </para>
+      <para>If both options are provided, the include filter is processed first, then the exclude
+        filter. </para>
     </listitem>
     <listitem>
-      <para>Names of entries in archives are always relative names. For instance, the name of a file called
-        <code>xyz.xml</code> in a <code>specs</code> subdirectory in an archive is called in full
-        <code>specs/xyz.xml</code> (and not <code>/specs/xyz.xml</code>).</para>
+      <para>Names of entries in archives are always relative names. For instance, the name of a file
+        called <code>xyz.xml</code> in a <code>specs</code> subdirectory in an archive is called in
+        full <code>specs/xyz.xml</code> (and not <code>/specs/xyz.xml</code>).</para>
     </listitem>
   </itemizedlist>
-  <para>As a result: an item is included if it matches (at least) one of the <option>include-filter</option> values and
-    none of the <option>exclude-filter</option> values.</para>
+  <para>As a result: an item is included if it matches (at least) one of the
+      <option>include-filter</option> values and none of the <option>exclude-filter</option>
+    values.</para>
+  
   <note role="editorial">
     <para>What about the base URIs of these documents?</para>
   </note>
- 
-  <section>
-    <title>Archive content specification</title>
-    <note role="editorial">
-      <para>TBD. Like the manifest of <code>p:archive</code> but no <code>@href</code>?</para>
-    </note>
-  </section>
 
   <simplesect>
     <title>Document properties</title>
@@ -3030,7 +3106,7 @@ children.</para>
 
 <p:declare-step type="p:unwrap">
    <p:input port="source" content-types="xml html"/>
-   <p:output port="result" content-types="application/xml"/>
+   <p:output port="result" content-types="application/xml text/plain"/>
    <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
 </p:declare-step>
 
@@ -3052,7 +3128,9 @@ ones.</para>
 </note>
 
 <para>This step produces a single document; if the document element is
-unwrapped, the result might not be well-formed XML.</para>
+unwrapped, the result might not be well-formed XML. If the step produces a
+document node with a single text child, the result will have content type 
+“<literal>text/plain</literal>”.</para>
 
 <simplesect>
 <title>Document properties</title>
@@ -3068,7 +3146,7 @@ the <port>source</port> document.</para>
 
 <p:declare-step type="p:uuid">
   <p:input port="source" primary="true" content-types="xml html"/>
-  <p:output port="result" content-types="xml html"/>
+  <p:output port="result" content-types="text xml html"/>
   <p:option name="match" as="xs:string" select="'/*'" e:type="XSLTSelectionPattern"/>
   <p:option name="version" as="xs:integer?"/>
 </p:declare-step>
@@ -3091,7 +3169,7 @@ the necessary inputs are made available for computing other versions,
 is <glossterm>implementation-defined</glossterm>.</impl>
 </para>
 
-<para>The matched nodes are specified with the match pattern in the
+<para>The matched nodes are specified with the <glossterm>selection pattern</glossterm> in the
 <option>match</option> option. For each matching node, the generated
 UUID is used in the output (if more than one node matches, the
 <emphasis>same</emphasis> UUID is used in each match). Nodes that do not
@@ -3108,7 +3186,10 @@ its contents) is replaced by the UUID.</para>
 
 <simplesect>
 <title>Document properties</title>
-<para feature="uuid-preserves-all">All document properties are preserved.</para>
+  <para feature="uuid-preserves-partially">If the resulting document contains exactly one text node,
+    the <literal>content-type</literal> property is changed to <literal>text/plain</literal> and the 
+    <literal>serialization</literal> property is removed, while all other document properties are 
+    preserved. For other document types, all document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.wrap-sequence">
@@ -3186,7 +3267,7 @@ element node whose QName is the value specified in the
 <option>wrapper</option> option. That new element contains copies of
 all of the children of the original document node.</para>
 
-<para>When the match pattern does not match the document node,
+<para>When the <glossterm>selection pattern</glossterm> does not match the document node,
 every node that matches the specified <option>match</option>
 pattern is replaced with a new element node whose QName is the value
 specified in the <option>wrapper</option> option.
@@ -3282,7 +3363,7 @@ The namespace name is ignored and no prefix or colon appears in the name.
 <para><impl>The order of the parameters
 is <glossterm>implementation-dependent</glossterm>.</impl></para>
 
-<para>The matched nodes are specified with the match pattern in the
+<para>The matched nodes are specified with the <glossterm>selection pattern</glossterm> in the
 <option>match</option> option. For each matching node, the encoded
 string is used in the output. Nodes that do not
 match are copied without change.</para>

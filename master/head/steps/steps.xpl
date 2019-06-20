@@ -55,7 +55,7 @@
    </p:declare-step>
    <p:declare-step type="p:delete" xml:id="delete">
       <p:input port="source" content-types="xml html"/>
-      <p:output port="result" content-types="xml html"/>
+      <p:output port="result" content-types="text xml html"/>
       <p:option name="match"
                 required="true"
                 as="xs:string"
@@ -65,7 +65,7 @@
       <p:output port="result" content-type="application/xml"/>
       <p:option name="path" required="true" as="xs:anyURI"/>
       <p:option name="detailed" as="xs:boolean" select="false()"/>
-      <p:option name="recursive" as="xs:boolean" select="false()"/>
+      <p:option name="max-depth" as="xs:string?" select="'1'"/>
       <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
       <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
    </p:declare-step>
@@ -89,7 +89,7 @@
    </p:declare-step>
    <p:declare-step type="p:hash" xml:id="hash">
       <p:input port="source" primary="true" content-types="xml html"/>
-      <p:output port="result" content-types="xml html"/>
+      <p:output port="result" content-types="text xml html"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="value" required="true" as="xs:string"/>
       <p:option name="algorithm" required="true" as="xs:QName"/>
@@ -117,9 +117,9 @@
                 select="'/*'"
                 e:type="XSLTSelectionPattern"/>
       <p:option name="position"
-                required="true"
                 as="xs:token"
-                values="('first-child','last-child','before','after')"/>
+                values="('first-child','last-child','before','after')"
+                select="'after'"/>
    </p:declare-step>
    <p:declare-step type="p:label-elements" xml:id="label-elements">
       <p:input port="source" content-types="xml html"/>
@@ -141,12 +141,6 @@
       <p:option name="parameters" as="xs:string"/>
       <p:option name="content-type" as="xs:string?"/>
       <p:option name="document-properties" as="xs:string"/>
-   </p:declare-step>
-   <p:declare-step type="p:load-directory-list" xml:id="load-directory-list">
-      <p:output port="result" content-type="application/xml"/>
-      <p:option name="path" required="true" as="xs:anyURI"/>
-      <p:option name="include-filter" as="xs:string" e:type="RegularExpression"/>
-      <p:option name="exclude-filter" as="xs:string" e:type="RegularExpression"/>
    </p:declare-step>
    <p:declare-step type="p:make-absolute-uris" xml:id="make-absolute-uris">
       <p:input port="source" content-types="xml html"/>
@@ -187,8 +181,8 @@
    </p:declare-step>
    <p:declare-step type="p:replace" xml:id="replace">
       <p:input port="source" primary="true" content-types="xml html"/>
-      <p:input port="replacement" content-types="xml html"/>
-      <p:output port="result" content-types="xml html"/>
+      <p:input port="replacement" content-types="text xml html"/>
+      <p:output port="result" content-types="text xml html"/>
       <p:option name="match"
                 required="true"
                 as="xs:string"
@@ -233,7 +227,7 @@
    </p:declare-step>
    <p:declare-step type="p:string-replace" xml:id="string-replace">
       <p:input port="source" content-types="xml html"/>
-      <p:output port="result" content-types="xml html"/>
+      <p:output port="result" content-types="text xml html"/>
       <p:option name="match"
                 required="true"
                 as="xs:string"
@@ -242,13 +236,6 @@
                 required="true"
                 as="xs:string"
                 e:type="XPathExpression"/>
-   </p:declare-step>
-   <p:declare-step type="p:tee" xml:id="tee">
-      <p:input port="source" content-types="any" sequence="true"/>
-      <p:output port="result" sequence="true" content-types="any"/>
-      <p:option name="href" required="true" as="xs:anyURI"/>
-      <p:option name="serialization" as="xs:string"/>
-      <p:option name="enable" as="xs:boolean" select="true()"/>
    </p:declare-step>
    <p:declare-step type="p:text-count" xml:id="text-count">
       <p:input port="source"
@@ -279,10 +266,11 @@
       <p:output port="result"
                 primary="true"
                 sequence="false"
-                content-types="text"/>
+                content-types="text/plain"/>
       <p:option name="separator" required="false" as="xs:string"/>
       <p:option name="prefix" required="false" as="xs:string"/>
       <p:option name="suffix" required="false" as="xs:string"/>
+      <p:option name="override-content-type" required="false" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:text-replace" xml:id="text-replace">
       <p:input port="source"
@@ -348,11 +336,11 @@
                 content-types="*/*"
                 sequence="true"/>
       <p:option name="include-filter"
-                as="xs:string"
+                as="xs:string*"
                 e:type="RegularExpression"
                 required="false"/>
       <p:option name="exclude-filter"
-                as="xs:string"
+                as="xs:string*"
                 e:type="RegularExpression"
                 required="false"/>
       <p:option name="format" as="xs:QName" required="false" select="'zip'"/>
@@ -368,7 +356,7 @@
    </p:declare-step>
    <p:declare-step type="p:unwrap" xml:id="unwrap">
       <p:input port="source" content-types="xml html"/>
-      <p:output port="result" content-types="application/xml"/>
+      <p:output port="result" content-types="application/xml text/plain"/>
       <p:option name="match"
                 as="xs:string"
                 select="'/*'"
@@ -376,7 +364,7 @@
    </p:declare-step>
    <p:declare-step type="p:uuid" xml:id="uuid">
       <p:input port="source" primary="true" content-types="xml html"/>
-      <p:output port="result" content-types="xml html"/>
+      <p:output port="result" content-types="text xml html"/>
       <p:option name="match"
                 as="xs:string"
                 select="'/*'"
