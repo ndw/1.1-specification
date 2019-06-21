@@ -252,7 +252,7 @@ free.</para>
 <para>The pattern of connections between steps will not always
 completely determine their order of evaluation. <impl>The evaluation
 order of steps not connected to one another is
-<glossterm>implementation-dependent</glossterm></impl>.</para>
+<glossterm>implementation-dependent</glossterm>.</impl></para>
 
 <section xml:id="step-concept">
 <title>Steps</title>
@@ -392,53 +392,97 @@ the step.
 <section xml:id="documents">
 <title>Documents</title>
 
-<para>An XProc pipeline processes documents.
-<termdef xml:id="dt-document">A <firstterm>document</firstterm> is a
-<glossterm>representation</glossterm> and its
-<glossterm>document properties</glossterm>.</termdef>.
-<termdef xml:id="dt-representation">A <firstterm>representation</firstterm>
-is a data structure used by an XProc processor to refer to the actual
-document content.</termdef></para>
+    <para>An XProc pipeline processes documents. <termdef xml:id="dt-document">A
+          <firstterm>document</firstterm> is a <glossterm>representation</glossterm> and its
+          <glossterm>document properties</glossterm>.</termdef>. <termdef xml:id="dt-representation">A <firstterm>representation</firstterm> is a data structure used by an XProc processor to
+        refer to the actual document content.</termdef></para>
+  
+  <para>An output port may have several connections. In this case the document(s) that
+    appear on that port are sent to each of the connections. In principle, a distinct
+    copy of each document is sent to each connection. Critically, any changes made to one
+    copy <rfc2119>must not</rfc2119> be visible in any other copy. In the interest of efficiency,
+    if an implementation can isolate such changes, it is not required to make actual copies.
+  </para>
 
-<para>Documents have associated with them a set of properties. The properties are key/value pairs. <termdef xml:id="dt-document-properties">The <firstterm>document properties</firstterm> are exposed to the XProc pipeline
-        as a map (<code>map(xs:QName, item()*)</code>).</termdef></para>
+    <section xml:id="document-properties">
+      <title>Document Properties</title>
 
-<para>Several property keys are defined by this specification:</para>
+<para>Documents have associated with them a set of properties.
+<termdef xml:id="dt-document-properties">The <firstterm>document
+properties</firstterm> are key/value pairs; they are exposed to the
+XProc pipeline as a map (<code>map(xs:QName, item()*)</code>).</termdef></para>
 
-<variablelist>
-<varlistentry>
-<term><code>content-type</code></term>
-<listitem>
-<para>The value of the “<code>content-type</code>”
-key identifies the media type (<biblioref linkend="rfc2046"/>) of the
-representation. The “<code>content-type</code>” <rfc2119>must</rfc2119>
-always be present. The processor is responsible for assuring that the
-<code>content-type</code> property matches the content type of each document
-produced on every output port.
+      <para>Several properties are defined by this specification:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term>
+            <code>content-type</code>
+          </term>
+          <listitem>
+            <para>The value of the “<code>content-type</code>” property identifies the media type
+                (<biblioref linkend="rfc2046"/>) of the representation. The
+                “<code>content-type</code>” <rfc2119>must</rfc2119> always be present. The processor
+              is responsible for assuring that the <code>content-type</code> property matches the
+              content type of each document produced on every output port.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <code>base-uri</code>
+          </term>
+          <listitem>
+            <para>The value of the (optional) “<code>base-uri</code>” property identifies the base URI of the
+              document. If no such key is present, the document has no base URI. The processor is
+              responsible for assuring that the <code>base-uri</code> property matches the base URI
+              of each document produced on every output port.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term>
+            <code>serialization</code>
+          </term>
+          <listitem>
+            <para>The value of the (optional) “<code>serialization</code>” property holds serialization
+              properties for the document. If present, it's value <rfc2119>must</rfc2119> be of type
+                <code>map(xs:QName, item()*)</code>. <error code="D0070">It is a <glossterm>dynamic
+                  error</glossterm> if a value is assigned to the <code>serialization</code>
+                document property that is not of type <code>map(xs:QName, item()*)</code>.</error>
+              Serialization properties control XML serialization as defined by <biblioref linkend="xml-serialization-31"/>. See also <xref linkend="serialization"/>. </para>
+            <para>Some steps, like <code>p:xslt</code> and <code>p:xquery</code>, can specify
+              serialization properties (for instance using an XSLT <tag>xsl:output</tag> element).
+              If this is the case, the specified serialization properties <rfc2119>should</rfc2119>
+              be returned in the result document(s) <code>serialization</code> property, as an
+              appropriate serialization properties map.</para>
+            <para>If a step serializes a document whose document properties contain a
+                <code>serialization</code> property, it <rfc2119>must</rfc2119> use these
+              serialization properties. If the step itself allows specification of serialization properties
+              (usually by a <option>serialization</option> option), both sets of serialization
+              properties are merged. Serialization properties specified on the step itself have
+              precedence over serialization properties specified with the <code>serialization</code>
+              document property.</para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+
+      <para>Other property keys may also be present, including user defined properties.</para>
+
+<para>Steps are responsible for describing how document properties are
+transformed as documents flow through them. Many steps claim that the
+specified properties are preserved. Generally, it is the
+responsibility of the pipeline author to determine when this is
+inapropriate and take corrective action. However, it is the
+responsibility of the pipeline processor to assure that the
+<code>content-type</code> property is correct. If a step transforms a
+document in a manner that is inconsistent with the
+<code>content-type</code> property (accepting an XML document on the
+source port but producing a text document on the result, for example), the
+processor must assure that the <code>content-type</code> property is appropriate.
+If a step changes the <code>content-type</code> in this way, it <rfc2119>must</rfc2119> also
+remove the <code>serialization</code> property
 </para>
-</listitem>
-</varlistentry>
-<varlistentry>
-<term><code>base-uri</code></term>
-<listitem>
-<para>The value of the “<code>base-uri</code>” key identifies the
-base URI of the document. If no such key is present, the document has
-no base URI. The processor is responsible for assuring that the <code>base-uri</code>
-property matches the base URI of each document produced on every output port.
-</para>
-</listitem>
-</varlistentry>
-</variablelist>
 
-<para>Other property keys may also be present, including user
-defined properties.</para>
-
-<para>An output port may have several connections. In this case the document(s) that
-appear on that port are sent to each of the connections. In principle, a distinct
-copy of each document is sent to each connection. Critically, any changes made to one
-copy <rfc2119>must not</rfc2119> be visible in any other copy. In the interest of efficiency,
-if an implementation can isolate such changes, it is not required to make actual copies.
-</para>
+    </section>
 
 <section xml:id="document-types">
 <title>Document Types</title>
@@ -517,7 +561,7 @@ be serialized using the XML serializer (see <xref linkend="xml-serialization-31"
 Within XProc, they are <link linkend="xml-documents">XML documents</link>.
 HTML documents are identified by an HTML media type.
 <termdef xml:id="dt-HTML-media-type">The
-“<literal>text/html</literal>” and “<literal>application/xhtml+xml</literal>
+  “<literal>text/html</literal>” and “<literal>application/xhtml+xml</literal>”
 media types
 are <firstterm baseform="HTML media type">HTML media types</firstterm>.
 </termdef>
@@ -543,7 +587,9 @@ in the pipeline) and will not be transformed in any way.</para>
 </listitem>
 <listitem>
 <para>When an HTML document is serialized, it <rfc2119>should</rfc2119> be serialized using the
-HTML serializer (see <xref linkend="xml-serialization-31"/>) by default.
+  HTML serializer for documents with media type “<literal>text/html</literal>” and the
+  XHTML serializer for those with media type “<literal>application/xhtml+xml</literal>” 
+  (see <xref linkend="xml-serialization-31"/>) by default.
 </para>
 </listitem>
 </orderedlist>
@@ -619,37 +665,38 @@ etc.
 </section>
 </section>
 
-<section>
-<title>Creating documents from XDM step results</title>
-<para>Some steps like <tag>p:xslt</tag>, <tag>p:xquery</tag> etc. create new
-XDM instances, that are converted into documents before appearing on the output
-port of that particular step. The following rules apply:</para>
-<itemizedlist>
-<listitem>
-<para>If the result is a single text node, it is wrapped in a document node and
-the document's content-type is <literal>text/plain</literal>.</para>
-</listitem>
-<listitem>
-<para>If the result is any other node (except for a document node), a document node is 
-wrapped around the node and the document's content-type is 
-<literal>application/xml</literal>.</para>
-</listitem>
-<listitem>
-<para>If the result is a document node, content-type "application/xml" is used.</para>
-</listitem>
-<listitem>
-<para>If the result is a <code>map</code>, <code>array</code> or any atomic value, a JSON document
-is created and content-type <literal>application/json</literal> is used.</para>
-</listitem>
+    <section>
+      <title>Creating documents from XDM step results</title>
+      <para>Some steps like <tag>p:xslt</tag>, <tag>p:xquery</tag> etc. create a sequence of new XDM
+        instances. Every item in such a sequence is converted into a <emphasis>separate</emphasis>
+        document that will appear on the output port of that particular step. The following rules
+        apply to each of the items in the output sequence:</para>
+      <itemizedlist>
+        <listitem>
+          <para>If the item is a single text node, it is wrapped in a document node and the
+            document's content-type is <literal>text/plain</literal>.</para>
+        </listitem>
+        <listitem>
+          <para>If the item is any other node (except for a document node), a document node is
+            wrapped around the node and the document's content-type is
+              <literal>application/xml</literal>.</para>
+        </listitem>
+        <listitem>
+          <para>If the item is a document node, content-type "application/xml" is used.</para>
+        </listitem>
+        <listitem>
+          <para>If the item is a <code>map</code>, <code>array</code> or any atomic value, a JSON
+            document is created and content-type <literal>application/json</literal> is used.</para>
+        </listitem>
 
-</itemizedlist>
-</section>
+      </itemizedlist>
+    </section>
 
 <section xml:id="specified-content-types">
 <title>Specifying content types</title>
 
-<para>In some contexts (step inputs, step outputs, and inline
-elements, for example), XProc allows the pipeline author to specify a
+<para>In some contexts (step inputs, and step outputs, for example), 
+XProc allows the pipeline author to specify a
 list of content types to identify what kinds of documents are allowed.
 Each content type in this list must have one of the following
 forms:</para>
@@ -682,7 +729,7 @@ The following shortcuts <rfc2119>must</rfc2119> be supported by the processor:</
 <variablelist>
 <varlistentry><term><literal>xml</literal></term>
 <listitem>
-<para>Expands to “<literal>application/xml text/xml application/*+xml -application/xhtml+xml</literal>”.
+<para>Expands to “<literal>application/xml text/xml */*+xml -application/xhtml+xml</literal>”.
 </para>
 </listitem>
 </varlistentry>
@@ -734,46 +781,9 @@ if the content type list expands to “<literal>-image/svg image/*</literal>”.
 
 <para>In the particular case of shortcut values, note that “<literal>application/xhtml+xml</literal>” is acceptable if the
 content type list is “<literal>xml html</literal>” but not if it is “<literal>html xml</literal>”.</para>
-</section>
-
-<section xml:id="media-type-match">
-<title>Matching Media Types</title>
-
-<para feature="media-type-match">When an input document arrives on a
-port, it must be match at least one of the media types specified on
-that input port. It matches if the port specifies no media types or if
-the media type of the input document is compatible with at least one
-of the specified media types. Two media types are compatible if:</para>
-
-<orderedlist>
-<listitem>
-<para feature="xml-media-types-compatible">They are both
-<glossterm baseform="XML media type">XML media types</glossterm>
-(<code>application/xml</code> is compatible with <code>image/svg+xml</code>),
-</para>
-</listitem>
-<listitem>
-<para feature="text-media-types-compatible">they are both
-<glossterm baseform="text media type">text media types</glossterm>
-(<code>text/plain</code> is compatible with <code>text/csv</code>),
-</para>
-</listitem>
-<listitem>
-<para feature="other-media-types-equal">or they are equal when
-compared with the Unicode codepoint collation
-(<code>image/png</code> is compatible with <code>image/png</code>).</para>
-</listitem>
-<listitem>
-<para feature="impl-media-type-equal"><impl>It is
-<glossterm>implementation-defined</glossterm> what additional
-content types are considered equal.</impl>
-</para>
-</listitem>
-</orderedlist>
-
 <para><error code="D0038">It is a <glossterm>dynamic error</glossterm>
 if an input document arrives on a port and it does not match the
-allowed media types.</error></para>
+allowed content types.</error></para>
 
 </section>
 
@@ -905,8 +915,7 @@ the pipeline is
 <glossterm>implementation-defined</glossterm>.</impl></para>
 
 <para>Input ports <rfc2119>may</rfc2119> specify a content type, or list of
-content types, that they accept. Input documents must
-<link linkend="media-type-match">match</link> the specified content types.</para>
+content types, that they accept, se <xref linkend="specified-content-types"/>.</para>
 
 <section xml:id="external-docs">
         <title>External Documents</title>
@@ -2029,8 +2038,14 @@ static analysis is <glossterm>implementation-defined</glossterm>.</impl></para>
         </listitem>
         <listitem>
           <para>If an implementation supports XPath 2.0 or later, the data model constructed with which to
-            evaluate XPath expressions and match patterns <rfc2119>should</rfc2119> take advantage
+            evaluate XPath expressions and <glossterm baseform="selection pattern">selection patterns</glossterm> <rfc2119>should</rfc2119> take advantage
             of as much PSVI information as possible. </para>
+          <para>
+          <termdef xml:id="dt-selection-pattern">A <firstterm>selection pattern</firstterm> uses a
+            subset of the syntax for path expressions, and is defined to match a node if the
+            corresponding path expression would select the node. It is defined as in the 
+            <link xlink:href="https://www.w3.org/TR/xslt-30/#dt-selection-pattern">XSLT 3.0
+              specification</link>.</termdef></para>
         </listitem>
         <listitem>
           <para>Except as specified above, or in the descriptions of individual steps,
@@ -2197,7 +2212,8 @@ node, all the children of the document node are inserted.</para>
 
 <orderedlist>
 <listitem>
-<para>If the content type is an <glossterm>XML media type</glossterm>,
+<para>If the content type is an <glossterm>XML media type</glossterm> or an
+  <glossterm>HTML media type</glossterm>,
 the nodes are added to the XML document where they occur. This is analagous
 to the way element constructors work in <biblioref linkend="xquery10"/>.
 </para>
@@ -2210,7 +2226,8 @@ element or the attribute has a preceding node that it not an attribute.</error>
 </para>
 </listitem>
 <listitem>
-<para>If the content type is not an <glossterm>XML media type</glossterm>, each text value template is replaced by the
+<para>If the content type is not an <glossterm>XML media type</glossterm> or an 
+  <glossterm>HTML media type</glossterm>, each text value template is replaced by the
             concatenation of the serialization of the nodes that result from evaluating the template.</para>
 <para>This serialization is performed with the following serialization parameters:</para>
 
@@ -3375,8 +3392,8 @@ are allowed anywhere, and attributes that are
     <para><type>XPathExpression</type>, <type>XSLTSelectionPattern</type>:
     As a string per <biblioref linkend="xmlschema-2"/>, including
     whitespace normalization, and the further requirement to be a
-    conformant Expression per <biblioref linkend="xpath31"/> or selection
-    pattern per <biblioref linkend="xslt30"/>.
+    conformant Expression per <biblioref linkend="xpath31"/> or 
+            <glossterm>selection pattern</glossterm> per <biblioref linkend="xslt30"/>.
     </para>
   </listitem>
   <listitem>
@@ -3455,12 +3472,12 @@ are allowed anywhere, and attributes that are
             extension steps are encouraged to use this code for general failures.</para>
         </listitem>
         <listitem>
-          <para>In most steps which use a select expression or match pattern, any kind of node can
+          <para>In most steps which use a select expression or <glossterm>selection pattern</glossterm>, any kind of node can
             be identified by the expression or pattern. However, some expressions and patterns on
             some steps are only applicable to some kinds of nodes (e.g., it doesn't make sense to
             speak of adding attributes to a comment!). </para>
           <para><error code="C0023">It is a <glossterm>dynamic error</glossterm> if a select
-              expression or match pattern returns a node type that is not allowed by the
+            expression or <glossterm>selection pattern</glossterm> returns a node type that is not allowed by the
               step.</error>
           </para>
         </listitem>
@@ -3680,7 +3697,7 @@ each document in the sequence is processed in turn producing a sequence
 on the output.</para>
 
 <para>The <tag class="attribute">match</tag> attribute specifies
-        an XSLT match pattern. Each matching node in the source document is wrapped in a document
+  an XSLT <glossterm>selection pattern</glossterm>. Each matching node in the source document is wrapped in a document
         node, as necessary, and provided, one at a time, to the viewport's
           <glossterm>subpipeline</glossterm> on a port named <port>current</port>. The base URI of
         the resulting document that is passed to the subpipeline is the base URI of the matched
@@ -3711,8 +3728,8 @@ on the output.</para>
           port.</error></para>
 <para>What appears on the output from the <tag>p:viewport</tag> will
         be a copy of the input document where each matching node is replaced by the result of
-        applying the subpipeline to the subtree rooted at that node. In other words, if the match
-        pattern matches a particular element then that element is wrapped in a document node and
+        applying the subpipeline to the subtree rooted at that node. In other words, if the 
+        <glossterm>selection pattern</glossterm> matches a particular element then that element is wrapped in a document node and
         provided on the <port>current</port> port, the subpipeline in the <tag>p:viewport</tag> is
         evaluated, and the result that appears on the <port>output</port> port replaces the matched
         element. </para>
@@ -4532,8 +4549,7 @@ expression is ignored.</para>
 or more (space separated) content types that this input port will
 accept. If the attribute is not specified, <literal>*/*</literal> is assumed.
 See <xref linkend="specified-content-types"/>.
-The media type of input documents must
-<link linkend="media-type-match">match</link> the allowed content types.</para>
+</para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">href</tag></term>
@@ -4915,16 +4931,17 @@ output port. These parameters control XML serialization as defined
 by <biblioref linkend="xml-serialization-31"/>.
 </para>
 
-<para>If the pipeline processor serializes the output on a port, it
-<rfc2119 feature="ser-must-use">must</rfc2119> use the serialization
-parameters specified. If the processor is not serializing (if, for
-example, the pipeline has been called from another pipeline), then
-serialization does not apply. The serialization parameter map is
-computed (and must therefore be statically and syntactically valid),
-but the processor <rfc2119 feature="ser-must-ignore">must not</rfc2119>
-raise an error if the output could not be serialized with those
-parameters.
-</para>
+        <para>If the pipeline processor serializes the output on a port, it <rfc2119 feature="ser-must-use">must</rfc2119> use the serialization parameters specified. If a
+            <code>serialization</code> document property is present, the serialization properties
+          specified by the <code>serialization</code> document property must be merged with the
+          properties specified with the <tag class="attribute">serialization</tag> attribute first.
+          For further details see the explanation of the <code>serialization</code> document
+          property in <xref linkend="document-properties"/>.</para>
+        <para>If the processor is not serializing (if, for example, the pipeline has been called
+          from another pipeline), then serialization does not apply. The serialization parameter map
+          is computed (and must therefore be statically and syntactically valid), but the processor
+            <rfc2119 feature="ser-must-ignore">must not</rfc2119> raise an error if the output could
+          not be serialized with those parameters. </para>
 
 <para><impl>The default value of any serialization parameters not specified on a particular output
             is <glossterm>implementation-defined</glossterm>.</impl> However if the serialization
@@ -6169,7 +6186,8 @@ element is interpreted depends on the document's content type and the
 
 <para><error code="D0054">It is a
 <glossterm>dynamic error</glossterm> if an encoding is specified
-and the content type is an <glossterm>XML media type</glossterm>.</error>
+and the content type is an <glossterm>XML media type</glossterm> or
+  an <glossterm>HTML media type</glossterm>.</error>
 </para>
 
 <para><error code="D0055">It is a <glossterm>dynamic error</glossterm>
@@ -6187,7 +6205,8 @@ if an encoding is specified and the content of the <tag>p:inline</tag>
 contains any XML markup.</error>
 <error code="D0063">It is a <glossterm>dynamic error</glossterm>
 if the <tag>p:inline</tag> contains any XML markup and has a
-content type that is not an <glossterm>XML media type</glossterm>.</error>
+content type that is not an <glossterm>XML media type</glossterm> or
+  an <glossterm>HTML media type</glossterm>.</error>
 In other words, in these cases, the entire content
 must be a single text node. CDATA sections and character references do
 not count as markup for this purpose because they will already have
@@ -6222,11 +6241,11 @@ depends on the document's content type.
   </note>
   
   <section xml:id="inline-xml-content">
-    <title>Inline XML content</title>
+    <title>Inline XML and HTML content</title>
     
     <para>If the <tag class="attribute">document-properties</tag> is not
       specified or the map does not contain a key "content-type" or specifies
-      an <glossterm>XML media type</glossterm>, then
+      an <glossterm>XML media type</glossterm> or an <glossterm>HTML media type</glossterm>, then
       the content is XML. A new XML document is created by wrapping a document node
       around the nodes which appear as children of <tag>p:inline</tag>. Any preceding or
       following whitespace-only text nodes will be discarded.</para>
@@ -7233,7 +7252,7 @@ Engineering Task Force. November, 1996.</bibliomixed>
 </section>
 </appendix>
 <appendix xmlns:db="http://docbook.org/ns/docbook" xml:id="glossary"><title>Glossary</title><glosslist><glossentry><glossterm>HTML media type</glossterm><glossdef><para>The
-“<literal>text/html</literal>” and “<literal>application/xhtml+xml</literal>
+  “<literal>text/html</literal>” and “<literal>application/xhtml+xml</literal>”
 media types
 are <firstterm baseform="HTML media type">HTML media types</firstterm>.
 </para></glossdef></glossentry><glossentry><glossterm>JSON media type</glossterm><glossdef><para>The
@@ -7287,10 +7306,12 @@ several subpipelines.</para></glossdef></glossentry><glossentry><glossterm>decla
             <firstterm>declared inputs</firstterm>.</para></glossdef></glossentry><glossentry><glossterm>declared outputs</glossterm><glossdef><para>The output ports declared on a step are its
             <firstterm>declared outputs</firstterm>.</para></glossdef></glossentry><glossentry><glossterm>default readable port</glossterm><glossdef><para>The
                 <firstterm>default readable port</firstterm>, which may be undefined, is a specific
-              step name/port name pair from the set of readable ports.</para></glossdef></glossentry><glossentry><glossterm>document</glossterm><glossdef><para>A <firstterm>document</firstterm> is a
-<glossterm>representation</glossterm> and its
-<glossterm>document properties</glossterm>.</para></glossdef></glossentry><glossentry><glossterm>document properties</glossterm><glossdef><para>The <firstterm>document properties</firstterm> are exposed to the XProc pipeline
-        as a map (<code>map(xs:QName, item()*)</code>).</para></glossdef></glossentry><glossentry><glossterm>dynamic
+              step name/port name pair from the set of readable ports.</para></glossdef></glossentry><glossentry><glossterm>document</glossterm><glossdef><para>A
+          <firstterm>document</firstterm> is a <glossterm>representation</glossterm> and its
+          <glossterm>document properties</glossterm>.</para></glossdef></glossentry><glossentry><glossterm>document
+properties</glossterm><glossdef><para>The <firstterm>document
+properties</firstterm> are key/value pairs; they are exposed to the
+XProc pipeline as a map (<code>map(xs:QName, item()*)</code>).</para></glossdef></glossentry><glossentry><glossterm>dynamic
       error</glossterm><glossdef><para>A <firstterm>dynamic
       error</firstterm> is one which occurs while a pipeline is being
       evaluated (and cannot be detected before evaluation begins).</para></glossdef></glossentry><glossentry><glossterm>dynamic evaluation</glossterm><glossdef><para><firstterm baseform="dynamic evaluation">Dynamic
@@ -7351,9 +7372,12 @@ the <tag>p:input</tag>, <tag>p:output</tag>, and <tag>p:option</tag> elements.
 The prologue may also contain <tag>p:variable</tag> elements, but if it does,
 they must be declared statically.</para></glossdef></glossentry><glossentry><glossterm>readable
                 ports</glossterm><glossdef><para>The <firstterm>readable
-                ports</firstterm> are a set of step name/port name pairs.</para></glossdef></glossentry><glossentry><glossterm>representation</glossterm><glossdef><para>A <firstterm>representation</firstterm>
-is a data structure used by an XProc processor to refer to the actual
-document content.</para></glossdef></glossentry><glossentry><glossterm>shadow</glossterm><glossdef><para>We
+                ports</firstterm> are a set of step name/port name pairs.</para></glossdef></glossentry><glossentry><glossterm>representation</glossterm><glossdef><para>A <firstterm>representation</firstterm> is a data structure used by an XProc processor to
+        refer to the actual document content.</para></glossdef></glossentry><glossentry><glossterm>selection pattern</glossterm><glossdef><para>A <firstterm>selection pattern</firstterm> uses a
+            subset of the syntax for path expressions, and is defined to match a node if the
+            corresponding path expression would select the node. It is defined as in the 
+            <link xlink:href="https://www.w3.org/TR/xslt-30/#dt-selection-pattern">XSLT 3.0
+              specification</link>.</para></glossdef></glossentry><glossentry><glossterm>shadow</glossterm><glossdef><para>We
           say that a variable <firstterm baseform="shadow">shadows</firstterm> another variable (or option) if it has
           the same name and appears later in the same lexical scope.</para></glossdef></glossentry><glossentry><glossterm>signature</glossterm><glossdef><para>The <firstterm>signature</firstterm> of a step is the set
           of inputs, outputs, and options that it is declared to accept.</para></glossdef></glossentry><glossentry><glossterm>static analysis</glossterm><glossdef><para><firstterm baseform="static analysis">Static
@@ -7979,6 +8003,9 @@ draft:</para>
         <para>Content type shortcuts and the notion of forbidden content types have been added.
         See <xref linkend="specified-content-types"/>.
         </para>
+      </listitem>
+      <listitem>
+        <para>Introduction of the <code>serialization</code> document property. See <xref linkend="document-properties"/>.</para>
       </listitem>
     </itemizedlist>
 </appendix>
