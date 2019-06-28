@@ -269,6 +269,7 @@ Step-set-attributes =
     use-when.attr?,
     step.attributes,
     attribute match { xsd:string }?,
+    attribute attributes { xsd:string }?,
     (WithInput* & WithOption* & (Documentation|PipeInfo)*)
   }
 
@@ -481,8 +482,7 @@ Step-www-form-urlencode =
     use-when.attr?,
     step.attributes,
     attribute parameters { xsd:string }?,
-    attribute match { xsd:string }?,
-    (WithInput* & WithOption* & (Documentation|PipeInfo)*)
+    (WithOption* & (Documentation|PipeInfo)*)
   }
 
 Step-xinclude =
