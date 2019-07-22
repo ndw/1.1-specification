@@ -3699,18 +3699,29 @@ port</glossterm>. If the <tag>p:viewport</tag> input is a sequence,
 each document in the sequence is processed in turn producing a sequence
 on the output.</para>
 
-<para>The <tag class="attribute">match</tag> attribute specifies
-  an XSLT <glossterm>selection pattern</glossterm>. Each matching node in the source document is wrapped in a document
-        node, as necessary, and provided, one at a time, to the viewport's
-          <glossterm>subpipeline</glossterm> on a port named <port>current</port>. The base URI of
-        the resulting document that is passed to the subpipeline is the base URI of the matched
-        element or document. <error code="D0010">It is a <glossterm>dynamic error</glossterm> if the
-            <tag class="attribute">match</tag> expression on <tag>p:viewport</tag> does not match an
-          element or document.</error>
-      </para>
-<para>After a match is found, the entire subtree rooted at that match is processed as a
-        unit. No further attempts are made to match nodes among the descendants of any matched
-        node.</para>
+<para>The <tag class="attribute">match</tag> attribute specifies an
+XSLT <glossterm>selection pattern</glossterm>. Each matching node in
+the source document is wrapped in a document node, as necessary, and
+provided, one at a time, to the viewport's
+<glossterm>subpipeline</glossterm> on a port named
+<port>current</port>. The base URI of the resulting document that is
+passed to the subpipeline is the base URI of the matched element or
+document. <error code="D0010">It is a <glossterm>dynamic
+error</glossterm> if the <tag class="attribute">match</tag> expression
+on <tag>p:viewport</tag> does not match an element or
+document.</error></para>
+
+<note>
+<para>The <tag class="attribute">match</tag> attribute on
+<tag>p:viewport</tag> is a selection pattern and may contain references
+to in-scope variables and options, but it is
+not an <glossterm>attribute value template</glossterm>.
+</para>
+</note>
+
+<para>After a match is found, the entire subtree rooted at that match
+is processed as a unit. No further attempts are made to match nodes
+among the descendants of any matched node.</para>
 <para>The environment inherited by the <glossterm>contained steps</glossterm> of
         a <tag>p:viewport</tag> is the <glossterm>inherited environment</glossterm> with these
         modifications:</para><itemizedlist>
@@ -3850,11 +3861,11 @@ The context item is specified as a <glossterm>connection</glossterm>
 in the <tag>p:with-input</tag>. If no explicit connection is provided,
 the <glossterm>default readable port</glossterm> is used. If the
 context item is connected to <tag>p:empty</tag>, or is connected to
-more than one document, or is unconnected and
-the <glossterm>default readable port</glossterm> is undefined, the
-  context item is undefined. <error code="D0001">It is a <glossterm>dynamic error</glossterm>
-    if the XPath expression makes use of the context item, but the context item is
-    undefined.</error>
+more than one document, or is unconnected and the <glossterm>default
+readable port</glossterm> is undefined, the context item is undefined.
+<error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
+XPath expression makes reference to the context item, size, or position when
+the context item is undefined.</error>
 </para>
 
 <para>Each conditional <glossterm>subpipeline</glossterm> is
@@ -3901,9 +3912,9 @@ for the <tag>p:with-input</tag>. If no context is specified on the
 <tag>p:when</tag>, the context of the <tag>p:choose</tag> is
 used. The context item is undefined if the connection or
 the context of the <tag>p:choose</tag> provides no or more than one document.
-<error code="D0001">It is a <glossterm>dynamic error</glossterm>
-    if the XPath expression makes use of the context item, but the context item is
-    undefined.</error></para>
+<error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
+XPath expression makes reference to the context item, size, or position when
+the context item is undefined.</error></para>
 <para>If the <tag class="attribute">collection</tag> attribute has the value true,
 then the default collection will contain all of the documents that appeared
 on that input and the context item will be undefined.
@@ -3972,9 +3983,9 @@ for the <tag>p:with-input</tag>. If no context is specified on the
 <glossterm>default readable port</glossterm>. If no context is specified and
 there is no default readable port, the context item is undefined. The context
 item is also undefined, if no or more than one document is provided. 
-<error code="D0001">It is a <glossterm>dynamic error</glossterm>
-  if the XPath expression makes use of the context item, but the context item is
-  undefined.</error></para>
+<error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
+XPath expression makes reference to the context item, size, or position when
+the context item is undefined.</error></para>
 
 <para>If the <tag class="attribute">collection</tag> attribute has the value true,
 then the default collection will contain all of the documents that appeared
@@ -5381,10 +5392,9 @@ specified. If they are not specified, the context item comes from the
 readable port</glossterm> exists, the context item is
 undefined.</para>
 
-<para><error code="D0026">It is a <glossterm>dynamic error</glossterm> if
-the <tag class="attribute">select</tag> expression makes reference to
-the context node, size, or position when the context item is
-undefined.</error>
+<para><error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
+XPath expression makes reference to the context item, size, or position when
+the context item is undefined.</error>
 <error code="D0065">It is a <glossterm>dynamic error</glossterm>
 to refer to the context item, size, or position if a sequence of documents
 appears on the connection that provides the context.</error>
@@ -5494,9 +5504,9 @@ expression on the <tag>p:declare-step</tag> that defines the step
 signature. It must be a statically valid expression at that point.
 Consequently, if it contains variable references, they can only be
 references to preceding options on the step.
-<error code="D0026">It is a <glossterm>dynamic error</glossterm> if
-the <tag class="attribute">select</tag> expression makes reference to
-the context node, size, or position.</error></para>
+<error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
+XPath expression makes reference to the context item, size, or position when
+the context item is undefined.</error></para>
 
 <para><impl>The precise details about what XPath expressions are allowed
 (for example, can the expression declare a function) is
@@ -5640,10 +5650,9 @@ If no <glossterm>default
 readable port</glossterm> exists, the context item is
 undefined.</para>
 
-<para><error code="D0026">It is a <glossterm>dynamic error</glossterm> if
-the <tag class="attribute">select</tag> expression makes reference to
-the context node, size, or position when the context item is
-undefined.</error>
+<para><error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
+XPath expression makes reference to the context item, size, or position when
+the context item is undefined.</error>
 <error code="D0065">It is a <glossterm>dynamic error</glossterm>
 to refer to the context item, size, or position if a sequence of documents
 appears on the connection that provides the context.</error>
