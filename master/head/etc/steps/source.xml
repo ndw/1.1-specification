@@ -1,4 +1,4 @@
-<specification xmlns="http://docbook.org/ns/docbook" xmlns:cs="http://www.w3.org/XML/XProc/2006/04/components#" xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax" xmlns:p="http://www.w3.org/ns/xproc" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="steps" class="ed" version="5.0-extension w3c-xproc">
+<specification xmlns:cs="http://www.w3.org/XML/XProc/2006/04/components#" xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax" xmlns:p="http://www.w3.org/ns/xproc" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://docbook.org/ns/docbook" xml:id="steps" class="ed" version="5.0-extension w3c-xproc">
 <info>
 <title>XProc 3.0: Standard Step Library</title>
 <!-- defaults to date formatted <pubdate>2014-12-18</pubdate> -->
@@ -303,9 +303,9 @@ element's [base URI].</para>
     <p:input port="archive" content-types="application/*" sequence="true"/>
     <p:output port="result" primary="true" content-types="application/*" sequence="false"/>
     <p:output port="report" content-types="application/xml" sequence="false"/>
-    <p:option name="format" as="xs:QName" required="false" select="'zip'"/>
-    <p:option name="relative-to" as="xs:anyURI" required="false"/>
-    <p:option name="parameters" as="map(xs:Qname, item()*)" required="false"/>
+    <p:option name="format" as="xs:QName" select="'zip'"/>
+    <p:option name="relative-to" as="xs:anyURI?"/>
+    <p:option name="parameters" as="map(xs:Qname, item()*)?"/>
   </p:declare-step>
 
   <para>The <code>p:archive</code> step can perform several different operations on archives. The
@@ -621,8 +621,8 @@ element's [base URI].</para>
   <p:declare-step type="p:archive-manifest">
     <p:input port="source" primary="true" content-types="*/*" sequence="false"/>
     <p:output port="result" primary="true" content-types="application/xml" sequence="false"/>
-    <p:option name="format" as="xs:QName?" required="false"/>
-    <p:option name="parameters" as="map(xs:Qname, item()*)" required="false"/>
+    <p:option name="format" as="xs:QName?"/>
+    <p:option name="parameters" as="map(xs:Qname, item()*)?"/>
   </p:declare-step>
 
   <para>The <code>p:archive-manifest</code> step inspects the archive appearing on its
@@ -2284,8 +2284,8 @@ use of a namespace in a document to a new IRI value.</para>
  <p:declare-step type="p:namespace-rename">
    <p:input port="source" content-types="xml html"/>
    <p:output port="result" content-types="xml html"/>
-   <p:option name="from" as="xs:anyURI"/>
-   <p:option name="to" as="xs:anyURI"/>
+   <p:option name="from" as="xs:anyURI?"/>
+   <p:option name="to" as="xs:anyURI?"/>
    <p:option name="apply-to" as="xs:token" select="'all'" values="('all','elements','attributes')"/>
 </p:declare-step>
 
@@ -2571,7 +2571,7 @@ properties on the source document.</para>
    <p:input port="source" content-types="any"/>
    <p:output port="result" content-types="any"/>
    <p:option name="properties" required="true" as="map(xs:QName,item()*)"/>
-   <p:option name="merge" default="false()" as="xs:boolean"/>
+   <p:option name="merge" select="false()" as="xs:boolean"/>
 </p:declare-step>
 
  <para>The document properties of the document
@@ -2827,10 +2827,10 @@ the string value of the <option>replace</option> expression.</para>
   <p:declare-step type="p:text-join">
     <p:output port="source" primary="true" sequence="true" content-types="text"/>
     <p:output port="result" primary="true" sequence="false" content-types="text/plain"/>
-    <p:option name="separator" required="false" as="xs:string"/>
-    <p:option name="prefix" required="false" as="xs:string"/>
-    <p:option name="suffix" required="false" as="xs:string"/>
-    <p:option name="override-content-type" required="false" as="xs:string"/>
+    <p:option name="separator" as="xs:string?"/>
+    <p:option name="prefix" as="xs:string?"/>
+    <p:option name="suffix" as="xs:string?"/>
+    <p:option name="override-content-type" as="xs:string?"/>
   </p:declare-step>
   
   <para>The <code>p:text-join</code> step concatenates the text documents appearing on its <port>source</port> port
@@ -2873,7 +2873,7 @@ the string value of the <option>replace</option> expression.</para>
     <p:output port="result" primary="true" sequence="false" content-types="text"/>
     <p:option name="pattern" required="true" as="xs:string"/>
     <p:option name="replacement" required="true" as="xs:string"/>
-    <p:option name="flags" required="false" as="xs:string"/>
+    <p:option name="flags" as="xs:string?"/>
   </p:declare-step>
 
   <para>The <code>p:text-replace</code> step replaces all occurrences of substrings in the text document appearing on
@@ -2899,12 +2899,12 @@ the string value of the <option>replace</option> expression.</para>
   <p:declare-step type="p:text-sort">
     <p:input port="source" primary="true" sequence="false" content-types="text"/>
     <p:output port="result" primary="true" sequence="false" content-types="text"/>
-    <p:option name="order" required="false" as="xs:string" select="'ascending'" values="('ascending', 'descending')"/>
-    <p:option name="case-order" required="false" as="xs:string" values="('upper-first', 'lower-first')"/>
-    <p:option name="lang" required="false" as="xs:language"/>
-    <p:option name="data-type" required="false" as="xs:string" select="'text'" values="('text', 'number')"/>
-    <p:option name="collation" required="false" as="xs:string" select="'https://www.w3.org/2005/xpath-functions/collation/codepoint'"/>
-    <p:option name="stable" required="false" as="xs:boolean" select="true()"/>
+    <p:option name="order" as="xs:string" select="'ascending'" values="('ascending', 'descending')"/>
+    <p:option name="case-order" as="xs:string?" values="('upper-first', 'lower-first')"/>
+    <p:option name="lang" as="xs:language?"/>
+    <p:option name="data-type" as="xs:string" select="'text'" values="('text', 'number')"/>
+    <p:option name="collation" as="xs:string" select="'https://www.w3.org/2005/xpath-functions/collation/codepoint'"/>
+    <p:option name="stable" as="xs:boolean" select="true()"/>
   </p:declare-step>
 
   <para>The <tag>p:text-sort</tag> step sorts the lines in the text document appearing on its <port>source</port> port
@@ -2996,10 +2996,10 @@ the string value of the <option>replace</option> expression.</para>
   <p:declare-step type="p:unarchive">
     <p:input port="source" primary="true" content-types="*/*" sequence="false"/>
     <p:output port="result" primary="true" content-types="*/*" sequence="true"/>
-    <p:option name="include-filter" as="xs:string*" e:type="RegularExpression" required="false"/>
-    <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression" required="false"/>
-    <p:option name="format" as="xs:QName" required="false"/>
-    <p:option name="parameters" as="map(xs:Qname, item()*)" required="false"/>
+    <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
+    <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
+    <p:option name="format" as="xs:QName?"/>
+    <p:option name="parameters" as="map(xs:Qname, item()*)?"/>
   </p:declare-step>
 
   <para>The format of the archive is determined as follows:</para>
@@ -3709,7 +3709,9 @@ to determine what version to use, including, but not limited to,
 examining the version of the stylesheet.</para>
 
 <para>The XSLT stylesheet provided on the <port>stylesheet</port> port
-is applied to the document on the <port>source</port> port. Any
+is applied to the document on the <port>source</port> port. <error code="C0093">
+It is a <glossterm>dynamic error</glossterm> if a static error occurs during 
+the static analysis of the XSLT stylesheet.</error> Any
 parameters passed in the <option>parameters</option> option are used
 to define top-level stylesheet parameters. The primary result document
 of the transformation, if there is one, appears on the
@@ -3727,17 +3729,18 @@ primary input document. The whole sequence is also the default
 collection.
 If no documents are provided on the <port>source</port> port,
 the primary input document is undefined and the default collection
-is empty.
+is empty.<error code="C0094">It is a <glossterm>dynamic error</glossterm> if 
+any document supplied on the source port is not an XML document, 
+an HTML documents, or a Text document if XSLT 2.0 is used.</error>
 <error code="C0039">It is a
-<glossterm>dynamic error</glossterm> if a sequence of documents (including
-an empty sequence) is provided
-to an XSLT 1.0 step.</error>
+<glossterm>dynamic error</glossterm> if the source port does not contain
+exactly one XML document or one HTML document if XSLT 1.0 is used.</error>
 </para>
 
-<para>A dynamic error occurs if the XSLT processor signals a fatal
-error. This includes the case where the transformation terminates due
-to a <tag>xsl:message</tag> instruction with a <tag class="attribute">terminate</tag> attribute value of
-“<literal>yes</literal>”. <impl>How XSLT message termination
+<para><error code="C0094">It is a <glossterm>dynamic error</glossterm> if 
+an error occurred during the transformation.</error> <error code="C0095">It
+is a <glossterm>dynamic error</glossterm> if the transformation is terminated 
+by XSLT message termination.</error> <impl>How XSLT message termination
 errors are reported to the XProc processor is
 <glossterm>implementation-dependent</glossterm>.</impl>
 Implementations <rfc2119>should</rfc2119> raise an error using the error code
