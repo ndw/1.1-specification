@@ -51,6 +51,7 @@
          <tocentry role="section" xml:id="c.load.html">Loading HTML data</tocentry>
          <tocentry role="section" xml:id="c.load.binary">Loading binary data</tocentry>
       </tocdiv>
+      <tocentry role="section" xml:id="c.json-join">p:json-join</tocentry>
       <tocentry role="section" xml:id="c.make-absolute-uris">p:make-absolute-uris</tocentry>
       <tocentry role="section" xml:id="c.namespace-rename">p:namespace-rename</tocentry>
       <tocentry role="section" xml:id="c.pack">p:pack</tocentry>
@@ -82,7 +83,12 @@
          <tocentry role="section" xml:id="example-xquery">Example</tocentry>
          <tocentry role="section">Document properties</tocentry>
       </tocdiv>
-      <tocentry role="section" xml:id="c.xslt">p:xslt</tocentry>
+      <tocdiv role="section" xml:id="c.xslt">
+         <title>p:xslt</title>
+         <tocentry role="section">Invoking an XSLT 3.0 stylesheet</tocentry>
+         <tocentry role="section">Invoking an XSLT 2.0 stylesheet</tocentry>
+         <tocentry role="section">Invoking an XSLT 1.0 stylesheet</tocentry>
+      </tocdiv>
    </tocdiv>
    <tocentry role="section" xml:id="errors">Step Errors</tocentry>
    <tocdiv role="appendix" xml:id="conformance">

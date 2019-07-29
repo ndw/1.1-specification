@@ -78,8 +78,8 @@
       <p:option name="path" required="true" as="xs:anyURI"/>
       <p:option name="detailed" as="xs:boolean" select="false()"/>
       <p:option name="max-depth" as="xs:string?" select="'1'"/>
-      <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
-      <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
+      <p:option name="include-filter" as="xs:string*"/>
+      <p:option name="exclude-filter" as="xs:string*"/>
    </p:declare-step>
    <p:declare-step type="p:error" xml:id="error">
       <p:input port="source" sequence="true" content-types="text xml"/>
@@ -153,6 +153,11 @@
       <p:option name="parameters" as="xs:string"/>
       <p:option name="content-type" as="xs:string?"/>
       <p:option name="document-properties" as="xs:string"/>
+   </p:declare-step>
+   <p:declare-step type="p:json-join" xml:id="json-join">
+      <p:input port="source" sequence="true" content-types="json"/>
+      <p:output port="result" content-types="application/json"/>
+      <p:option name="flatten-arrays" as="xs:boolean" select="false()"/>
    </p:declare-step>
    <p:declare-step type="p:make-absolute-uris" xml:id="make-absolute-uris">
       <p:input port="source" content-types="xml html"/>
@@ -279,7 +284,7 @@
       <p:output port="result"
                 primary="true"
                 sequence="false"
-                content-types="text/plain"/>
+                content-types="text"/>
       <p:option name="separator" as="xs:string?"/>
       <p:option name="prefix" as="xs:string?"/>
       <p:option name="suffix" as="xs:string?"/>
@@ -422,10 +427,11 @@
       <p:input port="stylesheet" content-types="xml"/>
       <p:output port="result"
                 primary="true"
-                sequence="false"
+                sequence="true"
                 content-types="any"/>
-      <p:output port="secondary" sequence="true" content-types="*/*"/>
+      <p:output port="secondary" sequence="true" content-types="any"/>
       <p:option name="parameters" as="xs:string"/>
+      <p:option name="global-context-item" as="xs:string"/>
       <p:option name="initial-mode" as="xs:QName?"/>
       <p:option name="template-name" as="xs:QName?"/>
       <p:option name="output-base-uri" as="xs:anyURI?"/>
