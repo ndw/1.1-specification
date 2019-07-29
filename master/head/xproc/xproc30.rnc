@@ -726,6 +726,7 @@ StandardStep =
   | Step-insert
   | Step-label-elements
   | Step-load
+  | Step-json-join
   | Step-make-absolute-uris
   | Step-namespace-rename
   | Step-pack
@@ -1130,6 +1131,15 @@ Step-load =
     attribute document-properties { xsd:string }?,
     (WithOption* & (Documentation | PipeInfo)*)
   }
+Step-json-join =
+  element json-join {
+    name.ncname.attr?,
+    common.attributes,
+    use-when.attr?,
+    step.attributes,
+    attribute flatten-arrays { xsd:boolean }?,
+    (WithInput* & WithOption* & (Documentation | PipeInfo)*)
+  }
 Step-make-absolute-uris =
   element make-absolute-uris {
     name.ncname.attr?,
@@ -1409,6 +1419,7 @@ Step-xslt =
     use-when.attr?,
     step.attributes,
     attribute parameters { xsd:string }?,
+    attribute global-context-item { xsd:string }?,
     attribute initial-mode { xsd:QName? }?,
     attribute template-name { xsd:QName? }?,
     attribute output-base-uri { xsd:anyURI? }?,

@@ -181,6 +181,11 @@
                 values="('first-child','last-child','before','after')"
                 select="'after'"/>
    </p:declare-step>
+   <p:declare-step type="p:json-join" xml:id="json-join">
+      <p:input port="source" sequence="true" content-types="json"/>
+      <p:output port="result" content-types="application/json"/>
+      <p:option name="flatten-arrays" as="xs:boolean" select="false()"/>
+   </p:declare-step>
    <p:declare-step type="p:label-elements" xml:id="label-elements">
       <p:input port="source" content-types="xml html"/>
       <p:output port="result" content-types="xml html"/>
@@ -561,10 +566,11 @@
       <p:input port="stylesheet" content-types="xml"/>
       <p:output port="result"
                 primary="true"
-                sequence="false"
+                sequence="true"
                 content-types="any"/>
-      <p:output port="secondary" sequence="true" content-types="*/*"/>
+      <p:output port="secondary" sequence="true" content-types="any"/>
       <p:option name="parameters" as="xs:string"/>
+      <p:option name="global-context-item" as="xs:string"/>
       <p:option name="initial-mode" as="xs:QName?"/>
       <p:option name="template-name" as="xs:QName?"/>
       <p:option name="output-base-uri" as="xs:anyURI?"/>
