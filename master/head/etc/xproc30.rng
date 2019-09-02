@@ -3843,6 +3843,11 @@
       </optional>
       <ref name="step.attributes"/>
       <optional>
+        <attribute name="sort-key">
+          <data type="string"/>
+        </attribute>
+      </optional>
+      <optional>
         <attribute name="order">
           <choice>
             <value>ascending</value>
@@ -3863,14 +3868,6 @@
           <optional>
             <data type="language"/>
           </optional>
-        </attribute>
-      </optional>
-      <optional>
-        <attribute name="data-type">
-          <choice>
-            <value>text</value>
-            <value>number</value>
-          </choice>
         </attribute>
       </optional>
       <optional>

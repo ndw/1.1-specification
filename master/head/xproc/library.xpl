@@ -20,13 +20,13 @@
    <p:declare-step type="p:archive" xml:id="archive">
       <p:input port="source"
                primary="true"
-               content-types="*/*"
+               content-types="any"
                sequence="true"/>
       <p:input port="manifest" content-types="application/xml" sequence="true"/>
-      <p:input port="archive" content-types="application/*" sequence="true"/>
+      <p:input port="archive" content-types="any" sequence="true"/>
       <p:output port="result"
                 primary="true"
-                content-types="application/*"
+                content-types="any"
                 sequence="false"/>
       <p:output port="report" content-types="application/xml" sequence="false"/>
       <p:option name="format" as="xs:QName" select="'zip'"/>
@@ -36,7 +36,7 @@
    <p:declare-step type="p:archive-manifest" xml:id="archive-manifest">
       <p:input port="source"
                primary="true"
-               content-types="*/*"
+               content-types="any"
                sequence="false"/>
       <p:output port="result"
                 primary="true"
@@ -402,6 +402,10 @@
                 primary="true"
                 sequence="false"
                 content-types="text"/>
+      <p:option name="sort-key"
+                as="xs:string"
+                select="'.'"
+                e:type="XPathExpression"/>
       <p:option name="order"
                 as="xs:string"
                 select="'ascending'"
@@ -410,10 +414,6 @@
                 as="xs:string?"
                 values="('upper-first', 'lower-first')"/>
       <p:option name="lang" as="xs:language?"/>
-      <p:option name="data-type"
-                as="xs:string"
-                select="'text'"
-                values="('text', 'number')"/>
       <p:option name="collation"
                 as="xs:string"
                 select="'https://www.w3.org/2005/xpath-functions/collation/codepoint'"/>
@@ -433,11 +433,11 @@
    <p:declare-step type="p:unarchive" xml:id="unarchive">
       <p:input port="source"
                primary="true"
-               content-types="*/*"
+               content-types="any"
                sequence="false"/>
       <p:output port="result"
                 primary="true"
-                content-types="*/*"
+                content-types="any"
                 sequence="true"/>
       <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
       <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
