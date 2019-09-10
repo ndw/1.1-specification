@@ -673,17 +673,17 @@ etc.
     <section>
       <title>Creating documents from XDM step results</title>
       <para>Some steps like <tag>p:xslt</tag>, <tag>p:xquery</tag> etc. create a sequence of new XDM
-        instances. Every item in such a sequence is converted into a <emphasis>separate</emphasis>
+        instances. Values in such a sequence can be of any XDM type (except attribute). Every item in such a sequence is converted into a <emphasis>separate</emphasis>
         document that will appear on the output port of that particular step. The following rules
         apply to each of the items in the output sequence:</para>
       <itemizedlist>
         <listitem>
-          <para>If the item is a single text node, it is wrapped in a document node and the
+          <para>If the item is a text node, it is wrapped in a document node and the
             document's content-type is <literal>text/plain</literal>.</para>
         </listitem>
         <listitem>
-          <para>If the item is any other node (except for a document node), a document node is
-            wrapped around the node and the document's content-type is
+          <para>If the item is an element, comment or processing-instruction node, a document node is
+            wrapped around the node and the document's content-type is set to
               <literal>application/xml</literal>.</para>
         </listitem>
         <listitem>
@@ -701,7 +701,6 @@ etc.
           </note>
         </listitem>
       </itemizedlist>
-      
     </section>
 
 <section xml:id="specified-content-types">
@@ -2485,7 +2484,7 @@ Variable names are always expressed as
       <para>The values of static options are computed during <link linkend="initiating">static
           analysis</link>.</para>
 
-      <para>XProc defines a single, global namespace for static options. Every static option must have exactly one
+      <para>XProc defines a single, global scope for static options. Every static option must have exactly one
       in-scope declaration.</para>
     </section>
 
@@ -2785,25 +2784,8 @@ measure of where it is available in a pipeline. <termdef xml:id="dt-visible">If 
 they are <firstterm>visible</firstterm> to each other.
 </termdef></para>
 
-    <para>Six kinds of things are named in XProc:</para>
-    <orderedlist spacing="compact">
-      <listitem>
-        <simpara>Step types,</simpara>
-      </listitem>
-      <listitem>
-        <simpara>Steps,</simpara>
-      </listitem>
-      <listitem>
-        <simpara>Input ports,</simpara>
-      </listitem>
-      <listitem>
-        <simpara>Output ports,</simpara>
-      </listitem>
-      <listitem>
-        <simpara>Options and variables</simpara>
-      </listitem>
-    </orderedlist>
-
+<section>
+  <title>Scoping of step type names</title>
       <para>The scope of the names of the step types is the pipeline in which they are declared,
         including any declarations imported from libraries via <tag>p:import</tag>. Nested pipelines
         inherit the step types in scope for their parent.</para>
@@ -2860,30 +2842,51 @@ they are <firstterm>visible</firstterm> to each other.
       <para><error code="S0036">All the step types in a pipeline or library <rfc2119>must</rfc2119>
           have unique names: it is a <glossterm>static error</glossterm> if any step type name is
           built-in and/or declared or defined more than once in the same scope.</error></para>
-
-<para>The scope of the names of the steps themselves is determined by
+</section>
+      
+<section>
+  <title>Scoping of step names</title>
+<para>The scope of the names of the steps (the values of the step's <code>name</code> attributes) is determined by
 the <glossterm>environment</glossterm> of each step. In general, the
 name of a step, the names of its sibling steps, the names of any steps
 that it contains directly, the names of its ancestors, and the names
 of the siblings of its ancestors are all in a common scope. <error code="S0002">All steps in the same scope <rfc2119>must</rfc2119> have
 unique names: it is a <glossterm>static error</glossterm> if two steps
 with the same name appear in the same scope.</error></para>
-
+</section>
+<section>
+  <title>Scoping of port names</title>
 <para>The scope of an input or output port name is the step on which
 it is defined. The names of all the ports on any step
 <rfc2119>must</rfc2119> be unique.</para>
-
-<para>Taken together, these uniqueness constraints guarantee that the
+      
+<para>Taken together with the scoping of step names, these uniqueness constraints guarantee that the
 combination of a step name and a port name uniquely identifies exactly
 one port on exactly one in-scope step.</para>
-
-<para>The scope of option and variable names is determined by where
-they are declared. When an option is declared with <tag>p:option</tag>
-(or a variable with <tag>p:variable</tag>), unless otherwise
-specified, its scope consists of the sibling elements that follow its
+</section>
+      
+<section>
+  <title>Scoping of non-static options and variables</title>
+<para>The scope of non-static option and variable names is determined by where
+they are declared. Their scope consists of the sibling elements that follow its
 declaration and the descendants of those siblings.
 </para>
+<para>Non-static options and variables declared in parent step declarations are not visible in child step declarations.</para>
 </section>
+      
+<section>
+  <title>Scoping of static options</title>
+
+  <note role="editorial">
+    <title>TBD</title>
+    <para>Fill in this section as soon as we have consensus about this</para>
+  </note>
+</section>
+      
+</section>
+    
+  
+  
     <section xml:id="xml-base-attribute">
       <title>Base URIs and xml:base</title>
 
@@ -3691,9 +3694,9 @@ with the <link linkend="dt-standard-modifications">standard modifications</link>
 <title>p:viewport</title>
 
 <para>A viewport is specified by the <tag>p:viewport</tag> element. It
-is a <glossterm>compound step</glossterm> that processes a single XML
-document, applying its <glossterm>subpipeline</glossterm> to one or
-more subtrees of the document. </para>
+is a <glossterm>compound step</glossterm> that processes single XML or 
+HTML documents, applying its <glossterm>subpipeline</glossterm> to one or
+more subtrees of each document in turn.</para>
 
 <e:rng-pattern name="Viewport"/>
 
@@ -3707,7 +3710,9 @@ the results of applying the subpipeline to them.</para>
 then the viewport source is read from the <glossterm>default readable
 port</glossterm>. If the <tag>p:viewport</tag> input is a sequence,
 each document in the sequence is processed in turn producing a sequence
-on the output.</para>
+on the output. <error code="D0072">It is a <glossterm>dynamic error</glossterm>
+if a document appearing on the input port of <tag>p:viewport</tag> is neither 
+an XML document nor an HTML document.</error></para>
 
 <para>The <tag class="attribute">match</tag> attribute specifies an
 XSLT <glossterm>selection pattern</glossterm>. Each matching node in
@@ -3718,8 +3723,7 @@ provided, one at a time, to the viewport's
 passed to the subpipeline is the base URI of the matched element or
 document. <error code="D0010">It is a <glossterm>dynamic
 error</glossterm> if the <tag class="attribute">match</tag> expression
-on <tag>p:viewport</tag> does not match an element or
-document.</error></para>
+on <tag>p:viewport</tag> matches an attribute or a namespace node.</error></para>
 
 <note>
 <para>The <tag class="attribute">match</tag> attribute on
@@ -3753,21 +3757,34 @@ among the descendants of any matched node.</para>
 <para>What appears on the output from the <tag>p:viewport</tag> will
         be a copy of the input document where each matching node is replaced by the result of
         applying the subpipeline to the subtree rooted at that node. In other words, if the 
-        <glossterm>selection pattern</glossterm> matches a particular element then that element is wrapped in a document node and
+        <glossterm>selection pattern</glossterm> matches a particular node then that 
+        node is wrapped in a document node and
         provided on the <port>current</port> port, the subpipeline in the <tag>p:viewport</tag> is
         evaluated, and the result that appears on the <port>output</port> port replaces the matched
-        element. </para>
+        node.</para>
+<para>If a document resulting from applying the subpipeline to the matched node is an XML document, 
+an HTML document, or a text document, all child nodes of the document node will be used to replace 
+the matched node. <error code="D0073">It is a <glossterm>dynamic error</glossterm> if the document 
+returned by applying the subpipeline to the matched node is not an XML document, an HTML document, 
+or a text document.</error>
+</para>
 <para>If no documents appear on the <port>output</port> port, the matched
-        element will effectively be deleted. If exactly one document appears, the contents of that
-        document will replace the matched element. If a sequence of documents appears, then the
+        node will effectively be deleted. If exactly one document appears, the contents of that
+        document will replace the matched node. If a sequence of documents appears, then the
         contents of each document in that sequence (in the order it appears in the sequence) will
-        replace the matched element.</para>
+        replace the matched node.</para>
 <para>The output of the <tag>p:viewport</tag> itself is a
-        single document that appears on a port named “<literal>result</literal>”. Note that the
+        sequence of documents that appear on a port named “<literal>result</literal>”. Note that the
         semantics of <tag>p:viewport</tag> are special. The <port>output</port> port in the
           <tag>p:viewport</tag> is used only to access the results of the subpipeline. The output of
         the step itself appears on a port with the fixed name “<literal>result</literal>” that is
-        never explicitly declared.</para><section xml:id="viewport-xpath-context">
+        never explicitly declared.</para>
+<para>For the documents appearing on port <port>result</port> all document properties will be preserved,
+except when option <option>match</option> matches a document node and the result from applying the 
+  subpipeline to the document node is a (sequence of) text document(s). In this case the content-type 
+  property is changed  to “<literal>text/plain</literal>” and the serialization property is removed, 
+  while all other document properties are preserved.</para>  
+  <section xml:id="viewport-xpath-context">
         <title>XPath Context</title>
         <para>Within a <tag>p:viewport</tag>, the <function>p:iteration-position</function> and
             <function>p:iteration-size</function> are taken from the sequence of documents that will
@@ -5724,9 +5741,8 @@ elements that declare additional steps.</para>
 </orderedlist>
 
 <para>Options in the prologue may not shadow each other.
-<error code="S0091">It is a <glossterm>static error</glossterm> if a
-<tag>p:option</tag> declared before the
-subpipeline begins shadows another option declared within
+<error code="S0091">It is a <glossterm>static error</glossterm> if an
+<tag>p:option</tag> shadows another option declared within
 the same <tag>p:declare-step</tag>.</error> (Within the subpipeline,
 variables may shadow (non-static) options and lexically preceding
 variables.)
@@ -7855,6 +7871,10 @@ draft:</para>
       </listitem>
       <listitem>
         <para>Introduction of the <code>serialization</code> document property. See <xref linkend="document-properties"/>.</para>
+      </listitem>
+      <listitem>
+        <para>The semantics pf <tag>p:viewport</tag> have been changed. HTML documents are now allowed as input and
+        <option>match</option> may now match every node type except attributes and namespace nodes.</para>
       </listitem>
     </itemizedlist>
 </appendix>
