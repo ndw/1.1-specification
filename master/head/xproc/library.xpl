@@ -60,6 +60,19 @@
       <p:option name="method" as="xs:QName?"/>
       <p:option name="fail-if-not-equal" as="xs:boolean" select="false()"/>
    </p:declare-step>
+   <p:declare-step type="p:compress" xml:id="compress">
+      <p:input port="source"
+               primary="true"
+               content-types="any"
+               sequence="false"/>
+      <p:output port="result"
+                primary="true"
+                content-types="any"
+                sequence="false"/>
+      <p:option name="format" as="xs:QName" select="'gzip'"/>
+      <p:option name="serialization" as="xs:string"/>
+      <p:option name="parameters" as="xs:string"/>
+   </p:declare-step>
    <p:declare-step type="p:count" xml:id="count">
       <p:input port="source" content-types="*/*" sequence="true"/>
       <p:output port="result" content-types="application/xml"/>
@@ -186,6 +199,18 @@
       <p:output port="result" content-types="application/json"/>
       <p:option name="flatten-to-depth" as="xs:string?" select="'0'"/>
    </p:declare-step>
+   <p:declare-step type="p:json-merge" xml:id="json-merge">
+      <p:input port="source" sequence="true" content-types="any"/>
+      <p:output port="result" content-types="application/json"/>
+      <p:option name="duplicates"
+                as="xs:token"
+                values="('reject', 'use-first', 'use-last', 'use-any', 'combine')"
+                select="'use-first'"/>
+      <p:option name="key"
+                as="xs:string"
+                select="'concat(&#34;_&#34;,$p:index)'"
+                e:type="XPathExpression"/>
+   </p:declare-step>
    <p:declare-step type="p:label-elements" xml:id="label-elements">
       <p:input port="source" content-types="xml html"/>
       <p:output port="result" content-types="xml html"/>
@@ -226,6 +251,11 @@
                 sequence="false"
                 content-types="application/xhtml+xml"/>
       <p:option name="parameters" as="xs:string"/>
+   </p:declare-step>
+   <p:declare-step type="p:namespace-delete" xml:id="namespace-delete">
+      <p:input port="source" content-types="xml html"/>
+      <p:output port="result" content-types="xml html"/>
+      <p:option name="prefixes" required="true" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:namespace-rename" xml:id="namespace-rename">
       <p:input port="source" content-types="xml html"/>
@@ -308,7 +338,7 @@
       <p:input port="source" content-types="any"/>
       <p:output port="result" content-types="any"/>
       <p:option name="properties" required="true" as="xs:string"/>
-      <p:option name="merge" select="false()" as="xs:boolean"/>
+      <p:option name="merge" select="true()" as="xs:boolean"/>
    </p:declare-step>
    <p:declare-step type="p:sink" xml:id="sink">
       <p:input port="source" content-types="any" sequence="true"/>
@@ -443,6 +473,19 @@
       <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
       <p:option name="format" as="xs:QName?"/>
       <p:option name="parameters" as="xs:string"/>
+   </p:declare-step>
+   <p:declare-step type="p:uncompress" xml:id="uncompress">
+      <p:input port="source"
+               primary="true"
+               content-types="any"
+               sequence="false"/>
+      <p:output port="result"
+                primary="true"
+                content-types="any"
+                sequence="false"/>
+      <p:option name="format" as="xs:QName?"/>
+      <p:option name="parameters" as="xs:string"/>
+      <p:option name="content-type" as="xs:string" select="'application/binary'"/>
    </p:declare-step>
    <p:declare-step type="p:unescape-markup" xml:id="unescape-markup">
       <p:input port="source" content-types="xml html"/>
