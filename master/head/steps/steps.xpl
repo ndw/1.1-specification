@@ -20,13 +20,13 @@
    <p:declare-step type="p:archive" xml:id="archive">
       <p:input port="source"
                primary="true"
-               content-types="*/*"
+               content-types="any"
                sequence="true"/>
       <p:input port="manifest" content-types="application/xml" sequence="true"/>
-      <p:input port="archive" content-types="application/*" sequence="true"/>
+      <p:input port="archive" content-types="any" sequence="true"/>
       <p:output port="result"
                 primary="true"
-                content-types="application/*"
+                content-types="any"
                 sequence="false"/>
       <p:output port="report" content-types="application/xml" sequence="false"/>
       <p:option name="format" as="xs:QName" select="'zip'"/>
@@ -36,7 +36,7 @@
    <p:declare-step type="p:archive-manifest" xml:id="archive-manifest">
       <p:input port="source"
                primary="true"
-               content-types="*/*"
+               content-types="any"
                sequence="false"/>
       <p:output port="result"
                 primary="true"
@@ -60,6 +60,19 @@
       <p:option name="method" as="xs:QName?"/>
       <p:option name="fail-if-not-equal" as="xs:boolean" select="false()"/>
    </p:declare-step>
+   <p:declare-step type="p:compress" xml:id="compress">
+      <p:input port="source"
+               primary="true"
+               content-types="any"
+               sequence="false"/>
+      <p:output port="result"
+                primary="true"
+                content-types="any"
+                sequence="false"/>
+      <p:option name="format" as="xs:QName" select="'gzip'"/>
+      <p:option name="serialization" as="xs:string"/>
+      <p:option name="parameters" as="xs:string"/>
+   </p:declare-step>
    <p:declare-step type="p:count" xml:id="count">
       <p:input port="source" content-types="*/*" sequence="true"/>
       <p:output port="result" content-types="application/xml"/>
@@ -72,14 +85,6 @@
                 required="true"
                 as="xs:string"
                 e:type="XSLTSelectionPattern"/>
-   </p:declare-step>
-   <p:declare-step type="p:directory-list" xml:id="directory-list">
-      <p:output port="result" content-type="application/xml"/>
-      <p:option name="path" required="true" as="xs:anyURI"/>
-      <p:option name="detailed" as="xs:boolean" select="false()"/>
-      <p:option name="max-depth" as="xs:string?" select="'1'"/>
-      <p:option name="include-filter" as="xs:string*"/>
-      <p:option name="exclude-filter" as="xs:string*"/>
    </p:declare-step>
    <p:declare-step type="p:error" xml:id="error">
       <p:input port="source" sequence="true" content-types="text xml"/>
@@ -133,6 +138,23 @@
                 values="('first-child','last-child','before','after')"
                 select="'after'"/>
    </p:declare-step>
+   <p:declare-step type="p:json-join" xml:id="json-join">
+      <p:input port="source" sequence="true" content-types="any"/>
+      <p:output port="result" content-types="application/json"/>
+      <p:option name="flatten-to-depth" as="xs:string?" select="'0'"/>
+   </p:declare-step>
+   <p:declare-step type="p:json-merge" xml:id="json-merge">
+      <p:input port="source" sequence="true" content-types="any"/>
+      <p:output port="result" content-types="application/json"/>
+      <p:option name="duplicates"
+                as="xs:token"
+                values="('reject', 'use-first', 'use-last', 'use-any', 'combine')"
+                select="'use-first'"/>
+      <p:option name="key"
+                as="xs:string"
+                select="'concat(&#34;_&#34;,$p:index)'"
+                e:type="XPathExpression"/>
+   </p:declare-step>
    <p:declare-step type="p:label-elements" xml:id="label-elements">
       <p:input port="source" content-types="xml html"/>
       <p:output port="result" content-types="xml html"/>
@@ -154,11 +176,6 @@
       <p:option name="content-type" as="xs:string?"/>
       <p:option name="document-properties" as="xs:string"/>
    </p:declare-step>
-   <p:declare-step type="p:json-join" xml:id="json-join">
-      <p:input port="source" sequence="true" content-types="json"/>
-      <p:output port="result" content-types="application/json"/>
-      <p:option name="flatten-arrays" as="xs:boolean" select="false()"/>
-   </p:declare-step>
    <p:declare-step type="p:make-absolute-uris" xml:id="make-absolute-uris">
       <p:input port="source" content-types="xml html"/>
       <p:output port="result" content-types="xml html"/>
@@ -167,6 +184,11 @@
                 as="xs:string"
                 e:type="XSLTSelectionPattern"/>
       <p:option name="base-uri" as="xs:anyURI?"/>
+   </p:declare-step>
+   <p:declare-step type="p:namespace-delete" xml:id="namespace-delete">
+      <p:input port="source" content-types="xml html"/>
+      <p:output port="result" content-types="xml html"/>
+      <p:option name="prefixes" required="true" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:namespace-rename" xml:id="namespace-rename">
       <p:input port="source" content-types="xml html"/>
@@ -218,7 +240,7 @@
       <p:input port="source" content-types="any"/>
       <p:output port="result" content-types="any"/>
       <p:option name="properties" required="true" as="xs:string"/>
-      <p:option name="merge" select="false()" as="xs:boolean"/>
+      <p:option name="merge" select="true()" as="xs:boolean"/>
    </p:declare-step>
    <p:declare-step type="p:sink" xml:id="sink">
       <p:input port="source" content-types="any" sequence="true"/>
@@ -312,6 +334,10 @@
                 primary="true"
                 sequence="false"
                 content-types="text"/>
+      <p:option name="sort-key"
+                as="xs:string"
+                select="'.'"
+                e:type="XPathExpression"/>
       <p:option name="order"
                 as="xs:string"
                 select="'ascending'"
@@ -320,10 +346,6 @@
                 as="xs:string?"
                 values="('upper-first', 'lower-first')"/>
       <p:option name="lang" as="xs:language?"/>
-      <p:option name="data-type"
-                as="xs:string"
-                select="'text'"
-                values="('text', 'number')"/>
       <p:option name="collation"
                 as="xs:string"
                 select="'https://www.w3.org/2005/xpath-functions/collation/codepoint'"/>
@@ -343,16 +365,29 @@
    <p:declare-step type="p:unarchive" xml:id="unarchive">
       <p:input port="source"
                primary="true"
-               content-types="*/*"
+               content-types="any"
                sequence="false"/>
       <p:output port="result"
                 primary="true"
-                content-types="*/*"
+                content-types="any"
                 sequence="true"/>
       <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
       <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
       <p:option name="format" as="xs:QName?"/>
       <p:option name="parameters" as="xs:string"/>
+   </p:declare-step>
+   <p:declare-step type="p:uncompress" xml:id="uncompress">
+      <p:input port="source"
+               primary="true"
+               content-types="any"
+               sequence="false"/>
+      <p:output port="result"
+                primary="true"
+                content-types="any"
+                sequence="false"/>
+      <p:option name="format" as="xs:QName?"/>
+      <p:option name="parameters" as="xs:string"/>
+      <p:option name="content-type" as="xs:string" select="'application/binary'"/>
    </p:declare-step>
    <p:declare-step type="p:unescape-markup" xml:id="unescape-markup">
       <p:input port="source" content-types="xml html"/>
@@ -411,11 +446,11 @@
    </p:declare-step>
    <p:declare-step type="p:xquery" xml:id="xquery">
       <p:input port="source"
-               content-types="application/xml text/xml */*+xml"
+               content-types="any"
                sequence="true"
                primary="true"/>
-      <p:input port="query" content-types="application/xml */*+xml text/*"/>
-      <p:output port="result" sequence="true" content-types="*/*"/>
+      <p:input port="query" content-types="text xml"/>
+      <p:output port="result" sequence="true" content-types="any"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="version" as="xs:string?"/>
    </p:declare-step>

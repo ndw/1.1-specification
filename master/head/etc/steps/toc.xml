@@ -17,13 +17,9 @@
       <tocentry role="section" xml:id="c.archive-manifest">p:archive-manifest</tocentry>
       <tocentry role="section" xml:id="c.cast-content-type">p:cast-content-type</tocentry>
       <tocentry role="section" xml:id="c.compare">p:compare</tocentry>
+      <tocentry role="section" xml:id="c.compress">p:compress</tocentry>
       <tocentry role="section" xml:id="c.count">p:count</tocentry>
       <tocentry role="section" xml:id="c.delete">p:delete</tocentry>
-      <tocdiv role="section" xml:id="c.directory-list">
-         <title>p:directory-list</title>
-         <tocentry role="example" xml:id="ex.c.directory-list">Sample Directory List Output for a Single File</tocentry>
-         <tocentry role="section" xml:id="dir-list-details">Directory list details</tocentry>
-      </tocdiv>
       <tocentry role="section" xml:id="c.error">p:error</tocentry>
       <tocentry role="section" xml:id="c.escape-markup">p:escape-markup</tocentry>
       <tocentry role="section" xml:id="c.filter">p:filter</tocentry>
@@ -42,6 +38,8 @@
       </tocdiv>
       <tocentry role="section" xml:id="c.identity">p:identity</tocentry>
       <tocentry role="section" xml:id="c.insert">p:insert</tocentry>
+      <tocentry role="section" xml:id="c.json-join">p:json-join</tocentry>
+      <tocentry role="section" xml:id="c.json-merge">p:json-merge</tocentry>
       <tocentry role="section" xml:id="c.label-elements">p:label-elements</tocentry>
       <tocdiv role="section" xml:id="c.load">
          <title>p:load</title>
@@ -51,8 +49,8 @@
          <tocentry role="section" xml:id="c.load.html">Loading HTML data</tocentry>
          <tocentry role="section" xml:id="c.load.binary">Loading binary data</tocentry>
       </tocdiv>
-      <tocentry role="section" xml:id="c.json-join">p:json-join</tocentry>
       <tocentry role="section" xml:id="c.make-absolute-uris">p:make-absolute-uris</tocentry>
+      <tocentry role="section" xml:id="c.sink">p:namespace-delete</tocentry>
       <tocentry role="section" xml:id="c.namespace-rename">p:namespace-rename</tocentry>
       <tocentry role="section" xml:id="c.pack">p:pack</tocentry>
       <tocentry role="section" xml:id="c.rename">p:rename</tocentry>
@@ -70,6 +68,7 @@
       <tocentry role="section" xml:id="c.text-sort">p:text-sort</tocentry>
       <tocentry role="section" xml:id="c.text-tail">p:text-tail</tocentry>
       <tocentry role="section" xml:id="c.unarchive">p:unarchive</tocentry>
+      <tocentry role="section" xml:id="c.uncompress">p:uncompress</tocentry>
       <tocentry role="section" xml:id="c.unescape-markup">p:unescape-markup</tocentry>
       <tocentry role="section" xml:id="c.unwrap">p:unwrap</tocentry>
       <tocentry role="section" xml:id="c.uuid">p:uuid</tocentry>

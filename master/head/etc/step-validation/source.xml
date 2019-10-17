@@ -179,10 +179,9 @@ validation to the <port>source</port> document.</para>
 
 <para>If the <port>schema</port> document has an XML media type, then
 it <rfc2119>must</rfc2119> be interpreted as a RELAX NG Grammar. If
-the <port>schema</port> document has the media type
-“<literal>application/relax-ng-compact-syntax</literal>” or the media
-type has a “<literal>text</literal>” type, then it
-<rfc2119>must</rfc2119> be interpreted as a <biblioref linkend="relaxng-compact-syntax"/> document for validation.</para>
+the <port>schema</port> document has a text media type, then it
+<rfc2119>must</rfc2119> be interpreted as a 
+<biblioref linkend="relaxng-compact-syntax"/> document for validation.</para>
 
 <para>If the <option>dtd-attribute-values</option> option is
 <literal>true</literal>, then the attribute value defaulting conventions of
@@ -357,8 +356,8 @@ count as an unsuccessful outcome of validation.</para>
 
 <para>If the step specifies a <option>version</option>, then that version
 of XML Schema <rfc2119>must</rfc2119> be used to process the validation.
-<error code="C0038">It is a
-<glossterm>dynamic error</glossterm> if the specified version
+<error code="C0011">It is a
+<glossterm>dynamic error</glossterm> if the specified schema version
 is not available.</error> If the step does not specify a version, the
 implementation may use any version it has available and may use any means
 to determine what version to use, including, but not limited to,

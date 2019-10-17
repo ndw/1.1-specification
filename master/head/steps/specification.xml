@@ -298,10 +298,10 @@ element's [base URI].</para>
     information about the archiving.</para>
 
   <p:declare-step type="p:archive">
-    <p:input port="source" primary="true" content-types="*/*" sequence="true"/>
+    <p:input port="source" primary="true" content-types="any" sequence="true"/>
     <p:input port="manifest" content-types="application/xml" sequence="true"/>
-    <p:input port="archive" content-types="application/*" sequence="true"/>
-    <p:output port="result" primary="true" content-types="application/*" sequence="false"/>
+    <p:input port="archive" content-types="any" sequence="true"/>
+    <p:output port="result" primary="true" content-types="any" sequence="false"/>
     <p:output port="report" content-types="application/xml" sequence="false"/>
     <p:option name="format" as="xs:QName" select="'zip'"/>
     <p:option name="relative-to" as="xs:anyURI?"/>
@@ -333,7 +333,10 @@ element's [base URI].</para>
       <listitem>
         <para>The <port>manifest</port> port can receive a manifest document that tells the step how
           to construct the archive. If no manifest document is provided on this port, a default
-          manifest is constructed automatically. See <xref linkend="cv.archive-manifest"/>.</para>
+          manifest is constructed automatically. See <xref linkend="cv.archive-manifest"/>. 
+          <error code="C0100">It is a <glossterm>dynamic error</glossterm> if the document on port
+          <port>report</port> does not conform to the given schema.</error>
+        </para>
       </listitem>
     </varlistentry>
     <varlistentry>
@@ -346,9 +349,8 @@ element's [base URI].</para>
               <glossterm>implementation-defined</glossterm>.</impl> For instance an implementation
           that supports archive merging may accept more than one document on the
             <port>archive</port> port. <error code="C0081">It is a <glossterm>dynamic
-              error</glossterm> if the content type of a document on the <port>archive</port> does
-            not match the given archive format as specified in the <option>format</option>
-            option.</error></para>
+              error</glossterm> if the format of the archive does not match the format as specified 
+              in <option>format</option> option.</error></para>
       </listitem>
     </varlistentry>
   </variablelist>
@@ -405,6 +407,30 @@ element's [base URI].</para>
       </listitem>
     </varlistentry>
   </variablelist>
+  
+  <para>The format of the archive is determined as follows:</para>
+  <itemizedlist>
+    <listitem>
+      <para>If the <option>format</option> option is specified, this determines the format of the
+        archive. Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/>
+        format, specified with the value <code>zip</code>. <impl>It is
+          <glossterm>implementation-defined</glossterm> what other formats are
+          supported.</impl> <error code="C0081">It is a <glossterm>dynamic error</glossterm> if the format of the
+            archive does not match the format as specified in the <option>format</option>
+            option.</error></para>
+    </listitem>
+    <listitem>
+      <para>If no <option>format</option> option is specified or if its value is the empty sequence,
+        the archive's format will be determined by the step, using the <code>content-type</code>
+        document-property of the document on the <port>archive</port> port and/or by inspecting its
+        contents. <impl>It is <glossterm>implementation-defined</glossterm> how the step determines
+          the archive's format.</impl> Implementations <rfc2119>should</rfc2119> recognize archives
+        in <biblioref linkend="zip"/> format. </para>
+    </listitem>
+  </itemizedlist>
+  
+  <para><error code="C0085">It is a <glossterm>dynamic error</glossterm> if the format of the
+    archive cannot be understood, determined and/or processed.</error></para>
 
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
@@ -486,7 +512,7 @@ element's [base URI].</para>
         <code>base-uri</code> property, which in turn will be used for the entry’s <tag role="attribute">href</tag> attribute. Both the URI that is given in
         <option>relative-to</option> and the value of the <code>base-uri</code> property should be
       normalized with respect to slash deduplication, parent path elimination, and drive letter case
-      folding. The the step will remove the leading (normalized) <option>relative-to</option> option
+      folding. The step will remove the leading (normalized) <option>relative-to</option> option
       value from the <port>source</port> document’s (normalized) base URI. If there is no match, the
       manifest entry’s <tag role="attribute">name</tag> attribute will consist of the path part of
       the <port>source</port> document’s base URI, without any leading slashes.</para>
@@ -619,7 +645,7 @@ element's [base URI].</para>
     the archive appearing on its <port>source</port> port.</para>
 
   <p:declare-step type="p:archive-manifest">
-    <p:input port="source" primary="true" content-types="*/*" sequence="false"/>
+    <p:input port="source" primary="true" content-types="any" sequence="false"/>
     <p:output port="result" primary="true" content-types="application/xml" sequence="false"/>
     <p:option name="format" as="xs:QName?"/>
     <p:option name="parameters" as="map(xs:Qname, item()*)?"/>
@@ -730,12 +756,10 @@ model document into XML is
 
 <listitem>
 <para>Casting from a JSON media type to an XML media type, converts the
-JSON into XML. <impl>The precise nature of the conversion from JSON to XML
-is <glossterm>implementation-defined</glossterm>.</impl>
-If the input document is a text node or other string representation,
-implementations <rfc2119>should</rfc2119> use <function>fn:json-to-xml</function>
-by default.
-</para>
+JSON into XML. An implementation <rfc2119>must</rfc2119> support the format
+specified in section “XML Representation of JSON” of <biblioref linkend="xpath31-functions"/>
+as default for the resulting XML. <impl>It is <glossterm>implementation defined</glossterm> whether
+other result formats are supported.</impl></para>
 </listitem>
 
 <listitem>
@@ -857,6 +881,72 @@ summary of the differences between the two documents may appear on the
 <para feature="compare-preserves-none">No document properties are preserved.</para>
 </simplesect>
 </section>
+<section xml:id="c.compress">
+
+  <title>p:compress</title>
+
+  <para>The <tag>p:compress</tag> step serializes the document appearing on its <port>source</port>
+    port and outputs a compressed version of this on its <port>result</port> port.</para>
+
+  <p:declare-step type="p:compress">
+    <p:input port="source" primary="true" content-types="any" sequence="false"/>
+    <p:output port="result" primary="true" content-types="any" sequence="false"/>
+    <p:option name="format" as="xs:QName" select="'gzip'"/>
+    <p:option name="serialization" as="map(xs:QName,item()*)?"/>
+    <p:option name="parameters" as="map(xs:Qname, item()*)?"/>
+  </p:declare-step>
+
+  <para>The <tag>p:compress</tag> step first serializes the document appearing on its
+      <port>source</port>. It then compresses the outcome of this serialization and outputs the
+    result on its <port>result</port> port.</para>
+
+  <para>The <tag>p:compress</tag> step has the following options:</para>
+  <variablelist>
+    <varlistentry>
+      <term><option>format</option></term>
+      <listitem>
+        <para>The format of the compression can be specified using the <option>format</option>
+          option. Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="gzip"/>
+          format, specified with the value <code>gzip</code>. <impl>It is
+              <glossterm>implementation-defined</glossterm> what other formats are supported.</impl>
+          <error code="C0202">It is a <glossterm>dynamic error</glossterm> if the compression
+              format cannot be understood, determined and/or processed.</error>
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>parameters</option></term>
+      <listitem>
+        <para>The <option>parameters</option> option can be used to supply parameters to control the
+          compression. <impl>The semantics of the keys and the allowed values for these keys are
+              <glossterm>implementation-defined</glossterm>.</impl>
+          <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+              <option>parameters</option> contains an entry whose key is defined by the
+            implementation and whose value is not valid for that key.</error></para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>serialization</option></term>
+      <listitem>
+        <para>The <option>serialization</option> option is provided to control the serialization of
+          content before compression takes place. If the document to be stored has a
+            <code>serialization</code> property, the serialization is controlled by the merger of
+          the two maps where the entries in the <code>serialization</code> property take precedence.
+          Serialization is described in <biblioref linkend="xproc30"/>.</para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+  <simplesect>
+    <title>Document properties</title>
+    <para feature="compress-preserves-some">All document properties are preserved, except for the
+        <code>content-type</code> property which is updated accordingly and the
+        <code>serialization</code> property which is removed.</para>
+  </simplesect>
+
+</section>
 <section xml:id="c.count">
 <title>p:count</title>
 
@@ -920,202 +1010,6 @@ of the element on which it occurred.</para>
       the <literal>content-type</literal> property is changed to <literal>text/plain</literal> and the 
       <literal>serialization</literal> property is removed, while all other document properties are 
       preserved. For other document types, all document properties are preserved.</para>
-</simplesect>
-</section>
-<?xml-model href="../../../../../schema/dbspec.rnc" type="application/relax-ng-compact-syntax"?><section xml:id="c.directory-list">
-<title>p:directory-list</title>
-
-  <para>The <code>p:directory-list</code> step produces a list of the contents
-    of a specified directory.</para>
-
-<p:declare-step type="p:directory-list">
-  <p:output port="result" content-type="application/xml"/>
-  <p:option name="path" required="true" as="xs:anyURI"/>
-  <p:option name="detailed" as="xs:boolean" select="false()"/>
-  <p:option name="max-depth" as="xs:string?" select="'1'"/>
-  <p:option name="include-filter" as="xs:string*"/>
-  <p:option name="exclude-filter" as="xs:string*"/>
-</p:declare-step>
-
-<para><impl>Conformant processors <rfc2119>must</rfc2119> support directory paths whose
-scheme is <code>file</code>. It is
-<glossterm>implementation-defined</glossterm> what other schemes are
-supported by <tag>p:directory-list</tag>, and what the interpretation
-of 'directory', 'file' and 'contents' is for those schemes.</impl>
-<error code="C0102">It is a <glossterm>dynamic error</glossterm> if an
-implementation does not support directory listing for a specified scheme.</error>
-</para>
-
- <para>If <option>path</option> is relative, it is made absolute against the 
- base URI of the element on which it is specified 
- (<tag>p:with-option</tag> or <tag>p:directory-list</tag> in the case of a 
- syntactic shortcut value). <error code="C0017">It is a
-<glossterm>dynamic error</glossterm> if the absolute path does not
-identify a directory.</error> <error code="C0012">It is a
-<glossterm>dynamic error</glossterm> if the contents of the directory
-path are not available to the step due to access restrictions in the
-environment in which the pipeline is run.</error></para>
-
-<para>If the <option>detailed</option> option is true, the pipeline
-author is requesting additional information about the matching entries,
-see <xref linkend="dir-list-details"/>.</para>
-  
-  <para>The <option>max-depth</option> option may contain either the string “<literal>unbounded</literal>” or a string
-    that may be cast to a non-negative integer. An integer value of <literal>0</literal> means that only information
-    about the directory that is given in the <option>path</option> option is returned. A <option>max-depth</option> of
-      <literal>1</literal>, which is the default, will effect that also information about the top-level directory’s
-    immediate children will be included. For larger values of <option>max-depth</option>, also the content of
-    directories will be considered recursively up to the maximum depth, and it will be included as children of the
-    corresponding <tag>c:directory</tag> elements.</para>
-
-<para>If present, the value of the <option>include-filter</option> or
-<option>exclude-filter</option> option <rfc2119>must</rfc2119> be a sequence of strings, each
-one representing a regular expressions as specified in <biblioref linkend="xpath31-functions"/>,
-    section 7.61 “<literal>Regular Expression Syntax</literal>”.</para>
-
-<para>The regular expressions will be matched against an item’s file system path relative to the top-level path that was
-  given in the <option>path</option> option. If the item is a directory, a trailing slash will be appended.</para>
-  <para>Examples: A file <literal>file.txt</literal> in the directory specified by <option>path</option> will remain
-    <literal>file.txt</literal>, a relative path <literal>dir1/file.txt</literal> will remain
-      <literal>dir1/file.txt</literal>, while a relative path <literal>dir1/dir2</literal> will become
-      <literal>dir1/dir2/</literal> if <literal>dir2</literal> is a directory.</para>
-  <para>Regular expressions that match <literal>a/a/b/file.txt</literal> are, for example,
-  <literal>^/(\w+/){2,3}.+\.txt$</literal>, <literal>a/a/b/</literal>, or <literal>/file\.[^/]+$</literal>.</para>
-
-<para>If any <option>include-filter</option> pattern matches the slash-augmented relative path, the entry is included in the output. 
-  If a directory’s path matches the inclusion regex, the directory’s content will not automatically be included, too.
-  They need to match, the regular expression, too. So the filter regex <literal>^dir/</literal> will match the directory
-  content but <literal>^dir/$</literal> won’t, and as a consequence the directory’s content will not be included in the result.</para>
-  <para>If a relative path is matched by an include filter,
-    all its ancestor directories starting from the initial directory (but not their content if not included explicitly) 
-    will be included, too.</para>
-  <example xml:id="ex.c.directory-list">
-    <title>Sample Directory List Output for a Single File</title>
-    <para>For a file <literal>a/a/b/file.txt</literal> below the initial directory 
-    <literal>/home/jane</literal>, this output will be produced, omitting content that might be present in the 
-    intermediate directories:</para>
-    <literallayout>&lt;c:directory xml:base="file:///home/jane/" name="jane"&gt;
-  &lt;c:directory xml:base="a/" name="a"&gt;
-    &lt;c:directory xml:base="a/" name="a"&gt;
-      &lt;c:directory xml:base="b/" name="b"&gt;
-        &lt;c:file xml:base="file.txt" name="file.txt"/&gt;
-      &lt;/c:directory&gt;
-    &lt;/c:directory&gt;
-  &lt;/c:directory&gt;
-&lt;/c:directory&gt;</literallayout>
-  </example>
-  <para>If the <option>exclude-filter</option> pattern matches the slash-augmented relative path, the entry (and all of
-    its content in case of a directory) is excluded in the output.</para>
-  <para>If both options are
-provided, the include filter is processed first, then the exclude
-filter. As a result, an item is included if it matches (at least) one
-of the <option>include-filter</option> values and none of the
-<option>exclude-filter</option> values.</para>
-  <para>If no <option>include-filter</option> is given, that is, if <option>include-filter</option> is an empty
-  sequence, any item will be included in the result (unless it is excluded by <option>exclude-filter</option>).</para>
-
-<note>
-<para>There is no way to specify a list of values using attribute value
-templates. If the option shortcut syntax is used to provide the
-<option>include-filter</option> or <option>exclude-filter</option> option,
-it will consist of a single regular expression. To specify a list of
-regular expressions, you must use the  <tag>p:with-option</tag>
-syntax.
-</para>
-</note>
-
-  <para xml:id="cv.directory">The result document produced for the specified directory path has a <tag>c:directory</tag>
-    document element whose base URI, attached as an <tag role="attribute">xml:base</tag> attribute, is the absolute
-    directory path (expressed as a URI that ends in a slash) and whose <tag class="attribute">name</tag> attribute
-    (without a trailing slash) is the last segment of the directory path.</para>
-
-<e:rng-pattern name="VocabDirectory"/>
-
-  <para>Its contents are determined as follows, based on the entries in the directory identified by the directory path.
-    For each entry in the directory and subject to the rules that are imposed by the <option>max-depth</option>,
-      <option>include-filter</option>, and <option>exclude-filter</option> options, a <tag>c:file</tag>, a
-      <tag>c:directory</tag>, or a <tag>c:other</tag> element is produced, as follows: </para>
-
-<itemizedlist>
-<listitem>
-      <para>A <tag>c:directory</tag> is produced for each subdirectory not determined to be special. Depending on the
-        values of the three options, it may contain child elements for the directory’s content.</para>
-</listitem>
-<listitem>
-<para xml:id="cv.file">A <tag>c:file</tag> is produced for each file
-not determined to be special.</para>
-<e:rng-pattern name="VocabFile"/>
-</listitem>
-<listitem>
-<para xml:id="cv.other"><impl>Any file or directory determined to be
-special by the <tag>p:directory-list</tag> step may be output using a
-<tag>c:other</tag> element but the criteria for marking a file as
-special are <glossterm>implementation-defined</glossterm>.</impl>
-</para>
-<e:rng-pattern name="VocabOther"/>
-</listitem>
-</itemizedlist>
-
-<para>Each of the elements <tag>c:file</tag>, <tag>c:directory</tag>,
-and <tag>c:other</tag> has a <code>name</code> attribute, whose
-value is a relative IRI reference, giving the (local) file or
-directory name.</para>
-  
-  <para>Each of these element also contains the corresponding resource’s URI in an <tag role="attribute">xml:base</tag>
-    attribute, which may be a relative URI for any but the top-level <tag>c:directory</tag> element. In the case of
-      <tag>c:directory</tag>, it must end in a trailing slash. This way, users will always be able to compute the
-    absolute URI for any of these elements by applying <code>fn:base-uri()</code> to it.</para>
-
-<section xml:id="dir-list-details">
-<title>Directory list details</title>
-
-<para>If <option>detailed</option> is false, then only the
-<tag class="attribute">name</tag> and <tag class="attribute">xml:base</tag> attributes are expected on
-<tag>c:file</tag>, <tag>c:directory</tag>, or <tag>c:other</tag>
-elements.</para>
-
-<para>If <option>detailed</option> is true, then the pipeline author
-is expecting additional details about each entry. The following attributes
-<rfc2119>should</rfc2119> be provided by the implementation:</para>
-
-<variablelist>
-<varlistentry><term><tag class="attribute">readable</tag></term>
-<listitem><para>“<code>true</code>” if the entry is readable.</para>
-</listitem>
-</varlistentry>
-<varlistentry><term><tag class="attribute">writable</tag></term>
-<listitem><para>“<code>true</code>” if the entry is writable.</para>
-</listitem>
-</varlistentry>
-<varlistentry><term><tag class="attribute">hidden</tag></term>
-<listitem><para>“<code>true</code>” if the entry is hidden.</para>
-</listitem>
-</varlistentry>
-<varlistentry><term><tag class="attribute">last-modified</tag></term>
-<listitem><para>The last modification time of the entry, expressed as a lexical
-<code>xs:dateTime</code> in UTC.</para>
-</listitem>
-</varlistentry>
-<varlistentry><term><tag class="attribute">size</tag></term>
-<listitem><para>The size of the entry in bytes.</para>
-</listitem>
-</varlistentry>
-</variablelist>
-
-<para><impl>The precise meaning of these properties are
-<glossterm>implementation-defined</glossterm> and may vary according
-to the URI scheme of the <option>path</option>.</impl>
-If the value of an attribute is “<code>false</code>” or if it has no
-meaningful value, the attribute may be omitted.</para>
-
-<para><impl>Any other attributes on
-<tag>c:file</tag>, <tag>c:directory</tag>, or <tag>c:other</tag>
-are <glossterm>implementation-defined</glossterm>.</impl></para>
-</section>
-
-<simplesect>
-<title>Document properties</title>
-<para feature="directory-list-preserves-none">No document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.error">
@@ -2005,6 +1899,117 @@ as the source.</para>
 <port>insertion</port> port are preserved.</para>
 </simplesect>
 </section>
+<section xml:id="c.json-join" version="5.0-extension w3c-xproc">
+<title>p:json-join</title>
+
+<para>The <code>p:json-join</code> step joins the sequence of documents on port <port>source</port>
+into a single JSON document (an array) appearing on port <port>result</port>. If the sequence on
+port <code>source</code> is empty, the empty sequence is returned on
+port <code>result</code>.</para>
+
+<p:declare-step type="p:json-join">
+  <p:input port="source" sequence="true" content-types="any"> </p:input>
+  <p:output port="result" content-types="application/json"/>
+  <p:option name="flatten-to-depth" as="xs:string?" select="'0'"/>
+</p:declare-step>
+
+<para>The step inspects the documents on port <port>source</port> in turn to create the
+  resulting array:</para>
+<itemizedlist>
+  <listitem>
+    <para>If the document under inspection is a JSON document representing an array, the array is copied 
+     to the resulting array according to the setting of option <option>flatten-to-depth</option>.</para>
+  </listitem>
+  <listitem>
+    <para>For every other type of JSON document, for XML documents, HTML documents, or text
+    documents, their XDM representation is appended to the resulting array.</para>
+  </listitem>
+  <listitem>
+    <para><impl>It is <glossterm>implementation defined</glossterm> if <code>p:json-join</code> is
+      able to process document types not mentioned yet, i.e. types of binary documents.</impl> If a processor
+      supports a given type of documents, an entry is created as described above. <error code="C0111">
+        It is a <glossterm>dynamic error</glossterm> if a document of an unsupported document type appears on 
+        port <port>source</port> of <code>p:json-join</code>.</error>
+    </para>  </listitem>
+</itemizedlist>
+  
+<para>The option <option>flatten-to-depth</option> controls whether and to which
+depth members of an array appearing on port <port>source</port> are flattened.
+The <option>flatten-to-depth</option> option may contain either the 
+string “<literal>unbounded</literal>” or a string that may be cast to a non-negative integer. 
+An integer value of <literal>0</literal>, which is the default, means that no 
+flattening takes place, so the array appearing on port <port>source</port> will
+be contained as an array in the resulting array. An integer value of <literal>1</literal>
+means that an array on port <port>source</port> is flattened, i.e. the members
+of that array will appear as individual members in the resulting array. Any value greater
+than <literal>1</literal> means that the flattening is applied recursively to arrays in
+arrays up to the given depth. A value of “<literal>unbounded</literal>” means that all
+arrays in arrays will be flattened. As a consequence, the resulting array appearing on
+port <port>result</port> will not have any arrays as members.</para>
+
+
+<simplesect>
+  <title>Document properties</title>
+  <para feature="json-join-preserves-none">No document properties are preserved.</para>
+</simplesect>
+</section>
+<section xml:id="c.json-merge" version="5.0-extension w3c-xproc">
+<title>p:json-merge</title>
+
+<para>The <tag>p:json-merge</tag> step merges the sequence of appearing
+on port <port>source</port> into a single JSON object appearing on port
+<port>result</port>. If the sequence on
+port <port>source</port> is empty, the empty sequence is returned on
+port <port>result</port>.</para>
+
+<p:declare-step type="p:json-merge">
+  <p:input port="source" sequence="true" content-types="any"> </p:input>
+  <p:output port="result" content-types="application/json"/>
+  <p:option name="duplicates" as="xs:token" values="('reject', 'use-first', 'use-last', 'use-any', 'combine')" select="'use-first'"/>
+  <p:option name="key" as="xs:string" select="'concat(&#34;_&#34;,$p:index)'" e:type="XPathExpression"/>
+</p:declare-step>
+
+<para>The step inspects the documents on port <port>source</port> in turn to create the resulting
+  map:</para>
+<itemizedlist>
+  <listitem>
+    <para>If the document under inspection is a JSON document representing a map,
+    all key-value pairs are copied into the result map unless this map already contains
+    an entry with the given key. In this case the value of option <option>duplicates</option>
+    determines the policy for handling duplicate keys as specified for function <code>map:merge</code>
+      in <biblioref linkend="xpath31-functions"/>.  
+      <error code="C0106">It is a <glossterm>dynamic error</glossterm> if duplicate keys are encountered and 
+      option <option>duplicates</option> has value “<literal>reject</literal>”.</error></para>
+  </listitem>
+  <listitem>
+    <para>For every other type of JSON document, for XML documents, HTML documents, or text documents a
+    new key-value pair is created and put into the resulting map. The key is created by evaluating
+    the XPath expression in option <option>key</option> with the inspected document as context item. If the
+      evaluation result is a single atomic value, it is taken as key. If the evaluation result is a node, its
+      string value is taken as key. <error code="C0110">It is a <glossterm>dynamic error</glossterm> if the
+      evaluation of the XPath expression in option <option>key</option> for a given item returns either a
+      sequence, an array, a map, or a function.</error> Duplicate
+    keys are handled as described above. The XDM representation of the inspected document is taken as value of
+    the key-value pair.</para>
+  </listitem>
+  <listitem>
+    <para><impl>It is <glossterm>implementation defined</glossterm> if <code>p:json-merge</code> is
+    able to process document types not mentioned yet, i.e. types of binary documents.</impl> If a processor
+    supports a given type of documents, the key-value pair is created as described above. <error code="C0107">
+    It is a <glossterm>dynamic error</glossterm> if a document of a not supported document type appears on 
+      port <port>source</port> of <code>p:json-merge</code>.</error>
+    </para>
+  </listitem>
+</itemizedlist> 
+  <para>An implementation must bind the variable “<code>p:index</code>” in the static context of 
+    each evaluation of the XPath expression to the position of the document in the sequence 
+    of documents on port <port>source</port>, starting with “<literal>1</literal>”.
+    </para>
+  <simplesect>
+    <title>Document properties</title>
+    <para feature="json-merge-preserves-none">No document properties are preserved.</para>
+  </simplesect>
+</section>
 <section xml:id="c.label-elements">
 <title>p:label-elements</title>
 
@@ -2228,31 +2233,6 @@ The properties specified in <option>document-properties</option> are applied.
 </para>
 </simplesect>
 </section>
-<section xml:id="c.json-join" version="5.0-extension w3c-xproc">
-<title>p:json-join</title>
-
-<para>The <code>p:json-join</code> step joins a sequence of JSON
-documents into a single JSON document (an array). If the sequence on
-port <code>source</code> is empty, the empty sequence is returned on
-port <code>result</code>.</para>
-
-<p:declare-step type="p:json-join">
-  <p:input port="source" sequence="true" content-types="json"> </p:input>
-  <p:output port="result" content-types="application/json"/>
-  <p:option name="flatten-arrays" as="xs:boolean" select="false()"/>
-</p:declare-step>
-
-<para>If option <code>flatten-arrays</code> is
-<literal>false</literal>, a member in the array is created for each
-document in the sequence appearing on port<code>source</code>.
-Therefore the produced array with have the same number of members as
-the number of documents appearing on port <code>source</code>. However
-if <code>flatten-arrays</code> is <literal>true</literal>, for each
-member of an array appearing at the top level of a JSON document on
-port <code>source</code> a new member in the resulting array will be
-created.</para>
-
-</section>
 <section xml:id="c.make-absolute-uris">
 <title>p:make-absolute-uris</title>
 
@@ -2302,6 +2282,36 @@ the results are <glossterm>implementation-dependent</glossterm>.</impl>
 <simplesect>
 <title>Document properties</title>
 <para feature="make-absolute-uris-preserves-all">All document properties are preserved.</para>
+</simplesect>
+</section>
+<section xml:id="c.sink">
+<title>p:namespace-delete</title>
+
+<para>The <tag>p:namespace-delete</tag> step deletes all of the namespaces identified by the specified 
+      prefixes from the document appearing on port <port>source</port>.</para>
+
+<p:declare-step type="p:namespace-delete">
+   <p:input port="source" content-types="xml html"/>
+   <p:output port="result" content-types="xml html"/>
+   <p:option name="prefixes" required="true" as="xs:string"/>
+</p:declare-step>
+
+<para>The value of option <option>prefixes</option> is taken as a space separated list of
+prefixes. <error code="C0108">It is a <glossterm>dynamic error</glossterm> if any
+prefix is not in-scope at the point where the <code>p:namespace-delete</code> occurs.</error></para>
+
+<para>For any prefix the associated namespace is removed from the elements and 
+attributes in the document appearing on port <port>source</port>. The respective
+elements or attributes in the document appearing on port <port>result</port> will be
+in no namespace.</para>
+
+<para><error code="C0109">It is a <glossterm>dynamic error</glossterm> if
+a namespace is to be removed from an attribute and the element already has an attribute
+with the resulting name.</error></para>
+
+<simplesect>
+<title>Document properties</title>
+<para feature="namespace-delete-preserves-all">All document properties are preserved.</para>
 </simplesect>
 </section>
 <section xml:id="c.namespace-rename">
@@ -2603,7 +2613,7 @@ properties on the source document.</para>
    <p:input port="source" content-types="any"/>
    <p:output port="result" content-types="any"/>
    <p:option name="properties" required="true" as="map(xs:QName,item()*)"/>
-   <p:option name="merge" select="false()" as="xs:boolean"/>
+   <p:option name="merge" select="true()" as="xs:boolean"/>
 </p:declare-step>
 
  <para>The document properties of the document
@@ -2614,8 +2624,14 @@ adjusted property values.</para>
 
 <para feature="p-set-properties-merge">If the <option>merge</option>
 option is true, then the supplied properties are added to the existing
-properties. If it is false, the document’s properties are replaced by
+properties, overwriting already existing values for a given key. 
+If it is false, the document’s properties are replaced by
 the new set.</para>
+
+<para><error code="D0070">It is a <glossterm>dynamic error</glossterm> if a value is 
+assigned to the <code>serialization</code> document property that cannot be converted 
+into <code>map(xs:QName, item()*)</code> according
+to the rules in section “QName handling” of <biblioref linkend="xproc30"/>.</error></para>
 
 <para><error code="C0069">It is a <glossterm>dynamic
 error</glossterm> if the <option>properties</option> map contains
@@ -2726,7 +2742,9 @@ of a syntactic shortcut
 value).</para>
 
 <para>The step attempts to store the document to the specified
-URI. <error code="C0050">It is a <glossterm>dynamic error</glossterm>
+  URI. If the URI scheme “<literal>file:</literal>” is supported, the processor
+ <rfc2119>should</rfc2119> try to create all non existing folders in the URI’s path. 
+<error code="C0050">It is a <glossterm>dynamic error</glossterm>
 if the URI scheme is not supported or the step cannot store to the
 specified location.</error></para>
 
@@ -2937,20 +2955,30 @@ the string value of the <option>replace</option> expression.</para>
   <p:declare-step type="p:text-sort">
     <p:input port="source" primary="true" sequence="false" content-types="text"/>
     <p:output port="result" primary="true" sequence="false" content-types="text"/>
+    <p:option name="sort-key" as="xs:string" select="'.'" e:type="XPathExpression"/>
     <p:option name="order" as="xs:string" select="'ascending'" values="('ascending', 'descending')"/>
     <p:option name="case-order" as="xs:string?" values="('upper-first', 'lower-first')"/>
     <p:option name="lang" as="xs:language?"/>
-    <p:option name="data-type" as="xs:string" select="'text'" values="('text', 'number')"/>
     <p:option name="collation" as="xs:string" select="'https://www.w3.org/2005/xpath-functions/collation/codepoint'"/>
     <p:option name="stable" as="xs:boolean" select="true()"/>
   </p:declare-step>
 
   <para>The <tag>p:text-sort</tag> step sorts the lines in the text document appearing on its <port>source</port> port
-    and returns the result as another text document on its <port>result</port> port. The full lines are used as the
-    sorting key.</para>
+    and returns the result as another text document on its <port>result</port> port. The sort key is obtained by applying
+    the XPath expression in <option>sort-key</option> to each line in turn.</para>
   <itemizedlist>
     <listitem>
-      <para>The <option>order</option> option defines whether the lines are processed in ascending or descending order.
+      <para>The <option>sort-key</option> is used to obtain a sort key for each of the lines in the document
+       appearing on <port>source</port>. The <code>context item</code> is the line as an instance of <code>xs:string</code>,
+       the <code>context position</code> is the number of the line in the document on port <port>source</port>, the
+       <code>context size</code> is the number of lines in this document. <error code="C0098">It is a 
+       <glossterm>dynamic error</glossterm> if a dynamic XPath error occurred while applying sort-key to a line.</error>
+       <error code="C0099">It is a <glossterm>dynamic error</glossterm> if the result of applying <code>sort-key</code>
+       to a given line results in a sequence with more than one item.</error>
+      </para>
+    </listitem>
+    <listitem>
+     <para>The <option>order</option> option defines whether the lines are processed in ascending or descending order.
         Its value <rfc2119>must</rfc2119> be one of <code>ascending</code> or <code>descending</code>. The default is
           <code>ascending</code>.</para>
     </listitem>
@@ -2964,12 +2992,7 @@ the string value of the <option>replace</option> expression.</para>
         default depends on the processing environment. Its value must be a valid language code (e.g.
         <code>en-EN</code>).</para>
     </listitem>
-    <listitem>
-      <para>The <option>data-type</option> option defines whether the lines are to be collated alphabetically or
-        numerically. Its value <rfc2119>must</rfc2119> be one of <code>text</code> or <code>number</code>. The default
-        is <code>text</code>.</para>
-    </listitem>
-    <listitem>
+     <listitem>
       <para>The <option>collation</option> option identifies how strings are to be compared with each other. Its value
         must be a valid collation URI. The only collation XProc processors <rfc2119>must</rfc2119> support is the
         Unicode Codepoint Collation <link xlink:href="https://www.w3.org/2005/xpath-functions/collation/codepoint/"><code>https://www.w3.org/2005/xpath-functions/collation/codepoint</code></link>. This is also its default.
@@ -2983,7 +3006,10 @@ the string value of the <option>replace</option> expression.</para>
 
   <para>Lines are identified as described in <link xlink:href="https://www.w3.org/TR/xml/#sec-line-ends">XML, 2.11
       End-of-Line Handling</link>.</para>
-
+  <para>The sort process performed by this step is the same as described in 
+    <link xlink:href="https://www.w3.org/TR/xslt-30/#xsl-sort">The xsl:sort Element</link>. Options <option>lang</option>
+    and <option>case-order</option> are only taken into consideration if no value is selected for option
+    <option>collation</option>.</para>
   <simplesect>
     <title>Document properties</title>
     <para feature="add-attribute-preserves-all">All document properties are preserved.</para>
@@ -3032,8 +3058,8 @@ the string value of the <option>replace</option> expression.</para>
     in an archive (for instance from a zip file).</para>
 
   <p:declare-step type="p:unarchive">
-    <p:input port="source" primary="true" content-types="*/*" sequence="false"/>
-    <p:output port="result" primary="true" content-types="*/*" sequence="true"/>
+    <p:input port="source" primary="true" content-types="any" sequence="false"/>
+    <p:output port="result" primary="true" content-types="any" sequence="true"/>
     <p:option name="include-filter" as="xs:string*" e:type="RegularExpression"/>
     <p:option name="exclude-filter" as="xs:string*" e:type="RegularExpression"/>
     <p:option name="format" as="xs:QName?"/>
@@ -3112,6 +3138,76 @@ the string value of the <option>replace</option> expression.</para>
     <title>Document properties</title>
     <para feature="archive-preserves-none">No document properties are preserved.</para>
   </simplesect>
+</section>
+<section xml:id="c.uncompress">
+
+  <title>p:uncompress</title>
+
+  <para>The <tag>p:uncompress</tag> step expects on its <port>source</port> port a compressed
+    document. It outputs an uncompressed version of this on its <port>result</port> port.</para>
+
+  <p:declare-step type="p:uncompress">
+    <p:input port="source" primary="true" content-types="any" sequence="false"/>
+    <p:output port="result" primary="true" content-types="any" sequence="false"/>
+    <p:option name="format" as="xs:QName?"/>
+    <p:option name="parameters" as="map(xs:QName,item()*)?"/>
+    <p:option name="content-type" as="xs:string" select="'application/binary'"/>
+  </p:declare-step>
+
+  <para>The compression format of the document appearing on the <port>source</port> port is
+    determined as follows:</para>
+  <itemizedlist>
+    <listitem>
+      <para>If the <option>format</option> option is specified, this determines the compression
+        format. Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="gzip"/>
+        format, specified with the value <code>gzip</code>. <impl>It is
+            <glossterm>implementation-defined</glossterm> what other formats are supported.</impl>
+         <error code="C0202">It is a <glossterm>dynamic error</glossterm> if the compression
+            format cannot be understood, determined and/or processed.</error></para>
+    </listitem>
+    <listitem>
+      <para>If no <option>format</option> option is specified or its value is the empty sequence,
+        the compression format will be determined by the step, using the <code>content-type</code>
+        document-property of the document on the <port>source</port> port and/or by inspecting its
+        contents. <impl>It is <glossterm>implementation-defined</glossterm> how the step determines
+          the compression format.</impl> Implementations <rfc2119>should</rfc2119> recognize
+        archives in <biblioref linkend="gzip"/> format. </para>
+    </listitem>
+  </itemizedlist>
+  
+  <para>The <option>parameters</option> option can be used to supply parameters to control the
+    uncompression. <impl>The semantics of the keys and the allowed values for these keys are
+      <glossterm>implementation-defined</glossterm>.</impl>
+    <error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+      <option>parameters</option> contains an entry whose key is defined by the
+      implementation and whose value is not valid for that key.</error></para>
+
+  <para>Identification of the uncompressed document's content-type is done as follows:</para>
+  <orderedlist>
+    <listitem>
+      <para>If the <option>content-type</option> option is specified, the uncompressed document
+          <rfc2119>must</rfc2119> be interpreted according to that content-type. <error code="C0070">It is a <glossterm>dynamic error</glossterm> if the supplied
+            <option>content-type</option> is not a valid media type of the form
+              “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”
+          where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error>
+        <error code="C0201">It is a <glossterm>dynamic error</glossterm> if the
+            <tag>p:uncompress</tag> step cannot perform the requested content-type cast.</error>
+      </para>
+    </listitem>
+    <listitem>
+      <para><impl>In the absence of an explicit type, the content will be interpreted as content
+          type <code>application/binary</code></impl>.</para>
+    </listitem>
+  </orderedlist>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+  <simplesect>
+    <title>Document properties</title>
+    <para feature="uncompress-preserves-some">All document properties are preserved, except for the
+        <code>content-type</code> property which is updated accordingly.</para>
+  </simplesect>
+
 </section>
 <section xml:id="c.unescape-markup">
 <title>p:unescape-markup</title>
@@ -3518,9 +3614,9 @@ XQuery query to the sequence of documents
 provided on the <port>source</port> port.</para>
 
 <p:declare-step type="p:xquery">
-  <p:input port="source" content-types="application/xml text/xml */*+xml" sequence="true" primary="true"/>
-  <p:input port="query" content-types="application/xml */*+xml text/*"/>
-  <p:output port="result" sequence="true" content-types="*/*"/>
+  <p:input port="source" content-types="any" sequence="true" primary="true"/>
+  <p:input port="query" content-types="text xml"/>
+  <p:output port="result" sequence="true" content-types="any"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
   <p:option name="version" as="xs:string?"/>
 </p:declare-step>
@@ -3532,45 +3628,53 @@ collection. If no documents are provided on the <port>source</port> port,
 the initial context item is undefined and the default collection
 is empty.</para>
 
-<para>The <port>query</port> port must receive a single document:</para>
-
+<para>The <port>query</port> port must receive a single document which is either an XML
+  document or a text document. A text document <rfc2119>must</rfc2119> be treated as
+  the query. For an XML document the following rules apply:</para>
+ 
 <itemizedlist>
-<listitem>
-<para>If the document root element is <tag xml:id="cv.query">c:query</tag>, the text
-descendants of this element are considered the query.</para>
-<e:rng-pattern name="VocabQuery"/>
-</listitem>
-
-<listitem>
-<para>If the document root element is in the XQueryX namespace, the
-document is treated as an XQueryX-encoded query. <impl>Support for
-XQueryX is <glossterm>implementation-defined</glossterm>.</impl>
-</para>
-</listitem>
-
-<listitem>
-<para>If the <port>query</port> document has an XML media type, then
-the string value of the document <rfc2119>must</rfc2119> be treated as
-the query. If the media type has a “<literal>text</literal>” type,
-then it <rfc2119>must</rfc2119> be interpreted as the query.</para>
-</listitem>
-
-<listitem>
-<para><impl>Otherwise, the interpretation of the query
-is <glossterm>implementation-defined</glossterm>.</impl>
-</para>
-</listitem>
+  <listitem>
+    <para>If the document root element is <tag xml:id="cv.query">c:query</tag>, the text
+      descendants of this element are considered the query.</para>
+    <e:rng-pattern name="VocabQuery"/>
+  </listitem>
+  <listitem>
+      <para>If the document root element is in the XQueryX namespace, the
+        document is treated as an XQueryX-encoded query. <impl>Support for
+          XQueryX is <glossterm>implementation-defined</glossterm>.</impl>
+      </para>
+    </listitem>
+    <listitem>
+      <para>Otherwise the string value of the document <rfc2119>must</rfc2119> be treated as
+        the query.</para>
+    </listitem>
 </itemizedlist>
-
+ 
 <para>If the step specifies a <option>version</option>, then that version
 of XQuery <rfc2119>must</rfc2119> be used to process the transformation.
-<error code="C0038">It is a
-<glossterm>dynamic error</glossterm> if the specified version
+<error code="C0009">It is a
+<glossterm>dynamic error</glossterm> if the specified XQuery version
 is not available.</error> If the step does not specify a version, the
 implementation may use any version it has available and may use any means
 to determine what version to use, including, but not limited to,
-examining the version of the query.</para>
+examining the version of the query.<impl>It is <glossterm>implementation defined</glossterm>
+which XQuery version(s) is/are supported.</impl></para>
 
+<para>The name/value pairs in option <option>parameters</option> are used to set the query’s
+external variables.</para>
+  
+<para><error code="C0101">It is a <glossterm>dynamic error</glossterm> if a document
+appearing on port <port>source</port> cannot be represented in the XDM version associated with
+  the chosen XQuery version, e.g. when a JSON document contains a map and XDM 3.0 is used.</error> 
+  <error code="C0102">It is a <glossterm>dynamic error</glossterm> if any key in option 
+    <option>parameters</option> is associated to a value that cannot be represented in 
+    the XDM version associated with the chosen XQuery version, e.g. with a map, an array, 
+    or a function when XDM 3.0 is used.</error></para>
+
+<para><error code="C0103">It is a <glossterm>dynamic error</glossterm> if any error occurs during
+    XQuery’s static analysis phase.</error> <error code="C0104">It is a <glossterm>dynamic error</glossterm>
+    if any error occurs during XQuery’s dynamic evaluation phase.</error></para>
+      
 <para>The output of this step
 <rfc2119>may</rfc2119> include PSVI annotations.</para>
 
@@ -3731,16 +3835,17 @@ validation before using XQuery:</para>
     of a syntactic shortcut value).</para>
   <para>If the step specifies a <option>version</option>, then that version of XSLT
     <rfc2119>must</rfc2119> be used to process the transformation. <error code="C0038">It is a
-      <glossterm>dynamic error</glossterm> if the specified version is not available.</error> If
+      <glossterm>dynamic error</glossterm> if the specified xslt version is not available.</error> If
     the step does not specify a version, the implementation may use any version it has available and
     may use any means to determine what version to use, including, but not limited to, examining the
-    version of the stylesheet.</para>
+    version of the stylesheet. <impl>It is <glossterm>implementation defined</glossterm> which XSLT
+    version(s) is/are supported.</impl></para>
   <para>The XSLT stylesheet provided on the <port>stylesheet</port> port is invoked. <error code="C0093"> It is a <glossterm>dynamic error</glossterm> if a static error occurs during the
     static analysis of the XSLT stylesheet.</error> Any parameters passed in the
     <option>parameters</option> option are used to define top-level stylesheet parameters.</para>
-  <para><error code="C0094">It is a <glossterm>dynamic error</glossterm> if an error occurred during
+  <para><error code="C0095">It is a <glossterm>dynamic error</glossterm> if an error occurred during
     the transformation.</error>
-    <error code="C0095">It is a <glossterm>dynamic error</glossterm> if the transformation is
+    <error code="C0096">It is a <glossterm>dynamic error</glossterm> if the transformation is
       terminated by XSLT message termination.</error>
     <impl>How XSLT message termination errors are reported to the XProc processor is
       <glossterm>implementation-dependent</glossterm>.</impl> Implementations
@@ -3758,15 +3863,16 @@ validation before using XQuery:</para>
       invocation.</para>
     <para>If no value is supplied for <option>template-name</option> option an “Apply-template
       invocation” is performed. The documents that appear on <port>source</port> are taken to be the
-      initial match selection. If a value is supplied for the <option>initial-mode</option> option,
-      this value is used as the initial-mode for the invocation. <error code="C0056">It is a
-        <glossterm>dynamic error</glossterm> if the supplied mode cannot be applied to the
-        supplied stylesheet.</error> If no value is supplied, nothing is supplied to the invocation,
+      initial match selection. The default collection is undefined. If a value is supplied for 
+      the <option>initial-mode</option> option,
+      this value is used as the initial-mode for the invocation. <error code="C0008">It is a
+        <glossterm>dynamic error</glossterm> if the stylesheet does not support a given mode.</error> 
+      If no value is supplied, nothing is supplied to the invocation,
       so the default behaviour defined for XSLT 3.0 could be applied.</para>
     <para>If a value is supplied for option <option>template-name</option> a “Call template
       invocation” is performed. The documents on port <port>source</port> are taken as the default
-      collection in this case. Option <option>initial-mode</option> is ignored. <error code="C0056">It is a <glossterm>dynamic error</glossterm> if the specified template name cannot be
-        applied to the supplied stylesheet.</error></para>
+      collection in this case. Option <option>initial-mode</option> is ignored. <error code="C0056">It is a <glossterm>dynamic error</glossterm> if the stylesheet does not provide a given
+        template.</error></para>
     <para>Independent of the way the stylesheet is invoked, the principal result(s) will appear on
       output port <port>result</port> while secondary result(s) will appear on output port
       <port>secondary</port>. Whether the raw results are delivered or a result tree is
@@ -3781,7 +3887,9 @@ validation before using XQuery:</para>
     <para>Option <option>output-base-uri</option> sets the base output URI per XSLT 3.0
       specification. If a final result tree is constructed, this URI is used to resolve a relative
       URI reference. If no value is supplied for <option>output-base-uri</option>, the base URI of
-      the first document in the <port>source</port> port's sequence is used.</para>
+      the first document in the <port>source</port> port's sequence is used. If no document is
+      supplied on port <port>source</port> the base URI of the document on port <port>stylesheet</port>
+      is used.</para>
     <note>
       <para>If no result tree is constructed for one of secondary results, a sequence of documents
         sharing the same value for attribute <literal>href</literal> may appear on output port
@@ -3800,10 +3908,12 @@ validation before using XQuery:</para>
       invoked as per XSLT 2.0. The invocation of the transformation is controlled by the
       <option>initial-mode</option> and <option>template-name</option> options that set the
       initial mode and/or named template in the XSLT transformation where processing begins. <error code="C0007">It is a <glossterm>dynamic error</glossterm> if any key in
-        <option>parameters</option> is associated to a value with is not an instance of the XQuery
+        <option>parameters</option> is associated to a value which is not an instance of the XQuery
         1.0 and XPath 2.0 Data Model, e.g. with a map, an array, or a function.</error>
-      <error code="C0056">It is a <glossterm>dynamic error</glossterm> if the specified initial mode
-        or named template cannot be applied to the specified stylesheet.</error>
+      <error code="C0008">It is a <glossterm>dynamic error</glossterm> if the specified initial mode
+        cannot be applied to the specified stylesheet.</error> 
+      <error code="C0056">It is a <glossterm>dynamic error</glossterm> if the specified template 
+        name cannot be applied to the specified stylesheet.</error>
     </para>
     <para>The primary result document of the transformation, if there is one, appears on the
       <port>result</port> port. At most one document can appear on the <port>result</port> port.
@@ -3813,7 +3923,9 @@ validation before using XQuery:</para>
     </para>
     <para>The <option>output-base-uri</option> option sets the context's output base URI per the
       XSLT 2.0 specification, otherwise the base URI of the <port>result</port> document is the base
-      URI of the first document in the <code>source</code> port's sequence.</para>
+      URI of the first document in the <code>source</code> port's sequence. If no document is
+      supplied on port <port>source</port> the base URI of the document on port <port>stylesheet</port>
+      is used.</para>
   </section>
   
   <section>
@@ -3828,11 +3940,11 @@ validation before using XQuery:</para>
       <option>output-base-uri</option> as the base URI of its output, if the option is
       specified.</para>
     <para>The key/value pairs supplied in <option>parameters</option> are used to set top-level
-      parameters in the stylesheet. 
+      parameters in the stylesheet. If the value is an atomic value or a node, its string value is
+      supplied to the stylesheet. <error code="C0105">It is a <glossterm>dynamic error</glossterm> if an XSLT 1.0
+      stylesheet is invoked and option <option>parameters</option> contains a value that is not an atomic value
+      or a node.</error>
     </para>
-    <note role="editorial">
-      <title>Editorial Note</title><para>I am not sure whether it makes sense to spell out in detail, how XDM 3.0 values are
-      mapped to XSLT 1.0 parameters. There are no rules in the XProc 1.0 specs.</para></note>
   </section>
   <simplesect>
     <title>Document properties</title>
@@ -4001,6 +4113,8 @@ and their use as ASN.1 Object Identifier components</citetitle>.
 1995.</bibliomixed>
     <bibliomixed xml:id="zip"><abbrev>ZIP</abbrev>
     <citetitle xlink:href="https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT">.ZIP File Format Specification</citetitle>.</bibliomixed>
+    <bibliomixed xml:id="gzip"><abbrev>GZIP</abbrev>
+    <citetitle xlink:href="https://tools.ietf.org/html/rfc1952">GZIP file format specification version 4.3</citetitle>.</bibliomixed>
   </bibliolist>
 </section>
 <section xml:id="informative-references">
