@@ -788,7 +788,7 @@ The archive has no <property>base-uri</property>.</para>
     of an unarchived document by <xref linkend="c.unarchive"/>. 
     <error code="C0120">It is a <glossterm>dynamic error</glossterm> if the 
       <option>relative-to</option> option is not present and the document on the 
-      <port>source</port> port does not have a base URI.</error><impl>Additional information
+      <port>source</port> port does not have a base URI.</error> <impl>Additional information
       provided for entries in <tag>p:archive-manifest</tag> is
         <glossterm>implementation-defined</glossterm>.</impl></para>
 
@@ -2476,8 +2476,8 @@ nodes.</error></para>
 as an IRI reference. If it is relative, it is made absolute against
 the base URI of the element on which it is specified
 (<tag>p:with-option</tag> or <tag>p:make-absolute-uris</tag> in the case of
-a syntactic shortcut
-value).</para>
+  a syntactic shortcut value). <error code="D0064">It is a <glossterm>dynamic 
+    error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error></para>
 
 <para>For every element or attribute in the input document which
 matches the specified pattern, its XPath string-value is resolved
@@ -3117,7 +3117,7 @@ newline (&amp;#10;).</para>
   
   <p:declare-step type="p:text-join">
     <p:input port="source" sequence="true" content-types="text"/>
-    <p:output port="result" content-types="text/plain"/>
+    <p:output port="result" content-types="text"/>
     <p:option name="separator" as="xs:string?"/>
     <p:option name="prefix" as="xs:string?"/>
     <p:option name="suffix" as="xs:string?"/>
@@ -3147,7 +3147,7 @@ newline (&amp;#10;).</para>
       a valid media type of the form
       “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
       where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error> <error code="C0001">It is a
-      <glossterm>dynamic error</glossterm> if the value of option <option>overwrite-content-type</option> 
+        <glossterm>dynamic error</glossterm> if the value of option <option>override-content-type</option> 
       is not a text media type.</error>
   </para>
 
@@ -4208,7 +4208,9 @@ establish a base URI, the document will not have one.
       URI reference. If no value is supplied for <option>output-base-uri</option>, the base URI of
       the first document in the <port>source</port> port's sequence is used. If no document is
       supplied on port <port>source</port> the base URI of the document on port <port>stylesheet</port>
-      is used.</para>
+      is used. <error code="C0121">It is a <glossterm>dynamic error</glossterm> if a document appearing
+        on the <port>secondary</port> port has a base URI that is not both absolute and 
+        valid according to <biblioref linkend="rfc3986"/>.</error></para>
     <note>
       <para>If no result tree is constructed for one of secondary results, a sequence of documents
         sharing the same value for attribute <literal>href</literal> may appear on output port
@@ -4244,7 +4246,9 @@ establish a base URI, the document will not have one.
       XSLT 2.0 specification, otherwise the base URI of the <port>result</port> document is the base
       URI of the first document in the <code>source</code> port's sequence. If no document is
       supplied on port <port>source</port> the base URI of the document on port <port>stylesheet</port>
-      is used.</para>
+      is used. <error code="C0121">It is a <glossterm>dynamic error</glossterm> if a document appearing
+        on the <port>secondary</port> port has a base URI that is not both absolute and 
+        valid according to <biblioref linkend="rfc3986"/>.</error></para>
   </section>
   
   <section>

@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0: Standard Step Library</title><meta charset="utf-8" /><meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" /><link class="removeOnSave" crossorigin="anonymous" href="https://www.w3.org" rel="preconnect" /><link as="script" class="removeOnSave" href="js/fixup.js" rel="preload" /><link as="style" class="removeOnSave" href="css/base.css" rel="preload" /><link as="image" class="removeOnSave" href="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" rel="preload" /><link rel="stylesheet" href="css/cg-draft.css" /><link rel="stylesheet" href="css/respec.css" /><link rel="alternate" title="XML" href="specification.xml" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.4.2" /><meta name="description" content="Abstract This specification describes the standard step vocabulary of&#xA;  XProc 3.0: An XML Pipeline Language." /><link href="css/default.css" rel="stylesheet" type="text/css" /><link href="css/db-prism.css" rel="stylesheet" type="text/css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><link rel="stylesheet" type="text/css" href="css/xproc.css" /><link rel="stylesheet" type="text/css" href="css/print.css" media="print" /><script type="text/javascript" src="js/dbmodnizr.js"></script></head><body><attribute name="class" select="'h-entry informative toc-sidebar'"></attribute><div class="head" id="spec.head"><a class="logo" href="https://www.w3.org/"><img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72" /></a><h1 id="title" class="title p-name">XProc 3.0: Standard Step Library</h1><h2>Draft Community Group Report <time class="dt-published" datetime="2019-01-04">1 January 2020</time></h2><div class="editors-draft">Editor's Draft   at 20:18 UTC (<a href="https://github.com/ndw/steps/commit/55895285c72e367570796e37471d4540230d7943">build 81</a>)</div><dl><dt>Latest editor’s draft:</dt><dd><a href="http://spec.xproc.org/master/head/steps/">http://spec.xproc.org/master/head/steps/</a></dd><dt>Editors:</dt><dd><span class="personname">Norman Walsh</span></dd><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Erik Siegel</span></dd><dt>Participate:</dt><dd><a href="http://github.com/xproc/3.0-steps">GitHub xproc/3.0-steps</a></dd><dd><a href="http://github.com/xproc/3.0-steps/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="diff.html">Diff against current “status quo” draft</a></dd><dd><a href="http://github.com/ndw/steps/commits/master">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="specification.xml">XML</a>, 
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0: Standard Step Library</title><meta charset="utf-8" /><meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" /><link class="removeOnSave" crossorigin="anonymous" href="https://www.w3.org" rel="preconnect" /><link as="script" class="removeOnSave" href="js/fixup.js" rel="preload" /><link as="style" class="removeOnSave" href="css/base.css" rel="preload" /><link as="image" class="removeOnSave" href="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" rel="preload" /><link rel="stylesheet" href="css/cg-draft.css" /><link rel="stylesheet" href="css/respec.css" /><link rel="alternate" title="XML" href="specification.xml" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.4.2" /><meta name="description" content="Abstract This specification describes the standard step vocabulary of&#xA;  XProc 3.0: An XML Pipeline Language." /><link href="css/default.css" rel="stylesheet" type="text/css" /><link href="css/db-prism.css" rel="stylesheet" type="text/css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><link rel="stylesheet" type="text/css" href="css/xproc.css" /><link rel="stylesheet" type="text/css" href="css/print.css" media="print" /><script type="text/javascript" src="js/dbmodnizr.js"></script></head><body><attribute name="class" select="'h-entry informative toc-sidebar'"></attribute><div class="head" id="spec.head"><a class="logo" href="https://www.w3.org/"><img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72" /></a><h1 id="title" class="title p-name">XProc 3.0: Standard Step Library</h1><h2>Draft Community Group Report <time class="dt-published" datetime="2019-01-04">2 January 2020</time></h2><div class="editors-draft">Editor's Draft   at 23:39 UTC (<a href="https://github.com/ndw/steps/commit/c734a0ae3bc3bbe36bb3edf118dc65c257576a8c">build 82</a>)</div><dl><dt>Latest editor’s draft:</dt><dd><a href="http://spec.xproc.org/master/head/steps/">http://spec.xproc.org/master/head/steps/</a></dd><dt>Editors:</dt><dd><span class="personname">Norman Walsh</span></dd><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Erik Siegel</span></dd><dt>Participate:</dt><dd><a href="http://github.com/xproc/3.0-steps">GitHub xproc/3.0-steps</a></dd><dd><a href="http://github.com/xproc/3.0-steps/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="diff.html">Diff against current “status quo” draft</a></dd><dd><a href="http://github.com/ndw/steps/commits/master">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="specification.xml">XML</a>, 
 	  automatic change markup
           <a href="diff.html">from the previous draft</a>
           and <a href="lcdiff.html">from the last call draft</a>
@@ -688,7 +688,7 @@ The archive has no <code class="property">base-uri</code>.</p>
     of an unarchived document by <a href="#c.unarchive" title="p:unarchive">Section 2.39, “p:unarchive”</a>. 
     <a id="err.inline.C0120"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0120"><code class="errqname">err:XC0120</code></a>) if the 
       <code class="option">relative-to</code> option is not present and the document on the 
-      <code class="port">source</code> port does not have a base URI.<span id="impl-19">Additional information
+      <code class="port">source</code> port does not have a base URI. <span id="impl-19">Additional information
       provided for entries in <code class="tag-element">p:archive-manifest</code> is
         <em class="glossterm"><a href="#dt-implementation-defined">implementation-defined</a></em>.</span></p>
 
@@ -2280,8 +2280,8 @@ nodes.</p>
 as an IRI reference. If it is relative, it is made absolute against
 the base URI of the element on which it is specified
 (<code class="tag-element">p:with-option</code> or <code class="tag-element">p:make-absolute-uris</code> in the case of
-a syntactic shortcut
-value).</p>
+  a syntactic shortcut value). <a id="err.inline.D0064.3"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic 
+    error</a></em> (<a href="#err.D0064"><code class="errqname">err:XD0064</code></a>) if the base URI is not both absolute and valid according to [<a href="#rfc3986"><span class="abbrev">RFC 3986</span></a>].</p>
 
 <p>For every element or attribute in the input document which
 matches the specified pattern, its XPath string-value is resolved
@@ -2629,7 +2629,7 @@ a key equal to the string “<code class="literal">content-type</code>”.
 
 <p>If the <code class="option">properties</code> map contains a key equal to the string
 “<code class="literal">base-uri</code>” the associated value is taken as the new base URI of
-   the resulting document. <a id="err.inline.D0064.3"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic 
+   the resulting document. <a id="err.inline.D0064.4"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic 
    error</a></em> (<a href="#err.D0064"><code class="errqname">err:XD0064</code></a>) if the base URI is not both absolute and valid according 
       to [<a href="#rfc3986"><span class="abbrev">RFC 3986</span></a>].</p>
 
@@ -2858,7 +2858,7 @@ newline (&amp;#10;).</p>
   
   <p>The <code class="code">p:text-join</code> step concatenates text documents.</p>
   
-  <p class="element-syntax element-syntax-declare-step"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:text-join</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">source</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">text</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">text/plain</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">separator</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                  </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">prefix</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">suffix</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">override-content-type</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>      </code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
+  <p class="element-syntax element-syntax-declare-step"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:text-join</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">source</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">text</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">text</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">separator</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                  </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">prefix</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">suffix</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">override-content-type</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>      </code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
   
   <p>The <code class="code">p:text-join</code> step concatenates the text documents appearing on its <code class="port">source</code> port
     into a single document on its <code class="port">result</code> port. The documents will be concatenated in order of appearance. </p>
@@ -2883,7 +2883,7 @@ newline (&amp;#10;).</p>
       a valid media type of the form
       “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em>+<em class="replaceable"><code>ext</code></em></code>” 
       where “<code class="literal">+<em class="replaceable"><code>ext</code></em></code>” is optional. <a id="err.inline.C0001"></a>It is a
-      <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0001"><code class="errqname">err:XC0001</code></a>) if the value of option <code class="option">overwrite-content-type</code> 
+        <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0001"><code class="errqname">err:XC0001</code></a>) if the value of option <code class="option">override-content-type</code> 
       is not a text media type.
   </p>
 
@@ -3130,7 +3130,7 @@ newline (&amp;#10;).</p>
   <p><a id="err.inline.C0120.1"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0120"><code class="errqname">err:XC0120</code></a>) if the 
     <code class="option">relative-to</code> option is not present and the document on the 
     <code class="port">source</code> port does not have a base URI.
-    <a id="err.inline.D0064.4"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic
+    <a id="err.inline.D0064.5"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic
     error</a></em> (<a href="#err.D0064"><code class="errqname">err:XD0064</code></a>) if the option is not a valid URI according to [<a href="#rfc3986"><span class="abbrev">RFC 3986</span></a>].</p>
   
   <p>For instance, the base URI of an unarchived file called <code class="code">xyz.xml</code> that resided in
@@ -3613,7 +3613,7 @@ is empty.</p>
 <ul><li>
     <p>If the document root element is <a href="#cv.query"><code id="cv.query" class="tag-element">c:query</code></a>, the text
       descendants of this element are considered the query.</p>
-    <p id="d2428e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:query&gt;<br />    <var>string</var><br />&lt;/c:query&gt;</code></p>
+    <p id="d2430e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:query&gt;<br />    <var>string</var><br />&lt;/c:query&gt;</code></p>
   </li><li>
       <p>If the document root element is in the XQueryX namespace, the
         document is treated as an XQueryX-encoded query. <span id="impl-64">Support for
@@ -3817,7 +3817,9 @@ establish a base URI, the document will not have one.
       URI reference. If no value is supplied for <code class="option">output-base-uri</code>, the base URI of
       the first document in the <code class="port">source</code> port's sequence is used. If no document is
       supplied on port <code class="port">source</code> the base URI of the document on port <code class="port">stylesheet</code>
-      is used.</p>
+      is used. <a id="err.inline.C0121"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0121"><code class="errqname">err:XC0121</code></a>) if a document appearing
+        on the <code class="port">secondary</code> port has a base URI that is not both absolute and 
+        valid according to [<a href="#rfc3986"><span class="abbrev">RFC 3986</span></a>].</p>
     <div class="note admonition"><h3>Note</h3><div class="admonition-body">
       <p>If no result tree is constructed for one of secondary results, a sequence of documents
         sharing the same value for attribute <code class="literal">href</code> may appear on output port
@@ -3853,7 +3855,9 @@ establish a base URI, the document will not have one.
       XSLT 2.0 specification, otherwise the base URI of the <code class="port">result</code> document is the base
       URI of the first document in the <code class="code">source</code> port's sequence. If no document is
       supplied on port <code class="port">source</code> the base URI of the document on port <code class="port">stylesheet</code>
-      is used.</p>
+      is used. <a id="err.inline.C0121.1"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0121"><code class="errqname">err:XC0121</code></a>) if a document appearing
+        on the <code class="port">secondary</code> port has a base URI that is not both absolute and 
+        valid according to [<a href="#rfc3986"><span class="abbrev">RFC 3986</span></a>].</p>
   </div></section>
   
   <section id="c.xslt.12" class="section"><div class="section-titlepage"><h4><bdi class="secno">2.50.3. </bdi>Invoking an XSLT 1.0 stylesheet<a aria-label="§" class="self-link" href="#"></a></h4></div><div class="content">
@@ -3930,7 +3934,7 @@ the processor does not support DTD validation.</p><p>See: <a href="#err.inline.D
 if the content-type is specified and the
 document-properties has a “content-type” that is not the
 same.</p><p>See: <a href="#err.inline.D0062">p:load</a></p></dd><dt id="err.D0064"><code class="errqname">err:XD0064</code></dt><dd><p>It is a dynamic 
-            error if the base URI is not both absolute and valid according to .</p><p>See: <a href="#err.inline.D0064">p:archive</a>, <a href="#err.inline.D0064.1">p:archive-manifest</a>, <a href="#err.inline.D0064.2">p:load</a>, <a href="#err.inline.D0064.3">p:set-properties</a>, <a href="#err.inline.D0064.4">p:unarchive</a></p></dd><dt id="err.D0070"><code class="errqname">err:XD0070</code></dt><dd><p>It is a dynamic error if a value is 
+            error if the base URI is not both absolute and valid according to .</p><p>See: <a href="#err.inline.D0064">p:archive</a>, <a href="#err.inline.D0064.1">p:archive-manifest</a>, <a href="#err.inline.D0064.2">p:load</a>, <a href="#err.inline.D0064.3">p:make-absolute-uris</a>, <a href="#err.inline.D0064.4">p:set-properties</a>, <a href="#err.inline.D0064.5">p:unarchive</a></p></dd><dt id="err.D0070"><code class="errqname">err:XD0070</code></dt><dd><p>It is a dynamic error if a value is 
 assigned to the serialization document property that cannot be converted 
 into map(xs:QName, item()*) according
 to the rules in section “QName handling” of .</p><p>See: <a href="#err.inline.D0070">p:set-properties</a></p></dd><dt id="err.D0078"><code class="errqname">err:XD0078</code></dt><dd><p>It is a dynamic error
@@ -3938,7 +3942,7 @@ if the loaded document cannot be represented as an HTML document in
 the XPath data model.</p><p>See: <a href="#err.inline.D0078">Loading HTML data</a></p></dd></dl></div>
 
 <div id="step-error-summary"><h5>Step Errors</h5><dl class="errs"><dt id="err.C0001"><code class="errqname">err:XC0001</code></dt><dd><p>It is a
-      dynamic error if the value of option overwrite-content-type 
+        dynamic error if the value of option override-content-type 
       is not a text media type.</p><p>See: <a href="#err.inline.C0001">p:text-join</a></p></dd><dt id="err.C0002"><code class="errqname">err:XC0002</code></dt><dd><p>It is a dynamic error if the value
 starts with the string “--”.</p><p>See: <a href="#err.inline.C0002">Request Entity body conversion</a></p></dd><dt id="err.C0003"><code class="errqname">err:XC0003</code></dt><dd><p>It
 is a dynamic error if a username
@@ -4090,7 +4094,9 @@ with the resulting name.</p><p>See: <a href="#err.inline.C0109">p:namespace-dele
         invalid according to the specification.</p><p>See: <a href="#err.inline.C0118">The archive manifest</a></p></dd><dt id="err.C0119"><code class="errqname">err:XC0119</code></dt><dd><p>It is a dynamic error if flatten is
 neither “unbounded”, nor a string that may be cast to a non-negative integer.</p><p>See: <a href="#err.inline.C0119">p:json-join</a></p></dd><dt id="err.C0120"><code class="errqname">err:XC0120</code></dt><dd><p>It is a dynamic error if the 
       relative-to option is not present and the document on the 
-      source port does not have a base URI.</p><p>See: <a href="#err.inline.C0120">p:archive-manifest</a>, <a href="#err.inline.C0120.1">p:unarchive</a></p></dd><dt id="err.C0201"><code class="errqname">err:XC0201</code></dt><dd><p>It is a dynamic error if the
+      source port does not have a base URI.</p><p>See: <a href="#err.inline.C0120">p:archive-manifest</a>, <a href="#err.inline.C0120.1">p:unarchive</a></p></dd><dt id="err.C0121"><code class="errqname">err:XC0121</code></dt><dd><p>It is a dynamic error if a document appearing
+        on the secondary port has a base URI that is not both absolute and 
+        valid according to .</p><p>See: <a href="#err.inline.C0121">Invoking an XSLT 3.0 stylesheet</a>, <a href="#err.inline.C0121.1">Invoking an XSLT 2.0 stylesheet</a></p></dd><dt id="err.C0201"><code class="errqname">err:XC0201</code></dt><dd><p>It is a dynamic error if the
             p:uncompress step cannot perform the requested content-type cast.</p><p>See: <a href="#err.inline.C0201">p:uncompress</a></p></dd><dt id="err.C0202"><code class="errqname">err:XC0202</code></dt><dd><p>It is a dynamic error if the compression
               format cannot be understood, determined and/or processed.</p><p>See: <a href="#err.inline.C0202">p:compress</a>, <a href="#err.inline.C0202.1">p:uncompress</a></p></dd></dl></div>
 
