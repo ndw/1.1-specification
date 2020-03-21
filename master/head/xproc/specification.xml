@@ -1261,7 +1261,7 @@ as they are available statically.</para>
   &lt;p:option name="A" static="true" select="5"/&gt;
   &lt;p:option name="B" static="true" select="$A + count(//*)"&gt;
     &lt;p:document href="doc.xml"/&gt;
-  &lt;/p:variable&gt;
+  &lt;/p:option&gt;
   &lt;p:variable name="D" select="count(//*)"/&gt;
 
   …
@@ -3761,7 +3761,7 @@ port</glossterm>.</para>
   &lt;/p:xslt&gt;
 
   &lt;p:xslt name="make-fo"&gt;
-    &lt;p:with-input port="source" pipe="chapters@current"/&gt;
+    &lt;p:with-input port="source" pipe="current@chapters"/&gt;
     &lt;p:with-input port="stylesheet" href="http://example.com/xsl/fo.xsl"/&gt;
   &lt;/p:xslt&gt;
 &lt;/p:for-each&gt;</programlisting>
@@ -4743,18 +4743,14 @@ that more than one input port is the primary.</error></para>
 <tag class="attribute">select</tag> may be used to select a portion of the
 input identified by the <tag>p:empty</tag>, <tag>p:document</tag>,
 or <tag>p:inline</tag> elements in the
-<tag>p:input</tag>. This select expression <rfc2119>must</rfc2119> be an XPath
-expression.
-The selected nodes are returned as separate documents.
-If such a document consists exclusively of text nodes, then it has a content
-type of <literal>text/plain</literal>, otherwise it has a content type
-of <literal>application/xml</literal>. <error code="D0016">It is a
-<glossterm>dynamic error</glossterm> if the select expression on a p:input or
-p:with-input returns anything other than document nodes, element nodes,
-processing instruction nodes, comment nodes, text nodes or an empty sequence.</error></para>
+<tag>p:input</tag>.</para>
+
+<para>With the exception that <tag>p:input</tag> cannot establish a connection 
+to another step, what is said about the <tag class="attribute">select</tag> 
+attribute in <tag>p:with-input</tag> equally applies to <tag>p:input</tag>.</para>
 
 <para>The
-<tag class="attribute">select</tag> expression applies
+<tag class="attribute">select</tag> expression on <tag>p:input</tag> applies
 <emphasis>only</emphasis> if the default connection is used. If an
 explicit connection is provided by the caller, then the default select
 expression is ignored.</para>
@@ -5362,20 +5358,6 @@ default collection within <tag class="attribute">select</tag> expression.</para>
 </listitem>
 </varlistentry>
 
-<varlistentry><term><tag class="attribute">visibility</tag></term>
-<listitem>
-<para>If the <tag>p:variable</tag> is a child of a <tag>p:library</tag>,
-the <tag class="attribute">visibility</tag> attribute controls whether
-the variable is visible to an importing pipeline. If
-<tag class="attribute">visibility</tag> is set to “<literal>private</literal>”,
-the variable is visible inside the <tag>p:library</tag> but not visible to
-any pipeline importing the <tag>p:library</tag>. If the visibility attribute is
-missing, “<literal>public</literal>” is assumed. If the <tag>p:variable</tag> is not a child 
-of <tag>a p:library</tag> the attribute has no effect and is ignored.
-</para>
-</listitem>
-</varlistentry>
-
 <varlistentry><term><tag class="attribute">href</tag></term>
 <listitem>
 <para>As described in <tag>p:with-input</tag>.</para>
@@ -5524,10 +5506,9 @@ which will be evaluated to provide the default value for the option.
 </para>
 
 <para>The default value of an option is specified with an XPath
-expression on the <tag>p:declare-step</tag> that defines the step
-signature. It must be a statically valid expression at that point.
-Consequently, if it contains variable references, they can only be
-references to preceding options on the step or to in-scope static variables.
+expression. It must be a statically valid expression at that point.
+Consequently, if it contains option references, these can only be
+references to preceding non-static options on the step or to in-scope static options.
 <error code="D0001">It is a <glossterm>dynamic error</glossterm> if an
 XPath expression makes reference to the context item, size, or position when
 the context item is undefined.</error></para>
@@ -8045,7 +8026,23 @@ who contributed to this document and all of the versions that came before it.</p
 
 <appendix xml:id="changelog">
 <title>Change Log</title>
-<para>This appendix catalogs non-editorial changes made after the
+  <para>This list contains the non-editorial changes made after the
+    December 2019
+    “<link xlink:href="https://spec.xproc.org/lastcall-2019-12/head/xproc/">last call</link>”
+    draft:</para>
+  
+  <itemizedlist>
+    <listitem>
+      <para>The <code>visibility</code> attribute of <tag>p:variable</tag> was removed.</para>
+    </listitem>
+    <listitem>
+        <para>The description of the <code>select</code> attribute of <tag>p:option</tag> no longer
+          mentions static variables.</para>
+    </listitem>
+    
+  </itemizedlist>
+  
+<para>This list contains the non-editorial changes made after the
 February 2019
 “<link xlink:href="http://spec.xproc.org/lastcall-2019-02/head/xproc/">last call</link>”
 draft:</para>
@@ -8109,7 +8106,7 @@ draft:</para>
         <para>Identified the <port>error</port> port as the primary input port in <tag>p:catch</tag>.</para>
       </listitem>
       <listitem>
-        <para>Clarified that <tag>p:finally</tag> <rfc2119>must not</rfc2119> declare a pirmary output port.</para>
+        <para>Clarified that <tag>p:finally</tag> <rfc2119>must not</rfc2119> declare a primary output port.</para>
       </listitem>
       <listitem>
         <para>Clarified which functions are available during static analysis.</para>
@@ -8124,6 +8121,10 @@ draft:</para>
         <para>Clarified how sequences of XDM values (for
         example, from a <tag>p:xslt</tag> step) are converted into
         documents.</para>
+      </listitem>
+      <listitem>
+        <para>Updated the description of the <tag class="attribute">select</tag> attribute for <tag>p:input</tag>
+        so that it is in line with the more recent changes that have been applied to <tag>p:with-input</tag>.</para>
       </listitem>
     </itemizedlist>
 </appendix>
