@@ -49,6 +49,7 @@ Step-archive-manifest =
     attribute format { avt.datatype }?,
     attribute parameters { avt.datatype }?,
     attribute relative-to { avt.datatype }?,
+    attribute override-content-types { avt.datatype }?,
     (WithInput* & WithOption* & (Documentation|PipeInfo)*)
   }
 
@@ -432,6 +433,7 @@ Step-unarchive =
     attribute format { avt.datatype }?,
     attribute parameters { avt.datatype }?,
     attribute relative-to { avt.datatype }?,
+    attribute override-content-types { avt.datatype }?,
     (WithInput* & WithOption* & (Documentation|PipeInfo)*)
   }
 
@@ -540,6 +542,7 @@ Step-xslt =
     use-when.attr?,
     step.attributes,
     attribute parameters { avt.datatype }?,
+    attribute static-parameters { avt.datatype }?,
     attribute global-context-item { avt.datatype }?,
     attribute initial-mode { avt.datatype }?,
     attribute template-name { avt.datatype }?,

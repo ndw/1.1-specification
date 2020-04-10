@@ -196,6 +196,11 @@
           <ref name="avt.datatype"/>
         </attribute>
       </optional>
+      <optional>
+        <attribute name="override-content-types">
+          <ref name="avt.datatype"/>
+        </attribute>
+      </optional>
       <interleave>
         <zeroOrMore>
           <ref name="WithInput"/>
@@ -1453,6 +1458,11 @@
           <ref name="avt.datatype"/>
         </attribute>
       </optional>
+      <optional>
+        <attribute name="override-content-types">
+          <ref name="avt.datatype"/>
+        </attribute>
+      </optional>
       <interleave>
         <zeroOrMore>
           <ref name="WithInput"/>
@@ -1794,6 +1804,11 @@
       <ref name="step.attributes"/>
       <optional>
         <attribute name="parameters">
+          <ref name="avt.datatype"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="static-parameters">
           <ref name="avt.datatype"/>
         </attribute>
       </optional>

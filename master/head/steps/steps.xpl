@@ -49,6 +49,7 @@
       <p:option name="format" as="xs:QName?"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="relative-to" as="xs:anyURI?"/>
+      <p:option name="override-content-types" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:cast-content-type" xml:id="cast-content-type">
       <p:input port="source" content-types="any"/>
@@ -380,6 +381,7 @@
       <p:option name="format" as="xs:QName?"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="relative-to" as="xs:anyURI?"/>
+      <p:option name="override-content-types" as="xs:string"/>
    </p:declare-step>
    <p:declare-step type="p:uncompress" xml:id="uncompress">
       <p:input port="source"
@@ -465,6 +467,7 @@
                 content-types="any"/>
       <p:output port="secondary" sequence="true" content-types="any"/>
       <p:option name="parameters" as="xs:string"/>
+      <p:option name="static-parameters" as="xs:string"/>
       <p:option name="global-context-item" as="xs:string"/>
       <p:option name="initial-mode" as="xs:QName?"/>
       <p:option name="template-name" as="xs:QName?"/>

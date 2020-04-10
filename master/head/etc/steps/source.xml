@@ -745,6 +745,7 @@ The archive has no <property>base-uri</property>.</para>
     <p:option name="format" as="xs:QName?"/>
     <p:option name="parameters" as="map(xs:QName, item()*)?"/>
     <p:option name="relative-to" as="xs:anyURI?"/>
+    <p:option name="override-content-types" as="array(array(xs:string))?"/>
   </p:declare-step>
 
   <para>The <code>p:archive-manifest</code> step inspects the archive appearing on its
@@ -758,7 +759,7 @@ The archive has no <property>base-uri</property>.</para>
         archive. Implementations <rfc2119>must</rfc2119> support the <biblioref linkend="zip"/>
         format, specified with the value <code>zip</code>. <impl>It is
             <glossterm>implementation-defined</glossterm> what other formats are supported.</impl>
-        </para>
+      </para>
     </listitem>
     <listitem>
       <para>If no <option>format</option> option is specified or if its value is the empty sequence,
@@ -770,8 +771,9 @@ The archive has no <property>base-uri</property>.</para>
     </listitem>
   </itemizedlist>
 
-  <para><error code="C0085">It is a <glossterm>dynamic error</glossterm> if the format of the archive 
-    does not match the specified format, cannot be understood, determined and/or processed.</error></para>
+  <para><error code="C0085">It is a <glossterm>dynamic error</glossterm> if the format of the
+      archive does not match the specified format, cannot be understood, determined and/or
+      processed.</error></para>
 
   <para>The <option>parameters</option> option can be used to supply parameters to control the
     archive manifest generation. <impl>The semantics of the keys and the allowed values for these
@@ -781,10 +783,10 @@ The archive has no <property>base-uri</property>.</para>
       whose value is not valid for that key.</error></para>
 
   <para>The <option>relative-to</option> option, when present, is used in creating the value of the
-    manifest's <code>c:entry/@href</code> attribute. If the option is relative, it is made absolute 
-    against the base URI of the element on which it is specified (<tag>p:with-option</tag> or the step 
-    in case of a syntactic shortcut value). <error code="D0064">It is a <glossterm>dynamic 
-      error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error></para>
+    manifest's <code>c:entry/@href</code> attribute. If the option is relative, it is made absolute
+    against the base URI of the element on which it is specified (<tag>p:with-option</tag> or the
+    step in case of a syntactic shortcut value). <error code="D0064">It is a <glossterm>dynamic
+        error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error></para>
 
   <para>The generated manifest has the format as described in <xref linkend="cv.archive-manifest"/>.
     Implementations <rfc2119>must</rfc2119> supply an <tag>c:entry</tag> element and its
@@ -798,10 +800,74 @@ The archive has no <property>base-uri</property>.</para>
 
   <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
+  <section xml:id="override-content-type">
+    <title>Overriding content types</title>
+
+    <para>The <option>override-content-types</option> option can be used to partially override the
+      content-type determination mechanism. If present, it must be an array of arrays, where the
+      inner arrays consist of exactly two strings: </para>
+    <itemizedlist>
+      <listitem>
+        <para>The first member in an inner array <rfc2119>must</rfc2119> be a regular expression as
+          specified in <biblioref linkend="xpath31-functions"/>, section 7.61 “<literal>Regular
+            Expression Syntax</literal>”. <error code="C0147">It is a <glossterm>dynamic
+              error</glossterm> if the specified value is not a valid XPath regular
+            expression.</error></para>
+      </listitem>
+      <listitem>
+        <para>The second member in an inner array <rfc2119>must</rfc2119> be a valid a MIME
+          content-type. <error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied 
+            content-type is not a valid media type of the form 
+            “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+            or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error></para>
+      </listitem>
+    </itemizedlist>
+
+    <para><error code="C0146">It is a <glossterm>dynamic error</glossterm> if the specified value
+        for the <option>override-content-types</option> option is not an array of arrays, where the
+        inner arrays have exactly two members of type <code>xs:string</code>.</error></para>
+
+    <para>Determining an archive entry's content-type is as follows:</para>
+    <itemizedlist>
+      <listitem>
+        <para>The XPath regular expressions (the first members of the inner arrays) will be matched
+          against the path of the entry <emphasis>in</emphasis> the archive. This will be done in
+          the order of appearance in the outer array (so order is significant). The matching is done
+          unanchored: it is a match if the regular expression matches part of the entry's path.
+          Informally: matching behaves like applying the XPath <code>matches#2</code> function, like
+          in <code>matches($path-in-archive, $regular-expression)</code>.</para>
+        <note>
+          <para>Depending on how archives are constructed, the path of an entry in an archive can be
+            with or without a leading slash. Usually it will be without. For archives constructed by
+              <tag>p:archive</tag> no leading slash will be present.</para>
+        </note>
+      </listitem>
+      <listitem>
+        <para>If a match is found, the content-type (the second member of the inner array for which
+          the match was found) is used as the entry's content-type.</para>
+      </listitem>
+      <listitem>
+        <para>If no match was found for all inner arrays, the normal
+            (<glossterm>implementation-defined</glossterm>) mechanism for determining the
+          content-type is used. </para>
+      </listitem>
+    </itemizedlist>
+
+    <para>For example: setting the <option>override-content-types</option> option to <code>[
+        ['.rels$', 'application/xml'], ['^special/', 'application/octet-stream'] ]</code> means that
+      all files ending with <code>.rels</code> will get the content-type
+        <code>application/xml</code>. All files in the archive's <code>special</code> directory
+      (including sub-directories) will get the content-type
+      <code>application/octet-stream</code>.</para>
+
+  </section>
+
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
   <simplesect>
     <title>Document properties</title>
-    <para feature="archive-manifest-preserves-none">No document properties are preserved.
-The manifest has no <property>base-uri</property>.</para>
+    <para feature="archive-manifest-preserves-none">No document properties are preserved. The
+      manifest has no <property>base-uri</property>.</para>
   </simplesect>
 </section>
 <section xml:id="c.cast-content-type">
@@ -820,11 +886,10 @@ The manifest has no <property>base-uri</property>.</para>
    </p:declare-step>
    
    <para>The input document is transformed from one media type to another.
-      <error code="C0070">It is a <glossterm>dynamic
-         error</glossterm> if the supplied <option>content-type</option> is not
-         a valid media type of the form
-         “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”
-         where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error>
+      <error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+         a valid media type of the form 
+         “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+         or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
       <error code="C0071">It is a <glossterm>dynamic
          error</glossterm> if the <tag>p:cast-content-type</tag> step
          cannot perform the requested cast.</error>
@@ -1511,8 +1576,10 @@ converted to lowercase.</para>
       the content type value of the document. If the content type
       specified begins with “<literal>multipart/</literal>”, a
       multipart request will be sent to the server.</para>
-      <para><error code="C0130">It is a <glossterm>dynamic error</glossterm> if
-      the content-type specified is not a valid content type.</error></para>
+      <para><error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+        a valid media type of the form 
+        “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+        or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error></para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -3004,11 +3071,10 @@ newline (&amp;#10;).</para>
     </listitem>
   </itemizedlist>
   <para>When the <option>override-content-type</option> option is specified, the document appearing on the port <port>result</port>
-    will have this media type as part of its document properties. <error code="C0070">It is a <glossterm>dynamic
-      error</glossterm> if the supplied <option>content-type</option> is not
-      a valid media type of the form
+    will have this media type as part of its document properties. <error code="D0079">It is a <glossterm>dynamic 
+      error</glossterm> if a supplied content-type is not  a valid media type of the form 
       “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
-      where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error> <error code="C0001">It is a
+      or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error> <error code="C0001">It is a
         <glossterm>dynamic error</glossterm> if the value of option <option>override-content-type</option> 
       is not a text media type.</error>
   </para>
@@ -3044,9 +3110,11 @@ The joined document has no <property>base-uri</property> property.
   <para>This step is a convenience wrapper around the XPath <link xlink:href="https://www.w3.org/TR/xpath-functions-31/#func-replace"><function>fn:replace</function></link>
     function to ease text replacements in the document flow of a pipeline.</para>
 
-  <para>The <option>pattern</option>, <option>replacement</option> and <option>flags</option> options are specified the
-    same as the parameters with the same names of the <link xlink:href="https://www.w3.org/TR/xpath-functions-31/#func-replace"><function>fn:replace</function></link>
-    function.</para>
+  <para>The <option>pattern</option>, <option>replacement</option> and <option>flags</option>
+    options are specified the same as the parameters with the same names of the <link xlink:href="https://www.w3.org/TR/xpath-functions-31/#func-replace"><function>fn:replace</function></link> function. The <option>pattern</option> option
+      <rfc2119>must</rfc2119> be a regular expression as specified in <biblioref linkend="xpath31-functions"/>, section 7.61 “<literal>Regular Expression Syntax</literal>”.
+      <error code="C0147">It is a <glossterm>dynamic error</glossterm> if the specified value is not
+      a valid XPath regular expression.</error></para>
 
   <para>Replacing strings in text documents does not require identifying individual
 lines in each document, consequently no special end-of-line handling is
@@ -3183,6 +3251,7 @@ newline (&amp;#10;).</para>
     <p:option name="format" as="xs:QName?"/>
     <p:option name="parameters" as="map(xs:QName, item()*)?"/>
     <p:option name="relative-to" as="xs:anyURI?"/>
+    <p:option name="override-content-types" as="array(array(xs:string))?"/>
   </p:declare-step>
 
   <para>The meaning and interpretation of the <code>p:unarchive</code> step's options is as
@@ -3224,7 +3293,9 @@ newline (&amp;#10;).</para>
       <para>If present, the value of the <option>include-filter</option> or
           <option>exclude-filter</option> option <rfc2119>must</rfc2119> be a sequence of strings,
         each one representing a regular expressions as specified in <biblioref linkend="xpath31-functions"/>, section 7.61 “<literal>Regular Expression
-        Syntax</literal>”.</para>
+            Syntax</literal>”. <error code="C0147">It is a <glossterm>dynamic
+              error</glossterm> if a specified value is not a valid XPath regular
+              expression.</error></para>
 
       <para>If neither the <option>include-filter</option> option nor the
           <option>exclude-filter</option> option is specified, the <code>p:unarchive</code> step
@@ -3255,12 +3326,27 @@ newline (&amp;#10;).</para>
       <para>As a result: an item is included if it matches (at least) one of the
           <option>include-filter</option> values and none of the <option>exclude-filter</option>
         values.</para>
+      <para>The regular expressions specified in the <option>include-filter</option> and
+          <option>exclude-filter</option> options will be matched against the path of the entry
+          <emphasis>in</emphasis> the archive. The matching is done unanchored: it is a match if the
+        regular expression matches part of the entry's path. Informally: matching behaves like
+        applying the XPath <code>matches#2</code> function, like in <code>matches($path-in-archive,
+          $regular-expression)</code>.</para>
+      <note>
+        <para>Depending on how archives are constructed, the path of an entry in an archive can be
+          with or without a leading slash. Usually it will be without. For archives constructed by
+            <tag>p:archive</tag> no leading slash will be present.</para>
+      </note>
     </listitem>
     <listitem>
       <para>The <option>relative-to</option> option, when present, is used in creating the base URI
         of the unarchived documents. If the option is relative, it is made absolute against the
         base URI of the element on which it is specified (<tag>p:with-option</tag> or the step in
         case of a syntactic shortcut value).</para>
+    </listitem>
+    <listitem>
+      <para>The <option>override-content-types</option> option can be used to partially override the
+        content-type determination mechanism, as described in <xref linkend="override-content-type"/>.</para>
     </listitem>
   </itemizedlist>
 
@@ -3355,10 +3441,11 @@ the base URI of the document.
   <orderedlist>
     <listitem>
       <para>If the <option>content-type</option> option is specified, the uncompressed document
-          <rfc2119>must</rfc2119> be interpreted according to that content-type. <error code="C0070">It is a <glossterm>dynamic error</glossterm> if the supplied
-            <option>content-type</option> is not a valid media type of the form
-              “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>”
-          where “<literal>+<replaceable>ext</replaceable></literal>” is optional.</error>
+        <rfc2119>must</rfc2119> be interpreted according to that content-type. 
+        <error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+          a valid media type of the form 
+          “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+          or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
         <error code="C0201">It is a <glossterm>dynamic error</glossterm> if the
             <tag>p:uncompress</tag> step cannot perform the requested content-type cast.</error>
       </para>
@@ -3894,6 +3981,7 @@ establish a base URI, the document will not have one.
     <p:output port="result" primary="true" sequence="true" content-types="any"/>
     <p:output port="secondary" sequence="true" content-types="any"/>
     <p:option name="parameters" as="map(xs:QName,item()*)?"/>
+    <p:option name="static-parameters" as="map(xs:QName,item()*)?"/>
     <p:option name="global-context-item" as="item()?"/>
     <p:option name="initial-mode" as="xs:QName?"/>
     <p:option name="template-name" as="xs:QName?"/>
@@ -3908,11 +3996,15 @@ establish a base URI, the document will not have one.
       <glossterm>dynamic error</glossterm> if the specified xslt version is not available.</error> If
     the step does not specify a version, the implementation may use any version it has available and
     may use any means to determine what version to use, including, but not limited to, examining the
-    version of the stylesheet. <impl>It is <glossterm>implementation defined</glossterm> which XSLT
+    version of the stylesheet. <impl>It is <glossterm>implementation-defined</glossterm> which XSLT
     version(s) is/are supported.</impl></para>
   <para>The XSLT stylesheet provided on the <port>stylesheet</port> port is invoked. <error code="C0093"> It is a <glossterm>dynamic error</glossterm> if a static error occurs during the
     static analysis of the XSLT stylesheet.</error> Any parameters passed in the
     <option>parameters</option> option are used to define top-level stylesheet parameters.</para>
+  <para>Parameters passed in the <option>static-parameters</option> option are passed as static
+    parameters to the XSLT invocation. Whether static parameters are supported is
+      <glossterm>implementation-defined</glossterm> and depends on the XSLT version (which must be
+    3.0 or higher). If static parameters are not supported the option is ignored.</para>
   <para><error code="C0095">It is a <glossterm>dynamic error</glossterm> if an error occurred during
     the transformation.</error>
     <error code="C0096">It is a <glossterm>dynamic error</glossterm> if the transformation is
@@ -4282,7 +4374,20 @@ draft:</para>
        <code>c:entry/@content-type</code> was added to the archive manifest, to be filled by the
        <tag>p:archive-manifest</tag> step. (2020-03-20)</para>
    </listitem>
-</orderedlist>
+   <listitem>
+     <para>A <option>static-parameters</option> was added to <tag>p:xslt</tag>. (2020-03-23)</para>
+   </listitem>
+   <listitem>
+     <para>The <option>override-content-types</option> option was added to <tag>p:archive-manifest</tag> and <tag>p:unarchive</tag>. (2020-03-30)</para>
+   </listitem>
+   <listitem>
+        <para>Clarified the regular expression matching for <tag>p:text-replace</tag> and
+            <tag>p:unarchive</tag>. Added an error code for invalid regular expressions. (2020-04-02)</para>
+   </listitem>
+   <listitem>
+     <para>Replaced errors XC0070 and XC0130 with XD0079. (2020-04-09)</para>
+   </listitem>
+ </orderedlist>
 </appendix>
 
 </specification>
