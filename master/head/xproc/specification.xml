@@ -783,7 +783,11 @@ The following shortcuts <rfc2119>must</rfc2119> be supported by the processor:</
 </listitem>
 </itemizedlist>
 
-<para><impl>It is <glossterm>implementation-defined</glossterm> if a processor accepts any other content type shortcuts.</impl>
+  <para><error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+    a valid media type of the form 
+    “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+    or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
+  <impl>It is <glossterm>implementation-defined</glossterm> if a processor accepts any other content type shortcuts.</impl>
 <error code="S0111">It is a <glossterm>static error</glossterm> if an unrecognized content type shortcut is specified.</error>
 </para>
 
@@ -3185,7 +3189,7 @@ For convenience, they are all summarized here.</para>
 </listitem>
 </itemizedlist>
 
-<para>The remaining elements are sometimes in no namespace and sometimes
+<para>The remaining attributes are sometimes in no namespace and sometimes
 explicitly in the XProc namespace. They are in no namespace when they
 appear on an XProc element; they are in the XProc namespace when they
 are on an element in any other namespace. In this way, they do not
@@ -7443,10 +7447,8 @@ they are <firstterm>visible</firstterm> to each other.</para></glossdef></glosse
 descriptions of this language are available in
 <link xlink:href="schemas/xproc.rng">RELAX NG</link> (and the
 RELAX NG 
-<link xlink:href="schemas/xproc.rnc">compact syntax</link>),
-<link xlink:href="schemas/xproc.xsd">W3C XML Schema</link>,
-and 
-<link xlink:href="schemas/xproc.dtd">DTD</link> syntaxes.</para>
+<link xlink:href="schemas/xproc.rnc">compact syntax</link>).
+</para>
 
 <?syntax-summary?>
 
@@ -8039,7 +8041,9 @@ who contributed to this document and all of the versions that came before it.</p
         <para>The description of the <code>select</code> attribute of <tag>p:option</tag> no longer
           mentions static variables.</para>
     </listitem>
-    
+    <listitem>
+      <para>Error XD0079 added for defective content-types. (Was XS0070 or XS00130).</para>
+    </listitem>
   </itemizedlist>
   
 <para>This list contains the non-editorial changes made after the
