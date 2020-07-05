@@ -1,4 +1,4 @@
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0: Standard Step Library</title><meta charset="utf-8" /><meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" /><link class="removeOnSave" crossorigin="anonymous" href="https://www.w3.org" rel="preconnect" /><link as="script" class="removeOnSave" href="js/fixup.js" rel="preload" /><link as="style" class="removeOnSave" href="css/base.css" rel="preload" /><link as="image" class="removeOnSave" href="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" rel="preload" /><link rel="stylesheet" href="css/cg-draft.css" /><link rel="stylesheet" href="css/respec.css" /><link rel="alternate" title="XML" href="specification.xml" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.4.2" /><meta name="description" content="Abstract This specification describes the standard step vocabulary of&#xA;  XProc 3.0: An XML Pipeline Language." /><link href="css/default.css" rel="stylesheet" type="text/css" /><link href="css/db-prism.css" rel="stylesheet" type="text/css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><link rel="stylesheet" type="text/css" href="css/xproc.css" /><link rel="stylesheet" type="text/css" href="css/print.css" media="print" /><script type="text/javascript" src="js/dbmodnizr.js"></script></head><body class="h-entry informative toc-sidebar"><div class="head" id="spec.head"><a class="logo" href="https://www.w3.org/"><img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72" /></a><h1 id="title" class="title p-name">XProc 3.0: Standard Step Library</h1><h2>Draft Community Group Report <time class="dt-published" datetime="2020-06-10">10 June 2020</time></h2><div class="editors-draft">Editor's Draft   at <time class="dt-timestamp" datetime="20200610T15:28:29Z">15:28 UTC</time> (<a href="https://github.com/ndw/steps/commit/b160f7e8afd4fb50a0f7a0cd7a012f1b4c9573f5">build 132</a>)</div><dl><dt>Latest editor’s draft:</dt><dd><a href="http://spec.xproc.org/master/head/steps/">http://spec.xproc.org/master/head/steps/</a></dd><dt>Editors:</dt><dd><span class="personname">Norman Walsh</span></dd><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Erik Siegel</span></dd><dt>Participate:</dt><dd><a href="http://github.com/xproc/3.0-steps">GitHub xproc/3.0-steps</a></dd><dd><a href="http://github.com/xproc/3.0-steps/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="diff.html">Diff against current “status quo” draft</a></dd><dd><a href="http://github.com/ndw/steps/commits/master">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="specification.xml">XML</a>, 
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>XProc 3.0: Standard Step Library</title><meta charset="utf-8" /><meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport" /><link class="removeOnSave" crossorigin="anonymous" href="https://www.w3.org" rel="preconnect" /><link as="script" class="removeOnSave" href="js/fixup.js" rel="preload" /><link as="style" class="removeOnSave" href="css/base.css" rel="preload" /><link as="image" class="removeOnSave" href="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" rel="preload" /><link rel="stylesheet" href="css/cg-draft.css" /><link rel="stylesheet" href="css/respec.css" /><link rel="alternate" title="XML" href="specification.xml" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.4.2" /><meta name="description" content="Abstract This specification describes the standard step vocabulary of&#xA;  XProc 3.0: An XML Pipeline Language." /><link href="css/default.css" rel="stylesheet" type="text/css" /><link href="css/db-prism.css" rel="stylesheet" type="text/css" /><link rel="stylesheet" type="text/css" href="css/base.css" /><link rel="stylesheet" type="text/css" href="css/xproc.css" /><link rel="stylesheet" type="text/css" href="css/print.css" media="print" /><script type="text/javascript" src="js/dbmodnizr.js"></script></head><body class="h-entry informative toc-sidebar"><div class="head" id="spec.head"><a class="logo" href="https://www.w3.org/"><img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2016/logos/W3C" width="72" /></a><h1 id="title" class="title p-name">XProc 3.0: Standard Step Library</h1><h2>Draft Community Group Report <time class="dt-published" datetime="2020-07-05">5 July 2020</time></h2><div class="editors-draft">Editor's Draft   at <time class="dt-timestamp" datetime="20200705T12:05:52Z">12:05 UTC</time> (<a href="https://github.com/ndw/steps/commit/9e33716734deec661c0c68cadb68bc74a0b8aab2">build 136</a>)</div><dl><dt>Latest editor’s draft:</dt><dd><a href="http://spec.xproc.org/master/head/steps/">http://spec.xproc.org/master/head/steps/</a></dd><dt>Editors:</dt><dd><span class="personname">Norman Walsh</span></dd><dd><span class="personname">Achim Berndzen</span></dd><dd><span class="personname">Gerrit Imsieke</span></dd><dd><span class="personname">Erik Siegel</span></dd><dt>Participate:</dt><dd><a href="http://github.com/xproc/3.0-steps">GitHub xproc/3.0-steps</a></dd><dd><a href="http://github.com/xproc/3.0-steps/issues">Report an issue</a></dd><dt>Changes:</dt><dd><a href="diff.html">Diff against current “status quo” draft</a></dd><dd><a href="http://github.com/ndw/steps/commits/master">Commits for this specification</a></dd></dl><p>This document is also available in these non-normative formats: <a href="specification.xml">XML</a>, 
 	  automatic change markup
           <a href="diff.html">from the previous draft</a>
           courtesy of <a href="http://www.deltaxml.com/">DeltaXML</a>.</p><p class="copyright"><p class="copyright"><a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © <span class="years">2018, 2019, 2020</span> the Contributors to the <cite>XProc 3.0: Standard Step Library</cite> specification, published by the <a href="https://www.w3.org/community/xproc-next/">XProc Next Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C
@@ -442,11 +442,8 @@ element's [base URI].</p>
         </li><li>
         <p>If no document on the <code class="port">source</code> port has a base URI that is exactly the same
         as the (absolute) <code class="code">href</code> value, the document at the specified URI is associated
-        with this entry. If this entry is to be added to the archive, the document must be obtained
-        by dereferencing the URI. <a id="err.inline.D0011"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0011"><code class="errqname">err:XD0011</code></a>)
-        if the resource referenced by the <code class="option">href</code> option does not exist, cannot be
-        accessed or is not a file. These documents are stored in the archive “as is”; they
-        <span class="rfc2119" id="cv.archive-manifest.8.2.2.2.1.4">must not</span> be parsed and re-serialized.</p>
+        with this entry. These documents are stored in the archive “as is”; they
+        <span class="rfc2119" id="cv.archive-manifest.8.2.2.2.1.3">must not</span> be parsed and re-serialized.</p>
         </li></ul></div>
       </li><li>
         <p>The <code class="code">method</code> attribute specifies how the entry should be compressed.
@@ -590,7 +587,10 @@ element's [base URI].</p>
                 the ZIP archive will be created. Creating a ZIP archive behaves exactly like
                 <code class="literal">update</code> except that any timestamps
                 are ignored; every ZIP entry will be updated or created if there is a <a href="#cv.entry"><code class="tag-element">c:entry</code></a> or
-                matching document for it.</p>
+                  matching document for it. The document must be obtained by dereferencing the URI in 
+                  <code class="option">href</code>. <a id="err.inline.D0011"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0011"><code class="errqname">err:XD0011</code></a>)
+                    if the resource referenced by the <code class="option">href</code> option does not exist, cannot be
+                    accessed or is not a file.</p>
               </dd><dt><span class="term"><code class="code">freshen</code></span></dt><dd>
                 <p>When the <code class="code">command</code> parameter is set to <code class="code">freshen</code>,
                 existing files in the ZIP archive may be updated, but no new files will be added.
@@ -980,7 +980,7 @@ The archive has no <code class="property">base-uri</code>.</p>
                <code class="tag-attribute">content-type</code> attribute on the
                <a href="#c.data"><code class="tag-element">c:data</code></a> element.</p>
             
-            <p id="d806e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:data<br />  <strong>content-type</strong> = <var>ContentType</var><br />  charset? = <var>string</var><br />  encoding? = <var>string</var>&gt;<br />    <var>string</var><br />&lt;/c:data&gt;</code></p>
+            <p id="d807e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:data<br />  <strong>content-type</strong> = <var>ContentType</var><br />  charset? = <var>string</var><br />  encoding? = <var>string</var>&gt;<br />    <var>string</var><br />&lt;/c:data&gt;</code></p>
             
             <p>The content of the <a href="#c.data"><code class="tag-element">c:data</code></a> element is the base64 encoded
                representation of the non-XML content. The serialization property is removed.</p>
@@ -1390,7 +1390,12 @@ converted to lowercase.</p>
 
   <p>If a single document appears on the <code class="port">source</code> port,
   then document properties on that document may be added as additional
-  headers. Properties in the <code class="code">http://www.w3.org/ns/xproc-http</code>
+  headers. For XML, HTML, and text documents with a 
+  <code class="literal">serialization</code> document property having an 
+    <code class="literal">encoding</code> key, a <code class="literal">charset</code> is
+    appended to the created <code class="literal">content-type</code> header of
+    the HTTP request.
+  Properties in the <code class="code">http://www.w3.org/ns/xproc-http</code>
   namespace will be added to the headers, using the local-name of the
   property QName as the header name. These properties are only copied
   if they are not specified in the <code class="option">header</code> map. In
@@ -1533,7 +1538,11 @@ converted to lowercase.</p>
       response. If the “<code class="literal">override-content-type</code>”
       parameter is provided, then its value is used to interpret the
       body. The content-type header that appears on the
-      <code class="port">report</code> port is not changed. <a id="err.inline.C0030"></a>It
+        <code class="port">report</code> port is not changed. 
+        <a id="err.inline.D0079.3"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0079"><code class="errqname">err:XD0079</code></a>) if a supplied content-type is not 
+          a valid media type of the form 
+          “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em>+<em class="replaceable"><code>ext</code></em></code>” 
+          or “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em></code>”. <a id="err.inline.C0030"></a>It
       is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.C0030"><code class="errqname">err:XC0030</code></a>) if the response body cannot
       be interpreted as requested (e.g. <code class="literal">application/json</code>
       to override <code class="literal">application/xml</code> content).</p>
@@ -1958,9 +1967,9 @@ remains the same.</p>
 
 
 <p>The <code class="code">p:load</code> step has no inputs but produces as its
-result a document (or documents) specified by an IRI.</p>
+result a document specified by an IRI.</p>
 
-<p class="element-syntax element-syntax-declare-step"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:load</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-req"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">href</code><code>"</code> <code class="attr required-attr">required</code><code>="</code><code class="value required-value">true</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:anyURI</code><code>"</code><code>/&gt;</code><code>        </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">parameters</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item()*)?</code><code>"</code><code>/&gt;</code><code>     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">content-type</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>               </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">document-properties</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName, item()*)?</code><code>"</code><code>/&gt;</code><code></code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
+<p class="element-syntax element-syntax-declare-step"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:load</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-req"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">href</code><code>"</code> <code class="attr required-attr">required</code><code>="</code><code class="value required-value">true</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:anyURI</code><code>"</code><code>/&gt;</code><code>        </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">parameters</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item()*)?</code><code>"</code><code>/&gt;</code><code>     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">content-type</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>               </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">document-properties</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName, item()*)?</code><code>"</code><code>/&gt;</code><code></code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
 
   <p>If the option is relative, it
     is made absolute against the base URI of the element on which it is specified
@@ -1970,8 +1979,8 @@ result a document (or documents) specified by an IRI.</p>
     shortcut value). <a id="err.inline.D0064.2"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic 
       error</a></em> (<a href="#err.D0064"><code class="errqname">err:XD0064</code></a>) if the base URI is not both absolute and valid according to [<a href="#rfc3986"><span class="abbrev">RFC 3986</span></a>].</p>
 
-<p>The document or documents identified by the
-<code class="option">href</code> URI are loaded and returned. If the URI protocol
+<p>The document identified by the
+<code class="option">href</code> URI is loaded and returned. If the URI protocol
 supports redirection, then redirects <span class="rfc2119" id="c.load.5.2">must</span> be
 followed.</p>
 
@@ -1980,7 +1989,7 @@ if the resource referenced by a <code class="code">p:load</code> element does no
 or cannot be accessed.</p>
 
 <p>The behavior of this step depends on the content type of the
-document or documents loaded. The content type of each document is
+document loaded. The content type of a document is
 determined as follows:</p>
 
 <div class="orderedlist">
@@ -1990,14 +1999,19 @@ determined as follows:</p>
 <ol style="list-style: decimal;"><li>
 <p>If a <code class="property">content-type</code> property is specified
 in <code class="option">document-properties</code> or <code class="option">content-type</code> is present,
-then each document <span class="rfc2119" id="c.load.8.1.1.4">must</span> be interpreted according to
-that content type. <a id="err.inline.D0062"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0062"><code class="errqname">err:XD0062</code></a>)
+then the document <span class="rfc2119" id="c.load.8.1.1.4">must</span> be interpreted according to
+that content type.
+  <a id="err.inline.D0079.4"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0079"><code class="errqname">err:XD0079</code></a>) if a supplied content-type is not 
+    a valid media type of the form 
+    “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em>+<em class="replaceable"><code>ext</code></em></code>” 
+    or “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em></code>”. 
+<a id="err.inline.D0062"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0062"><code class="errqname">err:XD0062</code></a>)
 if the <code class="tag-attribute">content-type</code> is specified and the
 document-properties has a “<code class="code">content-type</code>” that is not the
 same.
 </p>
 </li><li>
-<p>If the documents are retrieved with a URI protocol that specifies
+<p>If the document is retrieved with a URI protocol that specifies
 a content type (for example, <code class="literal">http:</code>), then the document
 <span class="rfc2119" id="c.load.8.2.1.2">must</span> be interpreted according to that content type.
 </p>
@@ -2741,7 +2755,7 @@ newline (&amp;#10;).</p>
         port will always end with its value (also when there are no documents on the <code class="port">source</code> port).</p>
     </li></ul></div>
   <p>When the <code class="option">override-content-type</code> option is specified, the document appearing on the port <code class="port">result</code>
-    will have this media type as part of its document properties. <a id="err.inline.D0079.3"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic 
+    will have this media type as part of its document properties. <a id="err.inline.D0079.5"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic 
       error</a></em> (<a href="#err.D0079"><code class="errqname">err:XD0079</code></a>) if a supplied content-type is not  a valid media type of the form 
       “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em>+<em class="replaceable"><code>ext</code></em></code>” 
       or “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em></code>”. <a id="err.inline.C0001"></a>It is a
@@ -3080,7 +3094,7 @@ the base URI of the document.
   <ol style="list-style: decimal;"><li>
       <p>If the <code class="option">content-type</code> option is specified, the uncompressed document
         <span class="rfc2119" id="c.uncompress.8.1.1.2">must</span> be interpreted according to that content-type. 
-        <a id="err.inline.D0079.4"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0079"><code class="errqname">err:XD0079</code></a>) if a supplied content-type is not 
+        <a id="err.inline.D0079.6"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic error</a></em> (<a href="#err.D0079"><code class="errqname">err:XD0079</code></a>) if a supplied content-type is not 
           a valid media type of the form 
           “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em>+<em class="replaceable"><code>ext</code></em></code>” 
           or “<code class="literal"><em class="replaceable"><code>type</code></em>/<em class="replaceable"><code>subtype</code></em></code>”.
@@ -3391,7 +3405,7 @@ is empty.</p>
 <ul><li>
     <p>If the document root element is <a href="#cv.query"><code id="cv.query" class="tag-element">c:query</code></a>, the text
       descendants of this element are considered the query.</p>
-    <p id="d2304e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:query&gt;<br />    <var>string</var><br />&lt;/c:query&gt;</code></p>
+    <p id="d2323e0" class="element-syntax element-syntax-step-vocabulary"><code>&lt;c:query&gt;<br />    <var>string</var><br />&lt;/c:query&gt;</code></p>
   </li><li>
       <p>If the document root element is in the XQueryX namespace, the
         document is treated as an XQueryX-encoded query. <span id="impl-64">Support for
@@ -3535,7 +3549,7 @@ establish a base URI, the document will not have one.
 <section id="c.xslt" class="section"><div class="section-titlepage"><h3><bdi class="secno">2.48. </bdi>p:xslt<a aria-label="§" class="self-link" href="#c.xslt"></a></h3></div><div class="content">
   
   <p>The <code class="tag-element">p:xslt</code> step invokes an XSLT stylesheet.</p>
-  <p class="element-syntax element-syntax-declare-step"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:xslt</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">source</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr primary-attr">primary</code><code>="</code><code class="value primary-value">true</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">stylesheet</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">xml</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr primary-attr">primary</code><code>="</code><code class="value primary-value">true</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">secondary</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">parameters</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item()*)?</code><code>"</code><code>/&gt;</code><code>     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">static-parameters</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item()*)?</code><code>"</code><code>/&gt;</code><code></code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">global-context-item</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">item()?</code><code>"</code><code>/&gt;</code><code>           </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">initial-mode</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:QName?</code><code>"</code><code>/&gt;</code><code>                </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">template-name</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:QName?</code><code>"</code><code>/&gt;</code><code>               </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">output-base-uri</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:anyURI?</code><code>"</code><code>/&gt;</code><code>            </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">version</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                    </code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
+  <p class="element-syntax element-syntax-declare-step"><span class="decl"><code>&lt;p:declare-step</code> <code class="attr type-attr">type</code><code>="</code><code class="value type-value">p:xslt</code><code>"</code><code>&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">source</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr primary-attr">primary</code><code>="</code><code class="value primary-value">true</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:input</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">stylesheet</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">xml</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">result</code><code>"</code> <code class="attr primary-attr">primary</code><code>="</code><code class="value primary-value">true</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code><code>/&gt;</code></span><br />     <span class="input"><code>&lt;p:output</code> <code class="attr port-attr">port</code><code>="</code><code class="value port-value">secondary</code><code>"</code> <code class="attr sequence-attr">sequence</code><code>="</code><code class="value sequence-value">true</code><code>"</code> <code class="attr content-types-attr">content-types</code><code>="</code><code class="value content-types-value">any</code><code>"</code><code>/&gt;</code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">parameters</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item()*)?</code><code>"</code><code>/&gt;</code><code>     </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">static-parameters</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">map(xs:QName,item()*)?</code><code>"</code><code>/&gt;</code><code></code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">global-context-item</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">item()?</code><code>"</code><code>/&gt;</code><code>           </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">populate-default-collection</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:boolean?</code><code>"</code> <code class="attr select-attr">select</code><code>="</code><code class="value select-value">true()</code><code>"</code><code>/&gt;</code><code></code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">initial-mode</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:QName?</code><code>"</code><code>/&gt;</code><code>                </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">template-name</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:QName?</code><code>"</code><code>/&gt;</code><code>               </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">output-base-uri</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:anyURI?</code><code>"</code><code>/&gt;</code><code>            </code></span><br />     <span class="opt-opt"><code>&lt;p:option</code> <code class="attr name-attr">name</code><code>="</code><code class="value name-value">version</code><code>"</code> <code class="attr as-attr">as</code><code>="</code><code class="value as-value">xs:string?</code><code>"</code><code>/&gt;</code><code>                    </code></span><br /><code>&lt;/p:declare-step&gt;</code></p>
   <p>If <code class="option">output-base-uri</code> is relative, it is made absolute against the base URI of
     the element on which it is specified (<code class="tag-element">p:with-option</code> or <code class="tag-element">p:xslt</code> in the case
     of a syntactic shortcut value).</p>
@@ -3578,9 +3592,12 @@ establish a base URI, the document will not have one.
         <p>If there is a single document on the <code class="port">source</code> port, this document will
           become the value of the <code class="option">global-context-item</code> option.</p>
       </li><li>
-        <p>If there are none or multiple documents on the <code class="port">source</code> port, its value
-          will be the empty sequence.</p>
+        <p>If there are none or multiple documents on the <code class="port">source</code> port, the
+          global context item is absent.</p>
       </li></ul></div>
+    <p>The <code class="option">populate-default-collection</code> option is used to control whether all
+    the documents appearing on <code class="port">source</code> port form the default collection for the XSLT
+    transformation.</p>
     <p>If no value is supplied for <code class="option">template-name</code> option an “Apply-template
       invocation” is performed. The documents that appear on <code class="port">source</code> are taken to be the
       initial match selection. The default collection is undefined. If a value is supplied for 
@@ -3595,7 +3612,10 @@ establish a base URI, the document will not have one.
         template.</p>
     <p>Independent of the way the stylesheet is invoked, the principal result(s) will appear on
       output port <code class="port">result</code> while secondary result(s) will appear on output port
-      <code class="port">secondary</code>. Whether the raw results are delivered or a result tree is
+      <code class="port">secondary</code>. <span id="impl-73">The order in which 
+        result documents appear on the <code class="port">secondary</code> port is
+        <em class="glossterm"><a href="#dt-implementation-dependent">implementation dependent</a></em>.</span> 
+      Whether the raw results are delivered or a result tree is
       constructed, depends on the (explicit or implicit) setting for attribute
       <code class="literal">build-tree</code> of in the output-definition for the respective result. If a
       result tree is constructed, the result will be a text document if it is a single text node
@@ -3625,7 +3645,10 @@ establish a base URI, the document will not have one.
       documents are provided on the <code class="port">source</code> port, the initial context node is undefined
       and the default collection is empty. <a id="err.inline.C0094"></a>It is a <em class="glossterm"><a href="#dt-dynamic-error">dynamic
         error</a></em> (<a href="#err.C0094"><code class="errqname">err:XC0094</code></a>) if any document supplied on the source port is not an XML document, an
-        HTML documents, or a Text document if XSLT 2.0 is used.</p> 
+        HTML documents, or a Text document if XSLT 2.0 is used.</p>
+    <p>The <code class="option">populate-default-collection</code> option is used to control whether all
+      the documents appearing on <code class="port">source</code> port form the default collection for the XSLT
+      transformation.</p>
     <p>The value of option <code class="option">global-context-item</code> is ignored if a stylesheet is
       invoked as per XSLT 2.0. The invocation of the transformation is controlled by the
       <code class="option">initial-mode</code> and <code class="option">template-name</code> options that set the
@@ -3639,7 +3662,7 @@ establish a base URI, the document will not have one.
     </p>
     <p>The primary result document of the transformation, if there is one, appears on the
       <code class="port">result</code> port. At most one document can appear on the <code class="port">result</code> port.
-      All other result documents appear on the <code class="port">secondary</code> port. <span id="impl-73">The order in which 
+      All other result documents appear on the <code class="port">secondary</code> port. <span id="impl-74">The order in which 
         result documents appear on the <code class="port">secondary</code> port is
         <em class="glossterm"><a href="#dt-implementation-dependent">implementation dependent</a></em>.</span>
     </p>
@@ -3708,8 +3731,8 @@ many more steps (e.g., URI not available). There is also precedent for some
 of the error codes dating back to XProc 1.0.</p>
 
 <div id="dynamic-error-summary"><h5>Dynamic Errors</h5><dl class="errs"><dt id="err.D0011"><code class="errqname">err:XD0011</code></dt><dd><p>It is a dynamic error
-        if the resource referenced by the href option does not exist, cannot be
-        accessed or is not a file.</p><p>See: <a href="#err.inline.D0011">The archive manifest</a>, <a href="#err.inline.D0011.1">p:load</a></p></dd><dt id="err.D0023"><code class="errqname">err:XD0023</code></dt><dd><p>It is a dynamic error if a DTD validation
+                    if the resource referenced by the href option does not exist, cannot be
+                    accessed or is not a file.</p><p>See: <a href="#err.inline.D0011">Handling of ZIP archives</a>, <a href="#err.inline.D0011.1">p:load</a></p></dd><dt id="err.D0023"><code class="errqname">err:XD0023</code></dt><dd><p>It is a dynamic error if a DTD validation
 is performed and either the document is not valid or no DTD is found.</p><p>See: <a href="#err.inline.D0023">Loading XML data</a></p></dd><dt id="err.D0043"><code class="errqname">err:XD0043</code></dt><dd><p>It is a dynamic error
 if the dtd-validate parameter is true and
 the processor does not support DTD validation.</p><p>See: <a href="#err.inline.D0043">Loading XML data</a></p></dd><dt id="err.D0049"><code class="errqname">err:XD0049</code></dt><dd><p>It is a dynamic error if the text value is not
@@ -3734,7 +3757,7 @@ if the loaded document cannot be represented as an HTML document in
 the XPath data model.</p><p>See: <a href="#err.inline.D0078">Loading HTML data</a></p></dd><dt id="err.D0079"><code class="errqname">err:XD0079</code></dt><dd><p>It is a dynamic error if a supplied 
             content-type is not a valid media type of the form 
             “type/subtype+ext” 
-            or “type/subtype”.</p><p>See: <a href="#err.inline.D0079">Overriding content types</a>, <a href="#err.inline.D0079.1">p:cast-content-type</a>, <a href="#err.inline.D0079.2">p:http-request</a>, <a href="#err.inline.D0079.3">p:text-join</a>, <a href="#err.inline.D0079.4">p:uncompress</a></p></dd></dl></div>
+            or “type/subtype”.</p><p>See: <a href="#err.inline.D0079">Overriding content types</a>, <a href="#err.inline.D0079.1">p:cast-content-type</a>, <a href="#err.inline.D0079.2">p:http-request</a>, <a href="#err.inline.D0079.3">p:http-request</a>, <a href="#err.inline.D0079.4">p:load</a>, <a href="#err.inline.D0079.5">p:text-join</a>, <a href="#err.inline.D0079.6">p:uncompress</a></p></dd></dl></div>
 
 <div id="step-error-summary"><h5>Step Errors</h5><dl class="errs"><dt id="err.C0001"><code class="errqname">err:XC0001</code></dt><dd><p>It is a
         dynamic error if the value of option override-content-type 
@@ -4049,10 +4072,6 @@ W3C Recommendation. 8 June 2017.</p></div>
 (XInclude) Version 1.0 (Second Edition)</cite></span></a>. Jonathan Marsh,
 David Orchard, and Daniel Veillard, editors.
 W3C Recommendation. 15 November 2006.</p></div>
-    <div id="xml-serialization-31" class="bibliomixed"><p class="error">@@FIXME:UNREFERENCED [<span class="abbrev">Serialization</span>] 
-<a href="https://www.w3.org/TR/xslt-xquery-serialization-31/"><span class="citetitle"><cite>XSLT
-and XQuery Serialization 3.1</cite></span></a>.
-Andrew Coleman and C. M. Sperberg-McQueen, editors. W3C Recommendation. 21 March 2017.</p></div>
     <div id="rfc1321" class="bibliomixed"><p>[<span class="abbrev">RFC 1321</span>] 
 <a href="https://doi.org/10.17487/RFC1321"><span class="citetitle"><cite>RFC 1321:
 The MD5 Message-Digest Algorithm</cite></span></a>.
@@ -4072,11 +4091,6 @@ S. Bradner.
 Network Working Group, IETF,
 Mar 1997.
 </p></div>
-    <div id="rfc2616" class="bibliomixed"><p class="error">@@FIXME:UNREFERENCED [<span class="abbrev">RFC 2616</span>] 
-<a href="https://doi.org/10.17487/RFC2616"><span class="citetitle"><cite>RFC 2616:
-Hypertext Transfer Protocol — HTTP/1.1</cite></span></a>.
-R. Fielding, J. Gettys, J. Mogul, et. al., editors. Internet
-Engineering Task Force. June, 1999.</p></div>
     <div id="rfc2617" class="bibliomixed"><p>[<span class="abbrev">RFC 2617</span>] 
 <a href="https://doi.org/10.17487/RFC2617"><span class="citetitle"><cite>RFC 2617:
 HTTP Authentication: Basic and Digest Access Authentication</cite></span></a>.
@@ -4087,19 +4101,6 @@ J. Franks, P. Hallam-Baker, J. Hostetler, S. Lawrence, P. Leach, A. Luotonen, L.
 Uniform Resource Identifier (URI): General Syntax</cite></span></a>.
 T. Berners-Lee, R. Fielding, and L. Masinter, editors.
 Internet Engineering Task Force. January, 2005.</p></div>
-    <div id="unicodetr17" class="bibliomixed"><p class="error">@@FIXME:UNREFERENCED [<span class="abbrev">Unicode TR#17</span>] 
-<a href="http://unicode.org/reports/tr17/"><span class="citetitle"><cite>Unicode Technical
-Report #17: Character Encoding Model</cite></span></a>.
-Ken Whistler, Mark Davis, and Asmus Freytag, authors.
-The Unicode Consortium. 11 November 2008.</p></div>
-    <div id="tidy" class="bibliomixed"><p class="error">@@FIXME:UNREFERENCED [<span class="abbrev">HTML Tidy</span>] 
-<a href="http://tidy.sourceforge.net/"><span class="citetitle"><cite>HTML Tidy Library
-Project</cite></span></a>. SourceForge project.
-</p></div>
-    <div id="tagsoup" class="bibliomixed"><p class="error">@@FIXME:UNREFERENCED [<span class="abbrev">TagSoup</span>] 
-<a href="http://ccil.org/~cowan/XML/tagsoup/"><span class="citetitle"><cite>TagSoup - Just Keep On Truckin'</cite></span></a>.
-John Cowan.
-</p></div>
     <div id="bib.uuid" class="bibliomixed"><p>[<span class="abbrev">UUID</span>] 
 <a href="http://www.itu.int/ITU-T/studygroups/com17/oid.html"><span class="citetitle"><cite>ITU
 X.667: Information technology - Open Systems Interconnection -
@@ -4187,6 +4188,11 @@ draft:</p>
    
    
    
+   
+   
+   
+   
+   
  <ol style="list-style: decimal;"><li>
     <p>For <a href="#c.cast-content-type"><code class="tag-element">p:cast-content-type</code></a> the expected result type for casting a 
     <code class="literal">c:param-set</code> document to “<code class="literal">application/json</code>” was
@@ -4215,6 +4221,19 @@ draft:</p>
      <p>Change the behavior of the <code class="option">global-context-item</code> option of <a href="#c.xslt"><code class="tag-element">p:xslt</code></a>. (2020-06-10)</p>
    </li><li>
      <p>Clarified which steps may produce PSVI annotations. (2020-06-09)</p>
+   </li><li>
+     <p>Clarified the behaviour in <a href="#c.archive"><code class="tag-element">p:archive</code></a>: A missing resource referenced by
+     c:archive/c:entry/@href is only an error for command = 'create'. (2020-06-11)</p>
+   </li><li>
+     <p>Option <code class="option">populate-default-collection</code> is added to the signature of <a href="#c.xslt"><code class="tag-element">p:xslt</code></a>. (2020-06-20)</p>
+   </li><li>
+     <p>Clarified how the default <code class="literal">content-type</code> header of <a href="#c.http-request"><code class="tag-element">p:http-request</code></a> is 
+     constructed if a single document appears on <code class="port">source</code> port. (2020-06-20)</p>
+   </li><li>
+     <p>Added error (XD0079) to <a href="#c.http-request"><code class="tag-element">p:http-request</code></a> and <a href="#c.load"><code class="tag-element">p:load</code></a> for invalid content-types. (2020-06-23)</p>
+   </li><li>
+     <p>Changed signature of the <code class="port">result</code> port of <a href="#c.load"><code class="tag-element">p:load</code></a> to <code class="literal">sequence="false"</code> and
+       adapted the prose accordingly. (2020-06-24)</p>
    </li></ol></div>
 </div></article>
 

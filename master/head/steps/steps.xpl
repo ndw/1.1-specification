@@ -181,7 +181,7 @@
       <p:option name="replace" as="xs:boolean" select="true()"/>
    </p:declare-step>
    <p:declare-step type="p:load" xml:id="load">
-      <p:output port="result" sequence="true" content-types="any"/>
+      <p:output port="result" content-types="any"/>
       <p:option name="href" required="true" as="xs:anyURI"/>
       <p:option name="parameters" as="xs:string"/>
       <p:option name="content-type" as="xs:string?"/>
@@ -469,6 +469,7 @@
       <p:option name="parameters" as="xs:string"/>
       <p:option name="static-parameters" as="xs:string"/>
       <p:option name="global-context-item" as="xs:string"/>
+      <p:option name="populate-default-collection" as="xs:boolean?" select="true()"/>
       <p:option name="initial-mode" as="xs:QName?"/>
       <p:option name="template-name" as="xs:QName?"/>
       <p:option name="output-base-uri" as="xs:anyURI?"/>
