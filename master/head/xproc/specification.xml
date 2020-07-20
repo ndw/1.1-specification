@@ -2237,13 +2237,15 @@ containing atomic values or nodes.</error> Function, array and map items are
 explicitly excluded here because they do not have a string representation.
 </para>
 
-<para>The context item used for evaluating value templates comes from
-the <glossterm>default readable port</glossterm>. 
-<error code="D0065">It is a <glossterm>dynamic error</glossterm>
-to refer to the context item, size, or position in a value template if a sequence of documents
-appears on the default readable port.</error>
-If the value template appears in a context where no default
-readable port exists, then the context item is undefined.</para>
+  <para>A value template that contains a reference to the context
+    item reads that context item from the <glossterm>default readable port</glossterm>. 
+    This establishes a connection between the two steps.
+    <error code="D0065">It is a <glossterm>dynamic error</glossterm>
+      to refer to the context item, size, or position in a value template 
+      if a sequence of documents appears on the default readable port.</error> 
+    Value templates that do not contain a reference to the context item
+    do not establish a connection to another step and do not
+    require that a <glossterm>default readable port</glossterm> is available.</para>
 
 <section xml:id="attribute-value-templates">
 <title>Attribute Value Templates</title>
@@ -2424,34 +2426,34 @@ element.</para>
 
 <para>If the media type is an XML media type:</para>
 
-<programlisting>  &lt;p:inline content-type="application/xml"&gt;
+<programlisting language="xml">  &lt;p:inline content-type="application/xml"&gt;
     &lt;attribution&gt;{$name/node()}&lt;/attribution&gt;
   &lt;/p:inline&gt;</programlisting>
 
 <para>the result is that sequence of nodes:</para>
 
-<programlisting>  &lt;attribution&gt;&lt;given&gt;Mary&lt;/given&gt; &lt;surname&gt;Smith&lt;/surname&gt;&lt;/attribution&gt;</programlisting>
+<programlisting language="xml">  &lt;attribution&gt;&lt;given&gt;Mary&lt;/given&gt; &lt;surname&gt;Smith&lt;/surname&gt;&lt;/attribution&gt;</programlisting>
 
 <para>If the media type is not an XML media type:</para>
 
-<programlisting>  &lt;p:inline content-type="application/json"&gt;
+<programlisting language="xml">  &lt;p:inline content-type="application/json"&gt;
     {{ "name": "{$name/node()}" }}
   &lt;/p:inline&gt;</programlisting>
 
 <para>the result is the concatenation of the serialization of the nodes:</para>
 
-<programlisting>  { "name": "&lt;given&gt;Mary&lt;/given&gt; &lt;surname&gt;Smith&lt;/surname&gt;" }</programlisting>
+<programlisting language="javascript">  { "name": "&lt;given&gt;Mary&lt;/given&gt; &lt;surname&gt;Smith&lt;/surname&gt;" }</programlisting>
 
 <para>If the string value is desired, instead of escaped markup, write the
 expression such that it returns the string values:</para>
 
-<programlisting>  &lt;p:inline content-type="application/json"&gt;
+<programlisting language="xml">  &lt;p:inline content-type="application/json"&gt;
     {{ "name": "{$name/node()/string()}" }}
   &lt;/p:inline&gt;</programlisting>
 
 <para>To produce:</para>
 
-<programlisting>  { "name": "Mary Smith" }</programlisting>
+<programlisting language="javascript">  { "name": "Mary Smith" }</programlisting>
 
 </simplesect>
 </section>
