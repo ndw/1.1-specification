@@ -293,18 +293,24 @@ steps is assumed; for background details, see
   <section xml:id="c.file-copy">
   <title>p:file-copy</title>
 
-  <para>The <code>p:file-copy</code> step copies a file.</para>
+  <para>The <code>p:file-copy</code> step copies a file or a directory to a given target.</para>
 
   <p:declare-step type="p:file-copy">
     <p:output port="result" primary="true" content-types="application/xml"/>
     <p:option name="href" required="true" as="xs:anyURI"/>
     <p:option name="target" required="true" as="xs:anyURI"/>
     <p:option name="fail-on-error" as="xs:boolean" select="true()"/>
+    <p:option name="overwrite" as="xs:boolean" select="true()"/>
   </p:declare-step>
 
-  <para>The <tag>p:file-copy</tag> step copies the file or directory named in <option>href</option> to the new name specified in
-      <option>target</option>. If the target is a directory, the step attempts to move the file into that directory,
-    preserving its base name.</para>
+  <para>The <tag>p:file-copy</tag> step copies the file or directory named in <option>href</option> to the new position specified in
+      <option>target</option>. Any non existent directory contained in <option>target</option> will be created before copying starts.
+    If the target is a directory, the step attempts to copy the file or directory into that directory,
+    preserving its base name. <error code="C0157">It is a <glossterm>dynamic error</glossterm> if the <option>href</option>
+    option names a directory, but the <option>target</option> option names a file.</error></para>
+  
+  <para>If the <option>overwrite</option> evaluates to <literal>false</literal>, no existing file is changed, i.e. no
+  copying will take place.</para>
 
     <para><impl>Conformant processors <rfc2119>must</rfc2119> support URIs whose
       scheme is <code>file</code> for the <option>href</option> and <option>target</option> options
@@ -324,7 +330,7 @@ steps is assumed; for background details, see
             <glossterm>dynamic error</glossterm> if <tag>p:file-copy</tag> is not available to the step due to access restrictions 
             in the environment in which the pipeline is run.</error></para>
 
-  <para>If the copy is successful, the step returns a <tag>c:result</tag> element containing the absolute URI of the
+  <para>If no error occurs, the step returns a <tag>c:result</tag> element containing the absolute URI of the
     target.</para>
 
   <para>If an error occurs and <option>fail-on-error</option> is <code>false</code>, the step returns a
@@ -365,8 +371,9 @@ steps is assumed; for background details, see
     <p:option name="fail-on-error" as="xs:boolean" select="true()"/>
   </p:declare-step>
 
-  <para>The <tag>p:file-delete</tag> step attempts to delete the file or directory named in
-    <option>href</option>.</para>
+  <para>The <tag>p:file-delete</tag> step attempts to delete an existing file or directory named in
+    <option>href</option>. If the named file or directory does not exist, the step just returns a
+  <tag>c:result</tag> element as described below.</para>
 
   <para><impl>Conformant processors <rfc2119>must</rfc2119> support URIs whose
     scheme is <code>file</code> for the <option>href</option> option of <tag>p:file-delete</tag>.
@@ -389,8 +396,7 @@ steps is assumed; for background details, see
   <para>If <option>href</option> specifies a directory, it can only be deleted if the <option>recursive</option> option
     is <code>true</code> or if the specified directory is empty.</para>
 
-  <para>If the delete is successful, the step returns a <tag>c:result</tag> element containing the absolute URI of the
-    deleted file or directory.</para>
+  <para>The step returns a <tag>c:result</tag> element containing the absolute URI of the file or directory.</para>
 
   <para>If an error occurs and <option>fail-on-error</option> is <code>false</code>, the step returns a
       <tag>c:error</tag> element which may contain additional, implementation-defined, information about the nature of
@@ -556,7 +562,8 @@ steps is assumed; for background details, see
   </p:declare-step>
 
   <para>The <tag>p:file-mkdir</tag> create the directory named in the <option>href</option> option. If this includes
-    more than one directory component, all of the intermediate components are created. The path separator is
+    more than one directory component, all of the intermediate components are created. If the directory already exists 
+    the step just returns the <tag>c:result</tag> element as described below. The path separator is
     implementation-defined.</para>
 
   <para><impl>Conformant processors <rfc2119>must</rfc2119> support URIs whose
@@ -577,8 +584,7 @@ steps is assumed; for background details, see
           in the environment in which the pipeline is run.</error></para>
   
 
-  <para>If the create is successful, the step returns a <tag>c:result</tag> element containing the absolute URI of the
-    directory created.</para>
+  <para>The step returns a <tag>c:result</tag> element containing the absolute URI of the directory.</para>
 
   <para>If an error occurs and <option>fail-on-error</option> is <code>false</code>, the step returns a
       <tag>c:error</tag> element which may contain additional, implementation-defined, information about the nature of
@@ -615,7 +621,8 @@ steps is assumed; for background details, see
   <para>The <tag>p:file-move</tag> step moves the file or directory named in <option>href</option> to the new location
     specified in <option>target</option>. If the <option>target</option> option specifies an
       <emphasis>existing</emphasis> directory, the step attempts to move the file or directory <emphasis>into</emphasis>
-    that directory, preserving its base name.</para>
+    that directory, preserving its base name. <error code="C0158">It is a <glossterm>dynamic error</glossterm> if the <option>href</option>
+      option names a directory, but the <option>target</option> option names a file.</error></para>
 
   <para><impl>Conformant processors <rfc2119>must</rfc2119> support URIs whose
     scheme is <code>file</code> for the <option>href</option> and <option>target</option> options

@@ -1320,11 +1320,9 @@ appear on it since the step always fails.</para>
 <para>For example, given the following invocation:</para>
 <programlisting language="xml">&lt;p:error xmlns:my="http://www.example.org/error"
          name="bad-document" code="my:unk12"&gt;
-   &lt;p:input port="source"&gt;
-     &lt;p:inline&gt;
-       &lt;message&gt;The document element is unknown.&lt;/message&gt;
-     &lt;/p:inline&gt;
-   &lt;/p:input&gt;
+   &lt;p:with-input port="source"&gt;
+     &lt;message&gt;The document element is unknown.&lt;/message&gt;
+   &lt;/p:with-input&gt;
 &lt;/p:error&gt;</programlisting>
 
 <para>The error vocabulary element (and document) generated on the
@@ -1825,7 +1823,9 @@ converted to lowercase.</para>
           <glossterm>dynamic error</glossterm> if the value associated
           with the “<literal>fail-on-timeout</literal>” is associated
           with <code>true()</code> and a HTTP status code
-          <literal>408</literal> is encountered.</error></para>
+          <literal>408</literal> is encountered.</error> If “<literal>fail-on-timeout</literal>”
+          is true, it prevents any dynamic error with code <literal>C0126</literal> resulting
+          from the <option>assert</option> option to be raised for request's timeout.</para>
           <note>
             <title>Note</title>
             <para>Please note that the “<literal>fail-on-timeout</literal>” parameter
@@ -3825,8 +3825,8 @@ is empty.</para>
       </para>
     </listitem>
     <listitem>
-      <para>Otherwise the string value of the document <rfc2119>must</rfc2119> be treated as
-        the query.</para>
+      <para>Otherwise the serialization of the document <rfc2119>must</rfc2119> be treated as
+        the query. The document's serialization property (if present) is used.</para>
     </listitem>
 </itemizedlist>
  
@@ -4041,7 +4041,7 @@ establish a base URI, the document will not have one.
       <glossterm>implementation-dependent</glossterm>.</impl> Implementations
     <rfc2119>should</rfc2119> raise an error using the error code from the XSLT step (for example,
     the <tag class="attribute">error-code</tag> specified on the <tag>xsl:message</tag> or
-    <code>err:XTTM9000</code> if no code is provided).</para>
+    <code>Q{http://www.w3.org/2005/xqt-errors}XTTM9000</code> if no code is provided).</para>
   <para>If XSLT 2.0 or XSLT 3.0 is used, the outputs of this step <rfc2119>may</rfc2119> include
     PSVI annotations.</para>
   <para>The interpretation of the input and output ports as well as for the other options depends on
