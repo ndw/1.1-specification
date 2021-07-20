@@ -754,8 +754,7 @@ in the pipeline) and will not be transformed in any way.</para>
 <section xml:id="text-documents">
 <title>Text Documents</title>
 
-<para>Representations of text documents are XDM documents that contain a single text node.
-Text documents are identified by a
+<para>Text documents are identified by a
 text media type.
 <termdef xml:id="dt-text-media-type">Media types of the form
 “<literal>text/<replaceable>something</replaceable></literal>”
@@ -767,7 +766,9 @@ and “<literal>text/html</literal>” which is an HTML media type. Additionally
 “<literal>application/xquery</literal>” are also text media types.
 </termdef> <impl>It is <glossterm>implementation-defined</glossterm>
 whether other media types not mentioned in this document are treated
-as text media types as well.</impl>
+as text media types as well.</impl> A text document is represented by a document node containing 
+a single text node or by an empty document node (for empty text documents).
+  
 </para>
 
 <para>When a text document is serialized, it <rfc2119>should</rfc2119> be serialized using the
@@ -5306,7 +5307,7 @@ document</emphasis> and provide it on the output port. It
     <title>Serialization parameters</title>
     
     <!-- This ID exists so that old links to the p.serialization section
-     will come here. Not that it will matter, but that&#x2019;s why.
+     will come here. Not that it will matter, but that’s why.
 -->
     <para xml:id="p.serialization">The <tag class="attribute">serialization</tag> attribute
       allows the user to request serialization parameters on an output port. These parameters
@@ -5484,7 +5485,7 @@ the name of a static option.</error>
 <listitem>
 <para>The type of the value may be specified in the
 <tag class="attribute">as</tag> attribute using an
-XProc sequence type, see <xref linkend="varopt-types"/>.
+XPath sequence type, see <xref linkend="varopt-types"/>.
 </para>
 </listitem>
 </varlistentry>
@@ -5615,7 +5616,7 @@ the name of a static option.</error>
 <listitem>
 <para>The type of the value may be specified in the
 <tag class="attribute">as</tag> attribute using an
-XProc sequence type, see <xref linkend="varopt-types"/>.
+XPath sequence type, see <xref linkend="varopt-types"/>.
 </para>
 </listitem>
 </varlistentry>
@@ -5757,7 +5758,7 @@ name as part of the same step invocation.</error></para>
 <listitem>
 <para>The type of the value may be specified in the
 <tag class="attribute">as</tag> attribute using an
-XProc sequence type, see <xref linkend="varopt-types"/>.
+XPath sequence type, see <xref linkend="varopt-types"/>.
 </para>
 </listitem>
 </varlistentry>
@@ -5768,7 +5769,7 @@ XProc sequence type, see <xref linkend="varopt-types"/>.
 <tag class="attribute">select</tag> attribute <rfc2119>must</rfc2119> be
 specified. The value of the <tag class="attribute">select</tag>
 attribute is an XPath expression which will be evaluated to provide
-the value of the variable.</para>
+the value of the option.</para>
 </listitem>
 </varlistentry>
 <varlistentry><term><tag class="attribute">collection</tag></term>
@@ -5851,7 +5852,7 @@ See <xref linkend="statics"/>.</para>
       syntax:</para>
     
     <programlisting language="xml">&lt;ex:stepType&gt;
-  &lt;p:with-option name="option-name" select="&amp;#x2019;some value'"/&gt;
+  &lt;p:with-option name="option-name" select="'some value'"/&gt;
 &lt;/ex:stepType&gt;</programlisting>
     
     <para>The second step uses the syntactic shortcut:</para>
@@ -5886,8 +5887,10 @@ See <xref linkend="statics"/>.</para>
                 The context node for the attribute value template comes from the default readable port for the step on
                 which they occur. If there is no such port, the context node is undefined.</para>
        
-            <para>The attribute’s string value, after the attribute value template expansion, is used as
-              the value of the option. It must be possible to convert this string to the option’s sequence type.</para>
+<para>As with other attribute value templates, the attribute’s string value,
+as an <code>xs:untypedAtomic</code>, is used as the value of the option. Function
+conversion rules apply to convert this untyped atomic value to the
+option’s sequence type.</para>
       </listitem>
     </itemizedlist>
     
@@ -5931,9 +5934,6 @@ connected to documents is
 steps cannot refer to the inputs or outputs of a
 <tag>p:declare-step</tag> using <tag>p:pipe</tag>; only instances of
 the type can be referenced.</para>
-
-<para>Most pipeline authors use the <tag>p:declare-step</tag> element
-to declare a pipeline.</para>
 
 <section xml:id="declare-pipelines">
 <title>Declaring pipelines</title>
