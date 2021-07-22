@@ -1,4 +1,4 @@
-<specification xmlns:cs="http://www.w3.org/XML/XProc/2006/04/components#" xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax" xmlns:p="http://www.w3.org/ns/xproc" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://docbook.org/ns/docbook" xml:id="steps" class="wd" version="5.0-extension w3c-xproc">
+<specification xmlns:cs="http://www.w3.org/XML/XProc/2006/04/components#" xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax" xmlns:p="http://www.w3.org/ns/xproc" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://docbook.org/ns/docbook" xml:id="steps" class="ed" version="5.0-extension w3c-xproc">
 <info>
 <title>XProc 3.0: Standard Step Library</title>
 <!-- defaults to date formatted <pubdate>2014-12-18</pubdate> -->
@@ -50,14 +50,10 @@ specifications</holder>
   </para>
 
 <note role="editorial">
-<para>This draft is a “last call” draft. This version is stable and
-will not be updated.</para>
-<para>The current editorial draft (including highlighted changes from
-this draft) is
-<link xlink:href="http://spec.xproc.org/master/head/xproc/">also available</link>.
-The
-<link xlink:href="https://spec.xproc.org/lastcall-2019-12/head/xproc/">previous
-last call draft</link> remains unchanged.
+<para>This draft is the “editor’s working draft” and may include changes made
+after the “last call” draft. The
+<link xlink:href="http://spec.xproc.org/lastcall-2020-08/head/steps/">last call draft</link>
+is stable and will not change.
 </para>
 </note>
 
@@ -447,10 +443,12 @@ element's [base URI].</para>
       <term><option>relative-to</option></term>
       <listitem>
         <para>The <option>relative-to</option> option is used in creating a manifest when no
-          manifest is provided on the <port>manifest</port> port. If the option is relative, it is made absolute
-          against the base URI of the element on which it is specified (<tag>p:with-option</tag> or
-          the step in case of a syntactic shortcut value). <error code="D0064">It is a <glossterm>dynamic 
-            error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error></para>
+          manifest is provided on the <port>manifest</port> port. If a manifest is present this option is
+          not used. If the option’s value is a relative URI, it is made absolute against the
+          base URI of the element on which it is specified (<tag>p:with-option</tag> or the step in
+          case of a syntactic shortcut value). <error code="D0064">It is a <glossterm>dynamic
+              error</glossterm> if the base URI is not both absolute and valid according to
+              <biblioref linkend="rfc3986"/>.</error></para>
       </listitem>
     </varlistentry>
   </variablelist>
@@ -3533,14 +3531,35 @@ matches. A pattern of the form <literal>h:div</literal> will replace
 ones.</para>
 </note>
 
-<para>This step produces a single document; if the document element is
-unwrapped, the result might not be well-formed XML. If the step produces a
-document node with a single text child, the result will have content type 
-“<literal>text/plain</literal>”.</para>
-
+  <para>This step produces a single document. Special cases:</para> 
+  <itemizedlist>
+    <listitem>
+      <para>If the document element is unwrapped, the result might not be well-formed XML.</para>
+      <para>For instance unwrapping the root element of
+          <code>&lt;!-- COMMENT --&gt;&lt;root-element/&gt;</code> will result in a document node
+        with a single comment node child, which is not well-formed.</para>
+    </listitem>
+    <listitem>
+      <para>If a document consisting of only an empty root element is unwrapped, the result will be
+        a document node without children. The result document’s content type will become
+          “<literal>text/plain</literal>”.</para>
+    </listitem>
+    <listitem>
+      <para>If a document consisting of a root element containing only text is unwrapped, the result will be
+        a document node with a single text node child. The result document’s content type will become
+        “<literal>text/plain</literal>”.</para>
+    </listitem>
+  </itemizedlist>
+  
+  <para>As specified in the core language specification: if the content type changes, the
+      <code>serialization</code> document property, if present, will be removed.</para>
+  
 <simplesect>
 <title>Document properties</title>
-<para feature="unwrap-preserves-all">All document properties are preserved.</para>
+    <para feature="unwrap-preserves-all">All document properties are preserved unless the step
+      changes the document’s content type. In that case the <code>content-type</code> document
+      property will reflect the new content type and the (optional) <code>serialization</code> document
+      property will be removed.</para>
 </simplesect>
 </section>
 <section xml:id="c.uuid">
